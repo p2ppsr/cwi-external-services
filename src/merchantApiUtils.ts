@@ -1,7 +1,6 @@
-import { MapiResponseApi, MapiTxidReturnResultApi, MapiTxStatusPayloadApi } from "./Api/MerchantApi";
+import { asString, bsv } from "@cwi/base";
 
-import * as bsv from '@ts-bitcoin/core';
-import { asString } from "@cwi/base";
+import { MapiResponseApi, MapiTxidReturnResultApi, MapiTxStatusPayloadApi } from "./Api/MerchantApi";
 
 /**
  * Verifies the payload signature on a mAPI response object
