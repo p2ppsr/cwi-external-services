@@ -17,6 +17,6 @@
     "composite": true,
     "noImplicitOverride": true
   },
-  "include": ["src/**/*", "test/**/*"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "jest.config.ts"]
 }

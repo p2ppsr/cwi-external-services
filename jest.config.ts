@@ -16,10 +16,10 @@ export default async (): Promise<Config> => {
     modulePathIgnorePatterns: [],
     // Default is 'node'
     testEnvironment: 'node',
-    // default [ '**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[tj]s?(x)' ]
-    testMatch: [ '**/?(*.)+(test).[tj]s' ],
-    // default []
-    testRegex: [],
+    // testMatch, default [ '**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[tj]s?(x)' ], exclusive with testRegex
+    //testMatch: [],
+    // testRegex, default (/__tests__/.*|(\\.|/)(test|spec))\\.[jt]sx?$, exclusive with testMatch
+    testRegex: ['test/.*\\.test\\.[jt]s'],
     transform: { '^.+\\.ts$': ['ts-jest', { 'rootDir': "." }] },
   }
 }
