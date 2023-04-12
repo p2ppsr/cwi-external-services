@@ -1,5 +1,16 @@
 import { asBuffer, asString, BlockHeader, ChaintracksClientApi, computeRootFromMerkleProofNodes, doubleSha256HashLE, readVarUint32LE } from "@cwi/base";
 import { TscMerkleProofApi } from "./Api/MerchantApi";
+import {
+    ERR_EXTSVS_BLOCK_HASH_MISSING,
+    ERR_EXTSVS_BLOCK_HEIGHT_MISSING,
+    ERR_EXTSVS_MERKLEPROOF_NODE_TYPE,
+    ERR_EXTSVS_MERKLEPROOF_PARSING,
+    ERR_EXTSVS_MERKLEPROOF_TAGET_TYPE,
+    ERR_EXTSVS_MERKLEPROOF_UNSUPORTED,
+    ERR_EXTSVS_MERKLEROOT_INVALID,
+    ERR_EXTSVS_MERKLEROOT_MISSING,
+    ERR_EXTSVS_TXID_INVALID
+} from './ERR_EXTSVS_errors'
 
 /**
  * Implement merkle proof per https://tsc.bitcoinassociation.net/standards/merkle-proof-standardised-format/
@@ -36,14 +47,14 @@ export async function checkMerkleProof(txid: string | Buffer, proof: TscMerklePr
 
     const txidMustMatch = async (proofTxid: string | Buffer) => {
         if (asString(txid) !== asString(proofTxid))
-            throw new Error(`Expected txid ${asString(txid)} doesn't match proof txid ${asString(proofTxid)}`)
+            throw new ERR_EXTSVS_TXID_INVALID(asString(txid), asString(proofTxid))
     }
 
     let header: BlockHeader | undefined
 
     const merkleRootMustBeActive = async (merkleRoot: string | Buffer) => {
         header = await chaintracks.findHeaderForMerkleRoot(asBuffer(merkleRoot))
-        if (!header) throw new Error(`MerkleRoot ${asString(merkleRoot)} was not found in active chain.`)
+        if (!header) throw new ERR_EXTSVS_MERKLEROOT_MISSING(asString(merkleRoot))
     }
 
     if (proofIsBuffer) {
@@ -68,7 +79,7 @@ export async function checkMerkleProof(txid: string | Buffer, proof: TscMerklePr
                 offset += 32;
                 header = await chaintracks.findHeaderForBlockHash(blockHash)
                 if (!header)
-                    throw new Error(`Header for block hash ${blockHash} was not found.`);
+                    throw new ERR_EXTSVS_BLOCK_HASH_MISSING(asString(blockHash));
                 p.target = header.merkleRoot
             } break;
             case 1: // block header
@@ -86,11 +97,11 @@ export async function checkMerkleProof(txid: string | Buffer, proof: TscMerklePr
                 let height = 0;
                 ({ val: height, offset } = readVarUint32LE(proof, offset));
                 header = await chaintracks.findHeaderForHeight(height)
-                if (!header) throw new Error(`No header found matching height ${height}`)
+                if (!header) throw new ERR_EXTSVS_BLOCK_HEIGHT_MISSING(height)
                 p.target = header.merkleRoot
             } break;
             default:
-                throw new Error(`Unsupported target type. ${targetType}`);
+                throw new ERR_EXTSVS_MERKLEPROOF_TAGET_TYPE(targetType)
         }
         let nodeCount = 0;
         ({ val: nodeCount, offset } = readVarUint32LE(proof, offset));
@@ -105,21 +116,21 @@ export async function checkMerkleProof(txid: string | Buffer, proof: TscMerklePr
                 case 1: // duplicate, no extra value needed
                     break;
                 case 2: // index (extension format), probably a varint for length + that many bytes...
-                    throw new Error(`Unsupported node type. ${nodeType}`);
+                    throw new ERR_EXTSVS_MERKLEPROOF_NODE_TYPE(nodeType)
                 default:
-                    throw new Error(`Unsupported node type. ${nodeType}`);
+                    throw new ERR_EXTSVS_MERKLEPROOF_NODE_TYPE(nodeType)
             }
         }
         p.nodes = proof.subarray(offset, offset + nodesLength);
         offset += nodesLength;
         if (offset !== proof.length)
-            throw new Error("Probable proof parsing error.");
+            throw new ERR_EXTSVS_MERKLEPROOF_PARSING()
     } else {
         p = { ...proof };
         if (p.proofType === "tree")
-            throw new Error("'tree' proofType is not currently supported.");
+            throw new ERR_EXTSVS_MERKLEPROOF_TAGET_TYPE(p.proofType)
         if (p.composite === true)
-            throw new Error("Composite proofs are not currently supported.");
+            throw new ERR_EXTSVS_MERKLEPROOF_UNSUPORTED('composite')
 
         // p.txOrId
         // Convert hex to buffer.
@@ -144,14 +155,14 @@ export async function checkMerkleProof(txid: string | Buffer, proof: TscMerklePr
             case "height": {
                 const height = Number(p.target)
                 header = await chaintracks.findHeaderForHeight(height)
-                if (!header) throw new Error(`No header found matching height ${height}`)
+                if (!header) throw new ERR_EXTSVS_BLOCK_HEIGHT_MISSING(height)
                 p.target = header.merkleRoot
             } break;
             case "hash":
             default:
                 header = await chaintracks.findHeaderForBlockHash(asBuffer(p.target))
                 if (!header)
-                    throw new Error(`Header for block hash ${p.target} was not found.`);
+                    throw new ERR_EXTSVS_BLOCK_HASH_MISSING(asString(p.target));
                 p.target = header.merkleRoot
                 break;
         }
@@ -163,10 +174,10 @@ export async function checkMerkleProof(txid: string | Buffer, proof: TscMerklePr
     const computedRoot = computeRootFromMerkleProofNodes(p.index, p.txOrId, p.nodes);
 
     if (!computedRoot.equals(p.target))
-        throw new Error(`Computed root ${asString(computedRoot)} doesn't equal expected root ${asString(p.target)}`)
+        throw new ERR_EXTSVS_MERKLEROOT_INVALID(asString(p.target), asString(computedRoot))
 
     if (!header)
-        throw new Error('Failed to retrieve active chain header containing target merkleRoot')
+        throw new ERR_EXTSVS_MERKLEROOT_MISSING()
     
     return header
 }

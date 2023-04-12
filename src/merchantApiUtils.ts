@@ -1,6 +1,13 @@
 import { asString, bsv } from "@cwi/base";
 
 import { MapiResponseApi, MapiTxidReturnResultApi, MapiTxStatusPayloadApi } from "./Api/MerchantApi";
+import {
+    ERR_EXTSVS_MAPI_SIGNATURE_INVALID,
+    ERR_EXTSVS_MAPI_UNSUPORTED_ENCODING,
+    ERR_EXTSVS_MAPI_UNSUPORTED_MIMETYPE,
+    ERR_EXTSVS_MAPI_UNSUPORTED_RETURNRESULT,
+    ERR_EXTSVS_TXID_INVALID
+} from "./ERR_EXTSVS_errors";
 
 /**
  * Verifies the payload signature on a mAPI response object
@@ -15,7 +22,7 @@ export function checkMapiResponse(response: MapiResponseApi) {
     const signature = new bsv.Sig().fromString(response.signature);
     const publicKey = new bsv.PubKey().fromString(response.publicKey);
     if (bsv.Ecdsa.verify(payloadHash, signature, publicKey) !== true) {
-        throw new Error('mAPI response signature check failed');
+        throw new ERR_EXTSVS_MAPI_SIGNATURE_INVALID()
     }
 }
 
@@ -30,9 +37,9 @@ export function checkMapiResponse(response: MapiResponseApi) {
 export function getMapiJsonResponsePayload<T>(response: MapiResponseApi): T {
     checkMapiResponse(response);
     if (response.mimetype && response.mimetype !== "application/json")
-        throw new Error(`mAPI response unsupported mimetype ${response.mimetype}`);
+        throw new ERR_EXTSVS_MAPI_UNSUPORTED_MIMETYPE(response.mimetype)
     if (response.encoding && response.encoding !== "UTF-8")
-        throw new Error(`mAPI response unsupported encoding ${response.encoding}`);
+        throw new ERR_EXTSVS_MAPI_UNSUPORTED_ENCODING(response.encoding)
     const payload = <T>JSON.parse(response.payload);
     return payload;
 }
@@ -56,17 +63,17 @@ export function getMapiTxStatusPayload(txid: string | Buffer, response: MapiResp
     const payload = getMapiJsonResponsePayload<MapiTxStatusPayloadApi>(response);
     txid = asString(txid)
     if (payload.txid !== txid)
-        throw new Error(`This mAPI response is supposed to be for ${txid} but it is for ${payload.txid} instead`);
+        throw new ERR_EXTSVS_TXID_INVALID(asString(txid), payload.txid)
     if (payload.returnResult !== 'success' && payload.returnResult !== 'failure')
-        throw new Error(`The mAPI return result was not 'success' or 'failure'`);
+        throw new ERR_EXTSVS_MAPI_UNSUPORTED_RETURNRESULT(payload.returnResult)
     return payload;
 }
 
 export function checkMapiResponseForTxid(response: MapiResponseApi, txid: string | Buffer) : boolean {
     const payload = getMapiJsonResponsePayload<MapiTxidReturnResultApi>(response)
     if (payload.txid !== asString(txid))
-        throw new Error(`This mAPI response is supposed to be for ${asString(txid)} but it is for ${payload.txid} instead`);
+        throw new ERR_EXTSVS_TXID_INVALID(asString(txid), payload.txid)
     if (payload.returnResult !== 'success')
-        throw new Error('The mAPI return result was not successful');
+        throw new ERR_EXTSVS_MAPI_UNSUPORTED_RETURNRESULT(payload.returnResult)
     return true
 }
