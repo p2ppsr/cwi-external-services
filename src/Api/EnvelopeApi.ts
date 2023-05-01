@@ -56,30 +56,37 @@ export interface EnvelopeApi {
 
 export type EnvelopeInputMapApi = Record<string, EnvelopeEvidenceApi>
 
+/**
+ * Either inputs or proof are required.
+ */
 export interface EnvelopeEvidenceApi {
-    /**
-     * double SHA256 hash of serialized rawTx. Optional.
-     */
-    txid?: string
     /**
      * A valid bitcoin transaction encoded as a hex string.
      */
     rawTx: string,
     /**
-     * Link up the inputs tree to the root for which child is undefined. 
-     */
-    child?: EnvelopeEvidenceApi
-    /**
-     * Either inputs or proof are required.
+     * Either proof, or inputs, must have a value.
+     * 
+     * If value is a Buffer, content is binary encoded serialized proof
+     * see: chaintracks-spv.utils.serializeTscMerkleProof
+     * 
      */
     proof?: TscMerkleProofApi | Buffer,
-    /**
-     * Array of mapi transaction status update responses
-     */
-    mapiResponses?: MapiResponseApi[]
     /**
      * Either inputs or proof are required.
      */
     inputs?: EnvelopeInputMapApi,
+    /**
+     * double SHA256 hash of serialized rawTx. Optional.
+     */
+    txid?: string
+    /**
+     * Link up the inputs tree to the root for which child is undefined. 
+     */
+    child?: EnvelopeEvidenceApi
+    /**
+     * Array of mapi transaction status update responses
+     */
+    mapiResponses?: MapiResponseApi[]
 }
 
