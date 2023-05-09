@@ -155,13 +155,6 @@ export async function getMerkleProofFromMetastreme(txid: string | Buffer, chain:
                 return proof
         }
         
-        const computedRoot = computeRootFromMerkleProofNodes(proof.index, txid, proof.nodes)
-
-        if (computedRoot.equals(Buffer.alloc(32)) || !computedRoot.equals(asBuffer(proof.target)))
-            return undefined
-
-        return proof
-
     } catch { /* ignore */ }
 
     return undefined
@@ -230,11 +223,6 @@ export async function getMerkleProofFromWhatsOnChain(txid: string | Buffer, chai
             nodes: wocProof.branches.map(x => x.hash),
         }
 
-        const computedRoot = computeRootFromMerkleProofNodes(proof.index, txid, proof.nodes)
-
-        if (computedRoot.equals(Buffer.alloc(32)) || !computedRoot.equals(asBuffer(proof.target)))
-            return undefined
-
         return proof
 
     } catch { /* ignore */ }
@@ -269,11 +257,6 @@ export async function getMerkleProofFromWhatsOnChainTsc(txid: string | Buffer, c
             targetType: 'hash',
             nodes: wocProof.nodes
         }
-
-        const computedRoot = computeRootFromMerkleProofNodes(proof.index, txid, proof.nodes)
-
-        if (computedRoot.equals(Buffer.alloc(32)) || !computedRoot.equals(asBuffer(proof.target)))
-            return undefined
 
         return proof
 

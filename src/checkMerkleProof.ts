@@ -52,8 +52,8 @@ export async function checkMerkleProof(txid: string | Buffer, proof: TscMerklePr
 
     let header: BlockHeader | undefined
 
-    const merkleRootMustBeActive = async (merkleRoot: string | Buffer) => {
-        header = await chaintracks.findHeaderForMerkleRoot(asBuffer(merkleRoot))
+    const merkleRootMustBeActive = async (merkleRoot: string | Buffer, height?: number) => {
+        header = await chaintracks.findHeaderForMerkleRoot(asBuffer(merkleRoot), height)
         if (!header) throw new ERR_EXTSVS_MERKLEROOT_MISSING(asString(merkleRoot))
     }
 
@@ -145,12 +145,12 @@ export async function checkMerkleProof(txid: string | Buffer, proof: TscMerklePr
             case "header":
                 // pull out just the merkle root of the header
                 p.target = asBuffer(p.target).subarray(36, 68).reverse();
-                await merkleRootMustBeActive(p.target)
+                await merkleRootMustBeActive(p.target, p.height)
                 break;
             case "merkleRoot":
                 // no action needed
                 p.target = asBuffer(p.target)
-                await merkleRootMustBeActive(p.target)
+                await merkleRootMustBeActive(p.target, p.height)
                 break;
             case "height": {
                 const height = Number(p.target)
@@ -173,8 +173,11 @@ export async function checkMerkleProof(txid: string | Buffer, proof: TscMerklePr
     }
     const computedRoot = computeRootFromMerkleProofNodes(p.index, p.txOrId, p.nodes);
 
-    if (!computedRoot.equals(p.target))
+    if (!computedRoot.equals(p.target)) {
+        // eslint-disable-next-line no-debugger
+        debugger
         throw new ERR_EXTSVS_MERKLEROOT_INVALID(asString(p.target), asString(computedRoot))
+    }
 
     if (!header)
         throw new ERR_EXTSVS_MERKLEROOT_MISSING()

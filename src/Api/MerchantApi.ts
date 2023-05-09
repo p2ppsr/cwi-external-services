@@ -28,6 +28,11 @@ export interface MapiResponseApi {
  */
 export interface TscMerkleProofApi {
     /**
+     * The most efficient way of confirming a proof should also be the most common,
+     * when the containing block's height is known.
+     */
+    height?: number
+    /**
      * Index of transaction in its block. First transaction is index zero.
      */
     index: number
