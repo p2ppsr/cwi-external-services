@@ -174,8 +174,6 @@ export async function checkMerkleProof(txid: string | Buffer, proof: TscMerklePr
     const computedRoot = computeRootFromMerkleProofNodes(p.index, p.txOrId, p.nodes);
 
     if (!computedRoot.equals(p.target)) {
-        // eslint-disable-next-line no-debugger
-        debugger
         throw new ERR_EXTSVS_MERKLEROOT_INVALID(asString(p.target), asString(computedRoot))
     }
 
