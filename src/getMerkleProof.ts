@@ -2,7 +2,7 @@
 //import { computeMerkleTreeParent, computeRootFromMerkleProofNodes, getMapiTxStatusPayload } from './spvVerifierUtils'
 //import { asBuffer, asString, Chain } from '@cwi/chaintracks-base'
 
-import { asBuffer, asString, Chain, computeMerkleTreeParent, computeRootFromMerkleProofNodes } from '@cwi/base'
+import { asBuffer, asString, Chain, computeMerkleTreeParent, computeRootFromMerkleProofNodes } from 'cwi-base'
 import axios from 'axios'
 import { MapiResponseApi, TscMerkleProofApi } from './Api/MerchantApi'
 import { getMapiTxStatusPayload } from './merchantApiUtils'

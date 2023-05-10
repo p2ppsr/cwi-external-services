@@ -30,8 +30,8 @@
     "test:coverage": "jest --coverage",
     "checknpmi": "npm i --silent && (cd ../cwi-base && npm i --silent)",
     "tolocal": "npm i ../cwi-base --silent",
-    "tonpm": "npm run tonone && npm i @cwi/base --silent",
-    "tonone": "npm remove @cwi/base --silent"
+    "tonpm": "npm run tonone && npm i cwi-base --silent",
+    "tonone": "npm remove cwi-base --silent"
   },
   "devDependencies": {
     "@types/bn.js": "^5.1.1",

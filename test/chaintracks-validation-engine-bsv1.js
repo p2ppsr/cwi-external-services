@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable no-undef */
-const { utils } = require('@cwi/base')
+const { utils } = require('cwi-base')
 
 const getMerkleTreeParent = (leftNode, rightNode) => {
   // swap endianness before concatenating

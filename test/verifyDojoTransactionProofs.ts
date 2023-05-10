@@ -1,6 +1,6 @@
 import { checkMerkleProof } from "./chaintracks-validation-engine-bsv1";
 
-import { asBuffer, asString, computeRootFromMerkleProofNodes } from "@cwi/base";
+import { asBuffer, asString, computeRootFromMerkleProofNodes } from "cwi-base";
 import { Knex, knex } from "knex";
 import { TscMerkleProofApi } from "../src/Api/MerchantApi";
 import { getMerkleProofFromTaal } from "../src/getMerkleProof";

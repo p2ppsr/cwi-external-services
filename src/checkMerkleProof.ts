@@ -1,4 +1,4 @@
-import { asBuffer, asString, BlockHeader, ChaintracksClientApi, computeRootFromMerkleProofNodes, doubleSha256HashLE, readVarUint32LE } from "@cwi/base";
+import { asBuffer, asString, BlockHeader, ChaintracksClientApi, computeRootFromMerkleProofNodes, doubleSha256HashLE, readVarUint32LE } from "cwi-base";
 import { TscMerkleProofApi } from "./Api/MerchantApi";
 import {
     ERR_EXTSVS_BLOCK_HASH_MISSING,

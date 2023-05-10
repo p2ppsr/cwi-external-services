@@ -1,4 +1,4 @@
-import { asString, bsv } from "@cwi/base";
+import { asString, bsv } from "cwi-base";
 
 import { MapiResponseApi, MapiTxidReturnResultApi, MapiTxStatusPayloadApi } from "./Api/MerchantApi";
 import {

@@ -1,4 +1,4 @@
-import { CwiError } from "@cwi/base";
+import { CwiError } from "cwi-base";
 
 export class ERR_EXTSVS_TXID_INVALID extends CwiError { constructor(expected?: string, actual?: string) { super('ERR_EXTSVS_TXID_INVALID', `Expected txid ${expected} doesn't match proof txid ${actual}`) } }
 export class ERR_EXTSVS_MERKLEROOT_INVALID extends CwiError { constructor(expected?: string, actual?: string) { super('ERR_EXTSVS_MERKLEROOT_INVALID', `Expected merkleRoot ${expected} doesn't match computed ${actual}`) } }
