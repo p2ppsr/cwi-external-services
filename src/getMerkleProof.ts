@@ -245,7 +245,7 @@ export async function getMerkleProofFromWhatsOnChainTsc(txid: string | Buffer, c
 
     try {
         const { data } = await axios.get(`https://api.whatsonchain.com/v1/bsv/${chain}/tx/${txid}/proof/tsc`)
-        if (data.length !== 1)
+        if (data.length < 1)
             return undefined
 
         const wocProof = data[0] as WhatsOnChainProofTsc

@@ -27,6 +27,15 @@ describe("getMerkleProof", () => {
     ]
 
     const unknownTxid = 'fffe38ace373720984d9f77dc2fd9dea0e8b660ac6b39ae49a7961621264efff'
+    
+    const orphanedTxid = 'b37a0afaad97930f2b08b080557dbea5e49bbb78fba78235c57d4acdd97c3054'
+
+    test.skip("WoC orphanedTxid", async () => {
+        const r = await getMerkleProofFromWhatsOnChain(orphanedTxid, 'test')
+        // Transaction was mined in an orphaned block as well as an active block
+        // Result should actually be multiple proofs
+        expect(r).toBeTruthy()
+    }, 400000)
 
     test.skip("verify dojo transaction proofs", async () => {
         const r = await verifyDojoTransactionProof(mainDojoConnection, mainTaalApiKey, false)
