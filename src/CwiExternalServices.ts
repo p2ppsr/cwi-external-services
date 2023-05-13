@@ -1,35 +1,8 @@
-import { Chain, CwiError, asBuffer, asString, computeMerkleTreeParent } from "cwi-base"
+import { Chain, ChaintracksClientApi, CwiError, ERR_TXID_INVALID, asBuffer, asString, computeMerkleTreeParent, doubleSha256BE } from "cwi-base"
 import { MapiResponseApi, TscMerkleProofApi } from "./Api/MerchantApi"
 import axios from 'axios'
 import { getMapiTxStatusPayload } from "./merchantApiUtils"
-
-export interface GetMerkleProofResultApi {
-    /**
-     * The name of the service returning the proof, or undefined if no proof
-     */
-    name?: string
-    /**
-     * Multiple proofs may be returned when a transaction also appears in
-     * one or more orphaned blocks
-     */
-    proof?: TscMerkleProofApi | TscMerkleProofApi[]
-    /**
-     * The first valid mapi response received from a service, if any.
-     * Relevant when no proof was received.
-     * @param name the service that generated the mapi response
-     */
-    mapi?: { name?: string, resp: MapiResponseApi }
-    /**
-     * The first exception error that occurred during processing, if any.
-     * @param name the service that triggered the exception
-     */
-    error?: { name?: string, err: CwiError }
-}
-
-export interface GetMerkleProofServiceApi {
-    name: string
-    service: (txid: string | Buffer, chain: Chain) => Promise<GetMerkleProofResultApi>
-}
+import { GetMerkleProofResultApi, GetMerkleProofServiceApi, GetRawTxResultApi, GetRawTxServiceApi } from "./Api/CwiExternalServicesApi"
 
 interface WhatsOnChainProofBranch {
     hash: string,
@@ -80,32 +53,77 @@ export class CwiExternalServices {
     }
 
     options: CwiExternalServicesOptions
+
     getProofServices: GetMerkleProofServiceApi[]
     getProofServicesIndex = 0
+
+    getRawTxServices: GetRawTxServiceApi[]
+    getRawTxServicesIndex = 0
 
     constructor(options?: CwiExternalServicesOptions) {
         this.options = options || CwiExternalServices.createDefaultOptions()
         
-        const a: GetMerkleProofServiceApi[] = []
+        const proofs: GetMerkleProofServiceApi[] = []
+        proofs.push({ name: 'WhatsOnChain', service: CwiExternalServices.getMerkleProofFromWhatsOnChain})
+        proofs.push({ name: 'WhatsOnChainTsc', service: CwiExternalServices.getMerkleProofFromWhatsOnChainTsc})
+        proofs.push({ name: 'MetaStreme', service: CwiExternalServices.getMerkleProofFromMetastreme})
+        proofs.push({ name: 'GorillaPool', service: CwiExternalServices.getMerkleProofFromGorillaPool})
+        proofs.push(this.makeTaal())
+        this.getProofServices = proofs
         
-        a.push({ name: 'WhatsOnChain', service: CwiExternalServices.getMerkleProofFromWhatsOnChain})
-        a.push({ name: 'WhatsOnChainTsc', service: CwiExternalServices.getMerkleProofFromWhatsOnChainTsc})
-        a.push({ name: 'MetaStreme', service: CwiExternalServices.getMerkleProofFromMetastreme})
-        a.push({ name: 'GorillaPool', service: CwiExternalServices.getMerkleProofFromGorillaPool})
-        a.push(this.makeTaal())
-        
-        this.getProofServices = a
+        const rawTxs: GetRawTxServiceApi[] = []
+        rawTxs.push({ name: 'WhatsOnChain', service: CwiExternalServices.getRawTxFromWhatsOnChain})
+        this.getRawTxServices = rawTxs
     }
 
     private makeTaal(): GetMerkleProofServiceApi {
         return {
-            name: 'Taaol',
+            name: 'Taal',
             service: (txid: string | Buffer, chain: Chain) => {
                 const mainApiKey = this.options.mainTaalApiKey || ''
                 const testApiKey = this.options.testTaalApiKey || ''
                 return CwiExternalServices.getMerkleProofFromTaal(txid, chain === 'main' ? mainApiKey : testApiKey)
             }
         }
+    }
+
+    private nextRawTxServicesIndex() {
+        this.getRawTxServicesIndex = (this.getRawTxServicesIndex + 1) % this.getRawTxServices.length
+        return this.getRawTxServicesIndex
+    }
+
+    async getRawTx(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetRawTxResultApi> {
+        
+        if (useNext)
+            this.nextProofServicesIndex()
+
+        const r0: GetRawTxResultApi = { txid: asString(txid) }
+
+        for (let tries = 0; tries < this.getRawTxServices.length; tries++) {
+            const service = this.getRawTxServices[this.getRawTxServicesIndex]
+            const r = await service.service(txid, chain)
+            if (r.rawTx) {
+                const hash = asString(doubleSha256BE(r.rawTx))
+                // Confirm transaction hash matches txid
+                if (hash === asString(txid)) {
+                    // If we have a proof, call it done.
+                    r0.rawTx = r.rawTx
+                    r0.name = r.name
+                    break
+                }
+                r.error = { name: r.name, err: new ERR_TXID_INVALID() }
+                r.rawTx = undefined
+            }
+            if (r.mapi && !r0.mapi)
+                // If we have a mapi response and didn't before...
+                r0.mapi = r.mapi
+            if (r.error && !r0.error)
+                // If we have an error and didn't before...
+                r0.error = r.error
+
+            this.nextRawTxServicesIndex()
+        }
+        return r0
     }
 
     private nextProofServicesIndex() {
@@ -139,6 +157,25 @@ export class CwiExternalServices {
             this.nextProofServicesIndex()
         }
         return r0
+    }
+
+    static async getRawTxFromWhatsOnChain(txid: string | Buffer, chain: Chain): Promise<GetRawTxResultApi> {
+
+        const r: GetRawTxResultApi = { name: 'WoC', txid: asString(txid) }
+
+        try {
+            const url = `https://api.whatsonchain.com/v1/bsv/${chain}/tx/${txid}/hex`
+            const { data } = await axios.get(url)
+            if (!data)
+               return r 
+
+            r.rawTx = asBuffer(data)
+
+        } catch (err: unknown) {
+            r.error = { name: r.name, err: CwiError.fromUnknown(err) }
+        }
+
+        return r
     }
 
     /**

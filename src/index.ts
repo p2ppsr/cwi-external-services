@@ -1,4 +1,5 @@
 export * from './ERR_EXTSVS_errors'
+export * from './Api/CwiExternalServicesApi'
 export * from './Api/EnvelopeApi'
 export * from './Api/MerchantApi'
 export * from './merchantApiUtils'

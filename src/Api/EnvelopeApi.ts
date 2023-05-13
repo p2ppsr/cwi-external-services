@@ -25,31 +25,42 @@ import { MapiResponseApi, TscMerkleProofApi } from "./MerchantApi"
  */
 export interface EnvelopeApi {
     /**
-     * Array of 80 byte block headers encoded as 160 character hex strings
+     * A valid bitcoin transaction encoded as a hex string.
      */
-    headers?: string[],
+    rawTx: string,
     /**
      * double SHA256 hash of serialized rawTx. Optional.
      */
     txid?: string
     /**
-     * A valid bitcoin transaction encoded as a hex string.
-     */
-    rawTx: string,
-    /**
-     * Either inputs or proof are required.
+     * Only one of proof or inputs must be valid.
+     * Leaf nodes have proofs.
      */
     proof?: TscMerkleProofApi,
     /**
-     * Array of mapi transaction status update responses
-     */
-    mapiResponses?: MapiResponseApi[]
-    /**
-     * Either inputs or proof are required.
+     * Only one of proof or inputs must be valid.
+     * Branching nodes have inputs with a sub envelope (values) for every input transaction txid (keys)
      */
     inputs?: EnvelopeInputMapApi,
     /**
-     * 
+     * count of maximum number of chained unproven transactions before a proven leaf node
+     * proof nodes have depth zero.
+     */
+    depth?: number
+    /**
+     * For root nodes only.
+     * Array of 80 byte block headers encoded as 160 character hex strings
+     * Include headers the envelope creator is aware of but which the resipient may not have.
+     */
+    headers?: string[],
+    /**
+     * Branching inputs nodes only.
+     * Array of mapi transaction status update responses confirming
+     * unproven transctions have at least been submitted for processing.
+     */
+    mapiResponses?: MapiResponseApi[]
+    /**
+     * Arbitrary reference string associated with the envelope, typically root node only.
      */
     reference?: string
 }
@@ -82,11 +93,18 @@ export interface EnvelopeEvidenceApi {
     txid?: string
     /**
      * Link up the inputs tree to the root for which child is undefined. 
+     * Not valid in stringified envelopes??
      */
     child?: EnvelopeEvidenceApi
     /**
      * Array of mapi transaction status update responses
+     * Only the payload, signature, and publicKey properties are relevant.
      */
     mapiResponses?: MapiResponseApi[]
+    /**
+     * count of maximum number of chained unproven transactions before a proven leaf node
+     * proof nodes have depth zero.
+     */
+    depth?: number
 }
 
