@@ -1,42 +1,9 @@
-import { Chain, ChaintracksClientApi, CwiError, ERR_TXID_INVALID, asBuffer, asString, computeMerkleTreeParent, doubleSha256BE } from "cwi-base"
+import { Chain, CwiError, ERR_TXID_INVALID, asBuffer, asString, computeMerkleTreeParent, doubleSha256BE } from "cwi-base"
 import { MapiResponseApi, TscMerkleProofApi } from "./Api/MerchantApi"
 import axios from 'axios'
 import { getMapiTxStatusPayload } from "./merchantApiUtils"
-import { GetMerkleProofResultApi, GetMerkleProofServiceApi, GetRawTxResultApi, GetRawTxServiceApi } from "./Api/CwiExternalServicesApi"
-
-interface WhatsOnChainProofBranch {
-    hash: string,
-    pos: "R" | "L"
-}
-
-interface WhatsOnChainProof {
-    blockHash: string,
-    branches: WhatsOnChainProofBranch[],
-    hash: string,
-    merkleRoot: string
-}
-
-interface WhatsOnChainProofTsc {
-    index: number,
-    txOrId: string,
-    target: string,
-    nodes: string[]
-}
-
-function computeIndexFromWhatsOnChainProof(proof: WhatsOnChainProof) : number {
-    let c = asBuffer(proof.hash)
-    let a = ''
-    for (let level = 0; level < proof.branches.length; level++) {
-        const b = proof.branches[level]
-        const p = asBuffer(b.hash)
-        const pIsLeft = b.pos === 'L' && !p.equals(c)
-        a = (pIsLeft ? '1' : '0') + a
-        c = pIsLeft
-            ? computeMerkleTreeParent(p, c)
-            : computeMerkleTreeParent(c, p);
-    }
-    return parseInt(a, 2);
-}
+import { GetMerkleProofResultApi, GetMerkleProofServiceApi, GetRawTxResultApi, GetRawTxServiceApi, MapiCallbackApi, PostRawTxResultApi, PostRawTxServiceApi } from "./Api/CwiExternalServicesApi"
+import { ServiceCollection } from "./ServiceCollection"
 
 export interface CwiExternalServicesOptions {
     mainTaalApiKey?: string
@@ -54,54 +21,52 @@ export class CwiExternalServices {
 
     options: CwiExternalServicesOptions
 
-    getProofServices: GetMerkleProofServiceApi[]
-    getProofServicesIndex = 0
-
-    getRawTxServices: GetRawTxServiceApi[]
-    getRawTxServicesIndex = 0
+    getProofs: ServiceCollection<GetMerkleProofServiceApi>
+    getRawTxs: ServiceCollection<GetRawTxServiceApi>
+    postRawTxs: ServiceCollection<PostRawTxServiceApi>
 
     constructor(options?: CwiExternalServicesOptions) {
         this.options = options || CwiExternalServices.createDefaultOptions()
         
-        const proofs: GetMerkleProofServiceApi[] = []
-        proofs.push({ name: 'WhatsOnChain', service: CwiExternalServices.getMerkleProofFromWhatsOnChain})
-        proofs.push({ name: 'WhatsOnChainTsc', service: CwiExternalServices.getMerkleProofFromWhatsOnChainTsc})
-        proofs.push({ name: 'MetaStreme', service: CwiExternalServices.getMerkleProofFromMetastreme})
-        proofs.push({ name: 'GorillaPool', service: CwiExternalServices.getMerkleProofFromGorillaPool})
-        proofs.push(this.makeTaal())
-        this.getProofServices = proofs
+        this.getProofs = new ServiceCollection<GetMerkleProofServiceApi>()
+        .add({ name: 'WhatsOnChain', service: CwiExternalServices.getMerkleProofFromWhatsOnChain})
+        .add({ name: 'WhatsOnChainTsc', service: CwiExternalServices.getMerkleProofFromWhatsOnChainTsc})
+        .add({ name: 'MetaStreme', service: CwiExternalServices.getMerkleProofFromMetastreme})
+        .add({ name: 'GorillaPool', service: CwiExternalServices.getMerkleProofFromGorillaPool})
+        .add({ name: 'Taal', service: this.makeGetMerkleProofFromTaalService() })
         
-        const rawTxs: GetRawTxServiceApi[] = []
-        rawTxs.push({ name: 'WhatsOnChain', service: CwiExternalServices.getRawTxFromWhatsOnChain})
-        this.getRawTxServices = rawTxs
+        this.getRawTxs = new ServiceCollection<GetRawTxServiceApi>()
+        .add({ name: 'WhatsOnChain', service: CwiExternalServices.getRawTxFromWhatsOnChain})
+
+        this.postRawTxs = new ServiceCollection<PostRawTxServiceApi>()
     }
 
-    private makeTaal(): GetMerkleProofServiceApi {
-        return {
-            name: 'Taal',
-            service: (txid: string | Buffer, chain: Chain) => {
-                const mainApiKey = this.options.mainTaalApiKey || ''
-                const testApiKey = this.options.testTaalApiKey || ''
-                return CwiExternalServices.getMerkleProofFromTaal(txid, chain === 'main' ? mainApiKey : testApiKey)
-            }
+    private makeGetMerkleProofFromTaalService(): GetMerkleProofServiceApi {
+        return (txid: string | Buffer, chain: Chain) => {
+            const mainApiKey = this.options.mainTaalApiKey || ''
+            const testApiKey = this.options.testTaalApiKey || ''
+            return CwiExternalServices.getMerkleProofFromTaal(txid, chain === 'main' ? mainApiKey : testApiKey)
         }
     }
 
-    private nextRawTxServicesIndex() {
-        this.getRawTxServicesIndex = (this.getRawTxServicesIndex + 1) % this.getRawTxServices.length
-        return this.getRawTxServicesIndex
+    async postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]> {
+        
+        return await Promise.all(this.postRawTxs.allServices.map(async service => {
+            const r = await service(rawTx, chain, callback)
+            return r
+        }))
     }
 
     async getRawTx(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetRawTxResultApi> {
         
         if (useNext)
-            this.nextProofServicesIndex()
+            this.getRawTxs.next()
 
         const r0: GetRawTxResultApi = { txid: asString(txid) }
 
-        for (let tries = 0; tries < this.getRawTxServices.length; tries++) {
-            const service = this.getRawTxServices[this.getRawTxServicesIndex]
-            const r = await service.service(txid, chain)
+        for (let tries = 0; tries < this.getRawTxs.count; tries++) {
+            const service = this.getRawTxs.service
+            const r = await service(txid, chain)
             if (r.rawTx) {
                 const hash = asString(doubleSha256BE(r.rawTx))
                 // Confirm transaction hash matches txid
@@ -121,26 +86,21 @@ export class CwiExternalServices {
                 // If we have an error and didn't before...
                 r0.error = r.error
 
-            this.nextRawTxServicesIndex()
+            this.getRawTxs.next()
         }
         return r0
-    }
-
-    private nextProofServicesIndex() {
-        this.getProofServicesIndex = (this.getProofServicesIndex + 1) % this.getProofServices.length
-        return this.getProofServicesIndex
     }
 
     async getMerkleProof(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetMerkleProofResultApi> {
         
         if (useNext)
-            this.nextProofServicesIndex()
+            this.getProofs.next()
 
         const r0: GetMerkleProofResultApi = {}
 
-        for (let tries = 0; tries < this.getProofServices.length; tries++) {
-            const service = this.getProofServices[this.getProofServicesIndex]
-            const r = await service.service(txid, chain)
+        for (let tries = 0; tries < this.getProofs.count; tries++) {
+            const service = this.getProofs.service
+            const r = await service(txid, chain)
             if (r.proof) {
                 // If we have a proof, call it done.
                 r0.proof = r.proof
@@ -154,7 +114,7 @@ export class CwiExternalServices {
                 // If we have an error and didn't before...
                 r0.error = r.error
 
-            this.nextProofServicesIndex()
+            this.getProofs.next()
         }
         return r0
     }
@@ -369,4 +329,38 @@ export class CwiExternalServices {
 
         return r
     }
+}
+
+interface WhatsOnChainProofBranch {
+    hash: string,
+    pos: "R" | "L"
+}
+
+interface WhatsOnChainProof {
+    blockHash: string,
+    branches: WhatsOnChainProofBranch[],
+    hash: string,
+    merkleRoot: string
+}
+
+interface WhatsOnChainProofTsc {
+    index: number,
+    txOrId: string,
+    target: string,
+    nodes: string[]
+}
+
+function computeIndexFromWhatsOnChainProof(proof: WhatsOnChainProof) : number {
+    let c = asBuffer(proof.hash)
+    let a = ''
+    for (let level = 0; level < proof.branches.length; level++) {
+        const b = proof.branches[level]
+        const p = asBuffer(b.hash)
+        const pIsLeft = b.pos === 'L' && !p.equals(c)
+        a = (pIsLeft ? '1' : '0') + a
+        c = pIsLeft
+            ? computeMerkleTreeParent(p, c)
+            : computeMerkleTreeParent(c, p);
+    }
+    return parseInt(a, 2);
 }

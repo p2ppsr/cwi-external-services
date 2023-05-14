@@ -1,6 +1,17 @@
 import { Chain, CwiError } from "cwi-base"
 import { MapiResponseApi, TscMerkleProofApi } from "./MerchantApi"
 
+export type GetMerkleProofServiceApi = (txid: string | Buffer, chain: Chain) => Promise<GetMerkleProofResultApi>
+
+export type GetRawTxServiceApi = (txid: string | Buffer, chain: Chain) => Promise<GetRawTxResultApi>
+
+export interface MapiCallbackApi {
+    id: string
+    url: string
+}
+
+export type PostRawTxServiceApi = (rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi) => Promise<PostRawTxResultApi>
+
 export interface GetMerkleProofResultApi {
     /**
      * The name of the service returning the proof, or undefined if no proof
@@ -24,14 +35,9 @@ export interface GetMerkleProofResultApi {
     error?: { name?: string, err: CwiError }
 }
 
-export interface GetMerkleProofServiceApi {
-    name: string
-    service: (txid: string | Buffer, chain: Chain) => Promise<GetMerkleProofResultApi>
-}
-
 export interface GetRawTxResultApi {
     /**
-     * The name of the service returning the proof, or undefined if no proof
+     * The name of the service returning the rawTx, or undefined if no rawTx
      */
     name?: string
     /**
@@ -56,7 +62,25 @@ export interface GetRawTxResultApi {
     error?: { name?: string, err: CwiError }
 }
 
-export interface GetRawTxServiceApi {
+export interface PostRawTxResultApi {
+    /**
+     * The name of the service to which the transaction was submitted for processing
+     */
     name: string
-    service: (txid: string | Buffer, chain: Chain) => Promise<GetRawTxResultApi>
+    /**
+     * 'success' - The transaction was accepted for processing
+     */
+    status: 'success' | 'error'
+    /**
+     * The first valid mapi response received from a service, if any.
+     * Relevant when no proof was received.
+     * @param name the service that generated the mapi response
+     */
+    mapi?: MapiResponseApi
+    /**
+     * The first exception error that occurred during processing, if any.
+     * @param name the service that triggered the exception
+     */
+    error?: CwiError
 }
+
