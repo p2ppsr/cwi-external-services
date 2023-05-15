@@ -29,9 +29,9 @@ const testMapiMinerTaal: PostTransactionMapiMinerApi = {
     authType: 'bearer',
 }
 
-export function postRawTxToGorillaPool(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi) : Promise<PostRawTxResultApi> {
-    if (chain === 'test') throw new ERR_BAD_REQUEST('GorillaPool does not support testNet.')
-    return postRawTxToMapiMiner(rawTx, mainMapiMinerGorillaPool, callback)
+export async function postRawTxToGorillaPool(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi) : Promise<PostRawTxResultApi> {
+    if (chain === 'test') return { name: 'GorillaPool', status: 'error', error: new ERR_BAD_REQUEST('GorillaPool does not support testNet.') }
+    return await postRawTxToMapiMiner(rawTx, mainMapiMinerGorillaPool, callback)
 }
 
 export function postRawTxToTaal(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi, apiKey?: string) : Promise<PostRawTxResultApi> {

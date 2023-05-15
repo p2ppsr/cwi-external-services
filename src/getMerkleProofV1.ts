@@ -1,7 +1,4 @@
-//import { MapiResponseApi, TscMerkleProofApi } from './Api/CwiExternalServicesApi'
-//import { computeMerkleTreeParent, computeRootFromMerkleProofNodes, getMapiTxStatusPayload } from './spvVerifierUtils'
-//import { asBuffer, asString, Chain } from '@cwi/chaintracks-base'
-
+// v1 DEPRECATION WARNING: These are obsolete implementations. Use CwiExternalServices class instead.
 import { asBuffer, asString, Chain, computeMerkleTreeParent, computeRootFromMerkleProofNodes } from 'cwi-base'
 import axios from 'axios'
 import { MapiResponseApi, TscMerkleProofApi } from './Api/MerchantApi'
