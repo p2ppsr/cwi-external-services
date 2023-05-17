@@ -23,30 +23,7 @@ import { MapiResponseApi, TscMerkleProofApi } from "./MerchantApi"
  * Section 2 of https://projectbabbage.com/assets/simplified-payments.pdf
  * https://gist.github.com/ty-everett/44b6a0e7f3d6c48439f9ff26068f8d8b
  */
-export interface EnvelopeApi {
-    /**
-     * A valid bitcoin transaction encoded as a hex string.
-     */
-    rawTx: string,
-    /**
-     * double SHA256 hash of serialized rawTx. Optional.
-     */
-    txid?: string
-    /**
-     * Only one of proof or inputs must be valid.
-     * Leaf nodes have proofs.
-     */
-    proof?: TscMerkleProofApi,
-    /**
-     * Only one of proof or inputs must be valid.
-     * Branching nodes have inputs with a sub envelope (values) for every input transaction txid (keys)
-     */
-    inputs?: EnvelopeInputMapApi,
-    /**
-     * count of maximum number of chained unproven transactions before a proven leaf node
-     * proof nodes have depth zero.
-     */
-    depth?: number
+export interface EnvelopeApi extends EnvelopeEvidenceApi {
     /**
      * For root nodes only.
      * Array of 80 byte block headers encoded as 160 character hex strings
@@ -54,18 +31,10 @@ export interface EnvelopeApi {
      */
     headers?: string[],
     /**
-     * Branching inputs nodes only.
-     * Array of mapi transaction status update responses confirming
-     * unproven transctions have at least been submitted for processing.
-     */
-    mapiResponses?: MapiResponseApi[]
-    /**
      * Arbitrary reference string associated with the envelope, typically root node only.
      */
     reference?: string
 }
-
-export type EnvelopeInputMapApi = Record<string, EnvelopeEvidenceApi>
 
 /**
  * Either inputs or proof are required.
@@ -77,14 +46,15 @@ export interface EnvelopeEvidenceApi {
     rawTx: string,
     /**
      * Either proof, or inputs, must have a value.
+     * Leaf nodes have proofs.
      * 
      * If value is a Buffer, content is binary encoded serialized proof
      * see: chaintracks-spv.utils.serializeTscMerkleProof
-     * 
      */
     proof?: TscMerkleProofApi | Buffer,
     /**
-     * Either inputs or proof are required.
+     * Only one of proof or inputs must be valid.
+     * Branching nodes have inputs with a sub envelope (values) for every input transaction txid (keys)
      */
     inputs?: EnvelopeInputMapApi,
     /**
@@ -92,13 +62,12 @@ export interface EnvelopeEvidenceApi {
      */
     txid?: string
     /**
-     * Link up the inputs tree to the root for which child is undefined. 
-     * Not valid in stringified envelopes??
-     */
-    child?: EnvelopeEvidenceApi
-    /**
      * Array of mapi transaction status update responses
      * Only the payload, signature, and publicKey properties are relevant.
+     *
+     * Branching inputs nodes only.
+     * Array of mapi transaction status update responses confirming
+     * unproven transctions have at least been submitted for processing.
      */
     mapiResponses?: MapiResponseApi[]
     /**
@@ -106,5 +75,15 @@ export interface EnvelopeEvidenceApi {
      * proof nodes have depth zero.
      */
     depth?: number
+    /**
+     * Link up the inputs tree to the root for which child is undefined. 
+     * Not valid in stringified envelopes??
+     */
+    child?: EnvelopeEvidenceApi
 }
+
+/**
+ * keys are txids
+ */
+export type EnvelopeInputMapApi = Record<string, EnvelopeEvidenceApi>
 
