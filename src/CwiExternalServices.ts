@@ -1,4 +1,4 @@
-import { Chain, ERR_MISSING_PARAMETER, ERR_TXID_INVALID, asString, doubleSha256BE } from "cwi-base"
+import { Chain, CwiError, ERR_MISSING_PARAMETER, ERR_TXID_INVALID, asString, doubleSha256BE } from "cwi-base"
 import { GetMerkleProofResultApi, GetMerkleProofServiceApi, GetRawTxResultApi, GetRawTxServiceApi } from "./Api/CwiExternalServicesApi"
 import { MapiCallbackApi, PostRawTxResultApi, PostRawTxServiceApi } from "./Api/CwiExternalServicesApi"
 import { ServiceCollection } from "./ServiceCollection"
@@ -6,6 +6,8 @@ import { ServiceCollection } from "./ServiceCollection"
 import { postRawTxToGorillaPool, postRawTxToTaal } from "./postRawTxServices"
 import { getRawTxFromWhatsOnChain } from "./getRawTxServices"
 import { getProofFromGorillaPool, getProofFromMetastreme, getProofFromTaal, getProofFromWhatsOnChain, getProofFromWhatsOnChainTsc } from "./getProofServices"
+import { getMapiPostTxResponse } from "./merchantApiUtils"
+import { ERR_EXTSVS_MAPI_MISSING } from "./ERR_EXTSVS_errors"
 
 export interface CwiExternalServicesOptions {
     mainTaalApiKey?: string
@@ -65,8 +67,35 @@ export class CwiExternalServices {
 
     async postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]> {
         
+        const txid = asString(doubleSha256BE(rawTx))
+        
         return await Promise.all(this.postRawTxs.allServices.map(async service => {
             const r = await service(rawTx, chain, callback)
+
+            // If mapi response, confirm signature of payload, check for success, check for already in mempool, check for double spend.
+            if (r.mapi) {
+                try {
+                    r.payload = getMapiPostTxResponse(r.mapi)
+                    r.txidChanged = r.payload.txid !== txid
+                } catch (e: unknown) {
+                    r.status = 'error'
+                    r.error = CwiError.fromUnknown(e)
+                }
+            }
+            if (r.status === 'success') {
+                if (!r.mapi) {
+                    r.status = 'error'
+                    r.error = new ERR_EXTSVS_MAPI_MISSING()
+                }
+                // "resultDescription": "" | "Transaction already mined into block" | "Already known"
+                const d = (r.payload?.resultDescription || '').toLowerCase()
+                r.alreadyKnown = d.indexOf('already mined') > -1 || d.indexOf('already known') > -1
+            } else {
+                if (r.payload) {
+                    // currently mapi has no reliable way of knowing these...
+                    r.doubleSpend = !!r.payload.conflictedWith
+                }
+            }
             return r
         }))
     }

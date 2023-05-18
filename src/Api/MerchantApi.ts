@@ -78,6 +78,47 @@ export interface MapiTxStatusPayloadApi {
  * Used to parse payloads when only confirmation that a miner acknowledges a specific txid matters.
  */
 export interface MapiTxidReturnResultApi {
+    apiVersion?: string // "1.5.0"
+    timestamp?: string // "2022-11-04T11:15:05.1234567Z"
     txid: string // hex encoded transaction hash
-    returnResult: string // "success"
+    returnResult: string // "success" | "failure"
+}
+
+/* Most recent, 2023-05-17, payload from mapi_responses table.
+{
+    "apiVersion": "1.5.0",
+    "timestamp": "2023-05-16T23:29:52.0703348Z",
+    "txid": "bac1aa272527df17a6151b6365d2062536ebd0bef9d2fd114247a2e162f5eb48",
+    "returnResult": "success",
+    "resultDescription": "",
+    "minerId": "030d1fe5c1b560efe196ba40540ce9017c20daa9504c4c4cec6184fc702d9f274e",
+    "currentHighestBlockHash": "00000000000004e382da3ae133702f2b51e9bc4921d1804a705976708f4a7bfd",
+    "currentHighestBlockHeight": 1552242,
+    "txSecondMempoolExpiry": 0,
+    "warnings": [],
+    "failureRetryable": false
+}
+{
+    "apiVersion":"1.5.0",
+    "timestamp":"2023-02-08T00:08:21.281829Z",
+    "txid":"e3a1c7519cd1fd6045a4fb77a15771f20d46c4008ab379a37bef93caac4e5d9d",
+    "returnResult":"success",
+    "resultDescription":"Transaction already mined into block" | "Already known"
+    "minerId":"030d1fe5c1b560efe196ba40540ce9017c20daa9504c4c4cec6184fc702d9f274e",
+    "currentHighestBlockHash":"000000000000014184a602349be8d97fd87d6e1ee4f66a26ca6974371f5e2247",
+    "currentHighestBlockHeight":1535997,"txSecondMempoolExpiry":0,"failureRetryable":false
+}
+*/
+/**
+ * Mapi payload from broadcast of a raw transaction for processing.
+ */
+export interface MapiPostTxResponseApi extends MapiTxidReturnResultApi {
+    resultDescription?: string // empty on success, error description on failure.
+    txSecondMempoolExpiry?: number // duration (minutes) Tx will be kept in the secondary mempool
+    warnings?: unknown[] // any DSNT protocol warnings provided by the system
+    failureRetryable?: boolean // if true, transaction may be resubmitted later
+    conflictedWith?: unknown[] // list of double spend transactions
+    minerId?: string // "030d1fe5c1b560efe196ba40540ce9017c20daa9504c4c4cec6184fc702d9f274e",
+    currentHighestBlockHash?: string // "00000000000004e382da3ae133702f2b51e9bc4921d1804a705976708f4a7bfd",
+    currentHighestBlockHeight?: number // 1552242,
 }

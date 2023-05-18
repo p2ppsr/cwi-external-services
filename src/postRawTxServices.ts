@@ -44,6 +44,14 @@ export function postRawTxToTaal(rawTx: string | Buffer, chain: Chain, callback?:
 export async function postRawTxToMapiMiner(rawTx: string | Buffer, miner: PostTransactionMapiMinerApi, callback?: MapiCallbackApi): Promise<PostRawTxResultApi> {
 
     try {
+        let callbackUrl: string | undefined = undefined
+        let callbackToken: string | undefined = undefined
+
+        if (callback?.url) {
+            callbackUrl = callback.url
+            callbackToken = await callback.getId()
+        }
+
         const headers = {
             'Content-Type': 'application/json'
         }
@@ -54,8 +62,8 @@ export async function postRawTxToMapiMiner(rawTx: string | Buffer, miner: PostTr
             `${miner.url}/tx`,
             {
                 rawtx: asString(rawTx),
-                callBackUrl: callback?.url,
-                callBackToken: callback?.id,
+                callbackUrl,
+                callbackToken,
                 merkleProof: true,
                 merkleFormat: 'TSC',
                 dsCheck: true
@@ -69,7 +77,8 @@ export async function postRawTxToMapiMiner(rawTx: string | Buffer, miner: PostTr
         const r: PostRawTxResultApi = {
             name: miner.name,
             status: data?.status === 200 ? 'success' : 'error',
-            mapi: data.data ? (<MapiResponseApi>JSON.parse(data.data)) : undefined
+            mapi: data.data ? (<MapiResponseApi>JSON.parse(data.data)) : undefined,
+            callbackID: callbackToken
         }
 
         return r

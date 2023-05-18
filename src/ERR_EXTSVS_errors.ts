@@ -41,9 +41,13 @@ export class ERR_EXTSVS_MERKLEPROOF_PARSING extends CwiError { constructor() { s
  */
 export class ERR_EXTSVS_MERKLEPROOF_UNSUPORTED extends CwiError { constructor(feature?: string) { super('ERR_EXTSVS_MERKLEPROOF_UNSUPORTED', `Merkle proof unsuported feature ${feature}.`) } }
 /**
- * Mapi resposne signature is invalid.
+ * Required Mapi response is missing.
  */
-export class ERR_EXTSVS_MAPI_SIGNATURE_INVALID extends CwiError { constructor() { super('ERR_EXTSVS_MAPI_SIGNATURE_INVALID', `Mapi resposne signature is invalid.`) } }
+export class ERR_EXTSVS_MAPI_MISSING extends CwiError { constructor() { super('ERR_EXTSVS_MAPI_MISSING', `Required Mapi response is missing.`) } }
+/**
+ * Mapi response signature is invalid.
+ */
+export class ERR_EXTSVS_MAPI_SIGNATURE_INVALID extends CwiError { constructor() { super('ERR_EXTSVS_MAPI_SIGNATURE_INVALID', `Mapi response signature is invalid.`) } }
 /**
  * mAPI response unsupported mimetype ${mimeType}
  */

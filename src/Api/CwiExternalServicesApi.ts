@@ -1,12 +1,12 @@
 import { Chain, CwiError } from "cwi-base"
-import { MapiResponseApi, TscMerkleProofApi } from "./MerchantApi"
+import { MapiPostTxResponseApi, MapiResponseApi, TscMerkleProofApi } from "./MerchantApi"
 
 export type GetMerkleProofServiceApi = (txid: string | Buffer, chain: Chain) => Promise<GetMerkleProofResultApi>
 
 export type GetRawTxServiceApi = (txid: string | Buffer, chain: Chain) => Promise<GetRawTxResultApi>
 
 export interface MapiCallbackApi {
-    id: string
+    getId: () => Promise<string>
     url: string
 }
 
@@ -68,6 +68,10 @@ export interface PostRawTxResultApi {
      */
     name: string
     /**
+     * callbackID associated with this request
+     */
+    callbackID?: string
+    /**
      * 'success' - The transaction was accepted for processing
      */
     status: 'success' | 'error'
@@ -78,9 +82,24 @@ export interface PostRawTxResultApi {
      */
     mapi?: MapiResponseApi
     /**
+     * If mapi, parsed, signature checked mapi payload
+     */
+    payload?: MapiPostTxResponseApi
+    /**
      * The first exception error that occurred during processing, if any.
-     * @param name the service that triggered the exception
      */
     error?: CwiError
+    /**
+     * txid returned in mapi response doesn't match txid of broadcast transaction.
+     */
+    txidChanged?: boolean
+    /**
+     * if true, this transaction is already in mempool or mined. Usually treat as a success.
+     */
+    alreadyKnown?: boolean
+    /**
+     * if true, at least one of the inputs has already been spent in another transaction.
+     */
+    doubleSpend?: boolean
 }
 

@@ -1,6 +1,6 @@
 import { asString, bsv } from "cwi-base";
 
-import { MapiResponseApi, MapiTxidReturnResultApi, MapiTxStatusPayloadApi } from "./Api/MerchantApi";
+import { MapiPostTxResponseApi, MapiResponseApi, MapiTxidReturnResultApi, MapiTxStatusPayloadApi } from "./Api/MerchantApi";
 import {
     ERR_EXTSVS_MAPI_SIGNATURE_INVALID,
     ERR_EXTSVS_MAPI_UNSUPORTED_ENCODING,
@@ -59,21 +59,37 @@ export function getMapiJsonResponsePayload<T>(response: MapiResponseApi): T {
  * @param response 
  * @returns 
  */
-export function getMapiTxStatusPayload(txid: string | Buffer, response: MapiResponseApi): MapiTxStatusPayloadApi {
+export function getMapiTxStatusPayload(txid: string | Buffer | undefined, response: MapiResponseApi): MapiTxStatusPayloadApi {
     const payload = getMapiJsonResponsePayload<MapiTxStatusPayloadApi>(response);
-    txid = asString(txid)
-    if (payload.txid !== txid)
-        throw new ERR_EXTSVS_TXID_INVALID(asString(txid), payload.txid)
+    if (txid) {
+        txid = asString(txid)
+        if (payload.txid !== txid)
+            throw new ERR_EXTSVS_TXID_INVALID(asString(txid), payload.txid)
+    }
     if (payload.returnResult !== 'success' && payload.returnResult !== 'failure')
         throw new ERR_EXTSVS_MAPI_UNSUPORTED_RETURNRESULT(payload.returnResult)
     return payload;
 }
 
-export function checkMapiResponseForTxid(response: MapiResponseApi, txid: string | Buffer) : boolean {
-    const payload = getMapiJsonResponsePayload<MapiTxidReturnResultApi>(response)
-    if (payload.txid !== asString(txid))
-        throw new ERR_EXTSVS_TXID_INVALID(asString(txid), payload.txid)
-    if (payload.returnResult !== 'success')
+export function verifyMapiResponseForTxid<T extends MapiTxidReturnResultApi>(response: MapiResponseApi, txid?: string | Buffer, checkFailure?: boolean): T {
+    const payload = getMapiJsonResponsePayload<T>(response)
+    if (txid) {
+        if (payload.txid !== asString(txid))
+            throw new ERR_EXTSVS_TXID_INVALID(asString(txid), payload.txid)
+    }
+    if (payload.returnResult === 'success')
+        return payload
+    if (checkFailure && payload.returnResult !== 'failure')
         throw new ERR_EXTSVS_MAPI_UNSUPORTED_RETURNRESULT(payload.returnResult)
-    return true
+    return payload;
+}
+
+export function getMapiPostTxResponse(response: MapiResponseApi, txid?: string | Buffer, checkFailure?: boolean) {
+    const payload = verifyMapiResponseForTxid<MapiPostTxResponseApi>(response, txid, checkFailure)
+    return payload
+}
+
+export function checkMapiResponseForTxid(response: MapiResponseApi, txid?: string | Buffer) : boolean {
+    const payload = verifyMapiResponseForTxid<MapiTxidReturnResultApi>(response, txid, false)
+    return payload.returnResult === 'success'
 }
