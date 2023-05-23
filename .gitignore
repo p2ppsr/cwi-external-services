@@ -4,3 +4,4 @@ test/data
 tsconfig.tsbuildinfo
 *.tgz
 .env
+.DS_Store
