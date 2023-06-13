@@ -1,5 +1,5 @@
 import { Chain, CwiError, ERR_MISSING_PARAMETER, ERR_TXID_INVALID, asString, doubleSha256BE } from "cwi-base"
-import { GetMerkleProofResultApi, GetMerkleProofServiceApi, GetRawTxResultApi, GetRawTxServiceApi } from "./Api/CwiExternalServicesApi"
+import { CwiExternalServicesApi, GetMerkleProofResultApi, GetMerkleProofServiceApi, GetRawTxResultApi, GetRawTxServiceApi } from "./Api/CwiExternalServicesApi"
 import { MapiCallbackApi, PostRawTxResultApi, PostRawTxServiceApi } from "./Api/CwiExternalServicesApi"
 import { ServiceCollection } from "./ServiceCollection"
 
@@ -14,7 +14,7 @@ export interface CwiExternalServicesOptions {
     testTaalApiKey?: string
 }
 
-export class CwiExternalServices {
+export class CwiExternalServices implements CwiExternalServicesApi {
     static createDefaultOptions() : CwiExternalServicesOptions {
         const o: CwiExternalServicesOptions = {
             mainTaalApiKey: "mainnet_9596de07e92300c6287e4393594ae39c",
@@ -114,7 +114,7 @@ export class CwiExternalServices {
                 const hash = asString(doubleSha256BE(r.rawTx))
                 // Confirm transaction hash matches txid
                 if (hash === asString(txid)) {
-                    // If we have a proof, call it done.
+                    // If we have a match, call it done.
                     r0.rawTx = r.rawTx
                     r0.name = r.name
                     break
