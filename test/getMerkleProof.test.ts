@@ -1,4 +1,4 @@
-import { getMerkleProofFromGorillaPool, getMerkleProofFromMetastreme, getMerkleProofFromTaal, getMerkleProofFromWhatsOnChain } from "../src/getMerkleProof";
+import { getMerkleProofFromGorillaPool, getMerkleProofFromMetastreme, getMerkleProofFromTaal, getMerkleProofFromWhatsOnChain } from "../src/getMerkleProofV1";
 import { verifyDojoTransactionProof } from "./verifyDojoTransactionProofs";
 
 import * as dotenv from 'dotenv';
