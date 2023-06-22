@@ -6,7 +6,7 @@ import {
     ERR_EXTSVS_MERKLEPROOF_NODE_TYPE,
     ERR_EXTSVS_MERKLEPROOF_PARSING,
     ERR_EXTSVS_MERKLEPROOF_TAGET_TYPE,
-    ERR_EXTSVS_MERKLEPROOF_UNSUPORTED,
+    ERR_EXTSVS_MERKLEPROOF_UNSUPPORTED,
     ERR_EXTSVS_MERKLEROOT_INVALID,
     ERR_EXTSVS_MERKLEROOT_MISSING,
     ERR_EXTSVS_TXID_INVALID
@@ -130,7 +130,7 @@ export async function checkMerkleProof(txid: string | Buffer, proof: TscMerklePr
         if (p.proofType === "tree")
             throw new ERR_EXTSVS_MERKLEPROOF_TAGET_TYPE(p.proofType)
         if (p.composite === true)
-            throw new ERR_EXTSVS_MERKLEPROOF_UNSUPORTED('composite')
+            throw new ERR_EXTSVS_MERKLEPROOF_UNSUPPORTED('composite')
 
         // p.txOrId
         // Convert hex to buffer.

@@ -3,6 +3,7 @@ import axios from 'axios'
 import { Chain, CwiError, ERR_BAD_REQUEST, asString, bsv, crypto, randomBytesBase64 } from 'cwi-base'
 import { MapiCallbackApi, PostRawTxResultApi } from './Api/CwiExternalServicesApi'
 import { MapiResponseApi } from './Api/MerchantApi'
+import { ERR_EXTSVS_MAPI_MISSING } from './ERR_EXTSVS_errors'
 
 export interface PostTransactionMapiMinerApi {
     name: string
@@ -38,14 +39,15 @@ export function postRawTxToTaal(rawTx: string | Buffer, chain: Chain, callback?:
     const miner = {...(chain === 'main' ? mainMapiMinerTaal : testMapiMinerTaal)}
     if (apiKey)
         miner.authToken = apiKey
-    return postRawTxToMapiMiner(rawTx, mainMapiMinerTaal, callback)
+    return postRawTxToMapiMiner(rawTx, miner, callback)
 }
 
 export async function postRawTxToMapiMiner(rawTx: string | Buffer, miner: PostTransactionMapiMinerApi, callback?: MapiCallbackApi): Promise<PostRawTxResultApi> {
 
+    let callbackToken: string | undefined = undefined
+
     try {
         let callbackUrl: string | undefined = undefined
-        let callbackToken: string | undefined = undefined
 
         if (callback?.url) {
             callbackUrl = callback.url
@@ -64,9 +66,9 @@ export async function postRawTxToMapiMiner(rawTx: string | Buffer, miner: PostTr
                 rawtx: asString(rawTx),
                 callbackUrl,
                 callbackToken,
-                merkleProof: true,
+                merkleProof: !!callback,
                 merkleFormat: 'TSC',
-                dsCheck: true
+                dsCheck: !!callback
             },
             {
                 headers,
@@ -76,9 +78,14 @@ export async function postRawTxToMapiMiner(rawTx: string | Buffer, miner: PostTr
         
         const r: PostRawTxResultApi = {
             name: miner.name,
-            status: data?.status === 200 ? 'success' : 'error',
-            mapi: data.data ? (<MapiResponseApi>JSON.parse(data.data)) : undefined,
-            callbackID: callbackToken
+            callbackID: callbackToken,
+            status: data?.status === 200 && data?.data ? 'success' : 'error',
+            mapi: data?.data
+        }
+
+        if (!r.mapi?.payload) {
+            r.status = 'error'
+            r.error = new ERR_EXTSVS_MAPI_MISSING(data?.data.message || data.statusText)
         }
 
         return r
@@ -87,7 +94,8 @@ export async function postRawTxToMapiMiner(rawTx: string | Buffer, miner: PostTr
         return {
             name: miner.name,
             status: 'error',
-            error: CwiError.fromUnknown(err)
+            error: CwiError.fromUnknown(err),
+            callbackID: callbackToken
         }
     }
 }

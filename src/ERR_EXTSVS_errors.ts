@@ -39,11 +39,11 @@ export class ERR_EXTSVS_MERKLEPROOF_PARSING extends CwiError { constructor() { s
 /**
  * Merkle proof unsuported feature ${feature}.
  */
-export class ERR_EXTSVS_MERKLEPROOF_UNSUPORTED extends CwiError { constructor(feature?: string) { super('ERR_EXTSVS_MERKLEPROOF_UNSUPORTED', `Merkle proof unsuported feature ${feature}.`) } }
+export class ERR_EXTSVS_MERKLEPROOF_UNSUPPORTED extends CwiError { constructor(feature?: string) { super('ERR_EXTSVS_MERKLEPROOF_UNSUPPORTED', `Merkle proof unsuported feature ${feature}.`) } }
 /**
  * Required Mapi response is missing.
  */
-export class ERR_EXTSVS_MAPI_MISSING extends CwiError { constructor() { super('ERR_EXTSVS_MAPI_MISSING', `Required Mapi response is missing.`) } }
+export class ERR_EXTSVS_MAPI_MISSING extends CwiError { constructor(description?: string) { super('ERR_EXTSVS_MAPI_MISSING', description || `Required Mapi response is missing.`) } }
 /**
  * Mapi response signature is invalid.
  */
@@ -51,12 +51,20 @@ export class ERR_EXTSVS_MAPI_SIGNATURE_INVALID extends CwiError { constructor() 
 /**
  * mAPI response unsupported mimetype ${mimeType}
  */
-export class ERR_EXTSVS_MAPI_UNSUPORTED_MIMETYPE extends CwiError { constructor(mimeType?: string) { super('ERR_EXTSVS_MAPI_UNSUPORTED_MIMETYPE', `mAPI response unsupported mimetype ${mimeType}`) } }
+export class ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE extends CwiError { constructor(mimeType?: string) { super('ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE', `mAPI response unsupported mimetype ${mimeType}`) } }
 /**
  * mAPI response unsupported encoding ${encoding}
  */
-export class ERR_EXTSVS_MAPI_UNSUPORTED_ENCODING extends CwiError { constructor(encoding?: string) { super('ERR_EXTSVS_MAPI_UNSUPORTED_ENCODING', `mAPI response unsupported encoding ${encoding}`) } }
+export class ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING extends CwiError { constructor(encoding?: string) { super('ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING', `mAPI response unsupported encoding ${encoding}`) } }
 /**
  * mAPI response unsupported returnResult ${result}
  */
-export class ERR_EXTSVS_MAPI_UNSUPORTED_RETURNRESULT extends CwiError { constructor(result?: string) { super('ERR_EXTSVS_MAPI_RETURNRESULT_INVALID', `mAPI response unsupported returnResult ${result}`) } }
+export class ERR_EXTSVS_MAPI_UNSUPPORTED_RETURNRESULT extends CwiError { constructor(result?: string) { super('ERR_EXTSVS_MAPI_RETURNRESULT_INVALID', `mAPI response unsupported returnResult ${result}`) } }
+/**
+ * Transaction is invalid.
+ */
+export class ERR_EXTSVS_INVALID_TRANSACTION extends CwiError { constructor(description?: string) { super('ERR_EXTSVS_INVALID_TRANSACTION', description ?? 'Transaction is invalid.') } }
+/**
+ * Transaction is a double spend.
+ */
+export class ERR_EXTSVS_DOUBLE_SPEND extends CwiError { constructor() { super('ERR_EXTSVS_DOUBLE_SPEND', 'Transaction is a double spend.') } }

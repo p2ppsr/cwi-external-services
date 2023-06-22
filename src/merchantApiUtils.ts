@@ -1,11 +1,11 @@
 import { asString, bsv } from "cwi-base";
 
-import { MapiPostTxResponseApi, MapiResponseApi, MapiTxidReturnResultApi, MapiTxStatusPayloadApi } from "./Api/MerchantApi";
+import { MapiCallbackPayloadApi, MapiPostTxResponseApi, MapiResponseApi, MapiTxidReturnResultApi, MapiTxStatusPayloadApi } from "./Api/MerchantApi";
 import {
     ERR_EXTSVS_MAPI_SIGNATURE_INVALID,
-    ERR_EXTSVS_MAPI_UNSUPORTED_ENCODING,
-    ERR_EXTSVS_MAPI_UNSUPORTED_MIMETYPE,
-    ERR_EXTSVS_MAPI_UNSUPORTED_RETURNRESULT,
+    ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING,
+    ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE,
+    ERR_EXTSVS_MAPI_UNSUPPORTED_RETURNRESULT,
     ERR_EXTSVS_TXID_INVALID
 } from "./ERR_EXTSVS_errors";
 
@@ -17,11 +17,15 @@ import {
  * https://github.com/bitcoin-sv-specs/brfc-misc/tree/master/jsonenvelope
  */
 export function checkMapiResponse(response: MapiResponseApi) {
-    // Check the format and signature
-    const payloadHash = bsv.Hash.sha256(Buffer.from(response.payload));
-    const signature = new bsv.Sig().fromString(response.signature);
-    const publicKey = new bsv.PubKey().fromString(response.publicKey);
-    if (bsv.Ecdsa.verify(payloadHash, signature, publicKey) !== true) {
+    try {
+        // Check the format and signature
+        const payloadHash = bsv.Hash.sha256(Buffer.from(response.payload));
+        const signature = new bsv.Sig().fromString(response.signature);
+        const publicKey = new bsv.PubKey().fromString(response.publicKey);
+        if (bsv.Ecdsa.verify(payloadHash, signature, publicKey) !== true) {
+            throw new ERR_EXTSVS_MAPI_SIGNATURE_INVALID()
+        }
+    } catch (eu: unknown) {
         throw new ERR_EXTSVS_MAPI_SIGNATURE_INVALID()
     }
 }
@@ -37,9 +41,9 @@ export function checkMapiResponse(response: MapiResponseApi) {
 export function getMapiJsonResponsePayload<T>(response: MapiResponseApi): T {
     checkMapiResponse(response);
     if (response.mimetype && response.mimetype !== "application/json")
-        throw new ERR_EXTSVS_MAPI_UNSUPORTED_MIMETYPE(response.mimetype)
+        throw new ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE(response.mimetype)
     if (response.encoding && response.encoding !== "UTF-8")
-        throw new ERR_EXTSVS_MAPI_UNSUPORTED_ENCODING(response.encoding)
+        throw new ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING(response.encoding)
     const payload = <T>JSON.parse(response.payload);
     return payload;
 }
@@ -67,7 +71,17 @@ export function getMapiTxStatusPayload(txid: string | Buffer | undefined, respon
             throw new ERR_EXTSVS_TXID_INVALID(asString(txid), payload.txid)
     }
     if (payload.returnResult !== 'success' && payload.returnResult !== 'failure')
-        throw new ERR_EXTSVS_MAPI_UNSUPORTED_RETURNRESULT(payload.returnResult)
+        throw new ERR_EXTSVS_MAPI_UNSUPPORTED_RETURNRESULT(payload.returnResult)
+    return payload;
+}
+
+export function getMapiCallbackPayload(txid: string | Buffer | undefined, response: MapiResponseApi): MapiCallbackPayloadApi {
+    const payload = getMapiJsonResponsePayload<MapiCallbackPayloadApi>(response);
+    if (txid) {
+        txid = asString(txid)
+        if (payload.callbackTxId !== txid)
+            throw new ERR_EXTSVS_TXID_INVALID(asString(txid), payload.callbackTxId)
+    }
     return payload;
 }
 
@@ -80,7 +94,7 @@ export function verifyMapiResponseForTxid<T extends MapiTxidReturnResultApi>(res
     if (payload.returnResult === 'success')
         return payload
     if (checkFailure && payload.returnResult !== 'failure')
-        throw new ERR_EXTSVS_MAPI_UNSUPORTED_RETURNRESULT(payload.returnResult)
+        throw new ERR_EXTSVS_MAPI_UNSUPPORTED_RETURNRESULT(payload.returnResult)
     return payload;
 }
 

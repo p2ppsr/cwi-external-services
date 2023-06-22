@@ -1,5 +1,5 @@
 import { Chain, CwiError } from "cwi-base"
-import { MapiPostTxResponseApi, MapiResponseApi, TscMerkleProofApi } from "./MerchantApi"
+import { MapiResponseApi, TscMerkleProofApi } from "./MerchantApi"
 
 /**
  * Defines standard interfaces to access functionality implemented by external transaction processing services.
@@ -71,8 +71,24 @@ export type GetMerkleProofServiceApi = (txid: string | Buffer, chain: Chain) => 
 
 export type GetRawTxServiceApi = (txid: string | Buffer, chain: Chain) => Promise<GetRawTxResultApi>
 
+/**
+ * An API that enables unique callback IDs to be generated for potentially multiple independent
+ * callback clients.
+ */
 export interface MapiCallbackApi {
+    /**
+     * Each call to this method generates a unique callbackID string and creates a record of the
+     * circumstances under which it was generated.
+     *
+     * @returns A unique callbackID string, e.g. randomBytesBase64(12)
+     */
     getId: () => Promise<string>
+    /**
+     * The public url to which callbacks will occur.
+     * 
+     * Callback requests must include a previously `getId` generated callbackID which must match
+     * an already existing callback record.
+     */
     url: string
 }
 
@@ -135,7 +151,7 @@ export interface GetRawTxResultApi {
 }
 
 /**
- * Properties on array items of result returned from `CwiExternalServicesApi` function `PostRawTx`.
+ * Properties on array items of result returned from `CwiExternalServicesApi` function `postRawTx`.
  */
 export interface PostRawTxResultApi {
     /**
@@ -151,30 +167,32 @@ export interface PostRawTxResultApi {
      */
     status: 'success' | 'error'
     /**
-     * The first valid mapi response received from a service, if any.
-     * Relevant when no proof was received.
-     * @param name the service that generated the mapi response
+     * Valid when the service responds with mapi signed payload.
      */
     mapi?: MapiResponseApi
     /**
-     * If mapi, parsed, signature checked mapi payload
-     */
-    payload?: MapiPostTxResponseApi
-    /**
-     * The first exception error that occurred during processing, if any.
+     * When status is 'error', provides code and description
+     * 
+     * Specific potential errors:
+     * ERR_BAD_REQUEST
+     * ERR_EXTSVS_DOUBLE_SPEND
+     * ERR_EXTSVS_INVALID_TRANSACTION (description has error details)
+     * ERR_EXTSVS_TXID_INVALID (service response txid doesn't match rawTx)
+     * ERR_EXTSVS_MAPI_SIGNATURE_INVALID
+     * ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING
+     * ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE
+     * ERR_EXTSVS_MAPI_MISSING (description has service request error details)
      */
     error?: CwiError
     /**
-     * txid returned in mapi response doesn't match txid of broadcast transaction.
-     */
-    txidChanged?: boolean
-    /**
-     * if true, this transaction is already in mempool or mined. Usually treat as a success.
+     * if true, the transaction was already known to this service. Usually treat as a success.
+     * 
+     * Potentially stop posting to additional transaction processors.
      */
     alreadyKnown?: boolean
     /**
-     * if true, at least one of the inputs has already been spent in another transaction.
+     * if true, the transaction has been mined
      */
-    doubleSpend?: boolean
+    alreadyMined?: boolean
 }
 

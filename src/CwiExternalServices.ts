@@ -7,7 +7,8 @@ import { postRawTxToGorillaPool, postRawTxToTaal } from "./postRawTxServices"
 import { getRawTxFromWhatsOnChain } from "./getRawTxServices"
 import { getProofFromGorillaPool, getProofFromMetastreme, getProofFromTaal, getProofFromWhatsOnChain, getProofFromWhatsOnChainTsc } from "./getProofServices"
 import { getMapiPostTxResponse } from "./merchantApiUtils"
-import { ERR_EXTSVS_MAPI_MISSING } from "./ERR_EXTSVS_errors"
+import { ERR_EXTSVS_DOUBLE_SPEND } from "./ERR_EXTSVS_errors"
+import { MapiPostTxResponseApi } from "./Api/MerchantApi"
 
 export interface CwiExternalServicesOptions {
     mainTaalApiKey?: string
@@ -67,33 +68,35 @@ export class CwiExternalServices implements CwiExternalServicesApi {
 
     async postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]> {
         
-        const txid = asString(doubleSha256BE(rawTx))
-        
+        const txid = doubleSha256BE(rawTx)
+
         return await Promise.all(this.postRawTxs.allServices.map(async service => {
             const r = await service(rawTx, chain, callback)
 
-            // If mapi response, confirm signature of payload, check for success, check for already in mempool, check for double spend.
-            if (r.mapi) {
+            // Standardize results while preserving evidence for history logging.
+            
+            let payload: MapiPostTxResponseApi | undefined
+            // If mapi response, confirm signature of payload
+            if (r.status === 'success' || !r.error) {
                 try {
-                    r.payload = getMapiPostTxResponse(r.mapi)
-                    r.txidChanged = r.payload.txid !== txid
+                    payload = r.mapi ? getMapiPostTxResponse(r.mapi, txid) : undefined
                 } catch (e: unknown) {
                     r.status = 'error'
                     r.error = CwiError.fromUnknown(e)
                 }
             }
             if (r.status === 'success') {
-                if (!r.mapi) {
-                    r.status = 'error'
-                    r.error = new ERR_EXTSVS_MAPI_MISSING()
-                }
+                // TODO: This is a kludge. Protocol should encode this explicitly.
                 // "resultDescription": "" | "Transaction already mined into block" | "Already known"
-                const d = (r.payload?.resultDescription || '').toLowerCase()
-                r.alreadyKnown = d.indexOf('already mined') > -1 || d.indexOf('already known') > -1
+                const d = (payload?.resultDescription || '').toLowerCase()
+                r.alreadyMined = d.indexOf('already mined') > -1
+                r.alreadyKnown = r.alreadyMined || d.indexOf('already known') > -1
             } else {
-                if (r.payload) {
-                    // currently mapi has no reliable way of knowing these...
-                    r.doubleSpend = !!r.payload.conflictedWith
+                if (payload) {
+                    // TODO: This is a kludge. Protocol should encode this explicitly.
+                    // currently mapi has no reliable way of knowing this...
+                    if (payload.conflictedWith)
+                        r.error = new ERR_EXTSVS_DOUBLE_SPEND()
                 }
             }
             return r

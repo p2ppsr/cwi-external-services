@@ -75,6 +75,19 @@ export interface MapiTxStatusPayloadApi {
 }
 
 /**
+ * As defined in https://github.com/bitcoin-sv-specs/brfc-merchantapi/blob/master/README.md
+ */
+export interface MapiCallbackPayloadApi {
+    apiVersion: string // "1.5.0"
+    timestamp: string // "2022-11-04T11:15:05.1234567Z"
+    blockHash: string // hex encoded block hash
+    blockHeight: number
+    callbackTxId: string // hex encoded transaction hash
+    callbackReason: string // "merkleProof" or ""
+    callbackPayload: string // stringified mapi payload of type determined by callbackReason
+}
+
+/**
  * Used to parse payloads when only confirmation that a miner acknowledges a specific txid matters.
  */
 export interface MapiTxidReturnResultApi {
