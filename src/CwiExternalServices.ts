@@ -1,14 +1,12 @@
-import { Chain, CwiError, ERR_MISSING_PARAMETER, ERR_TXID_INVALID, asString, doubleSha256BE } from "cwi-base"
+import { Chain, ERR_MISSING_PARAMETER, ERR_TXID_INVALID, asString, doubleSha256BE } from "cwi-base"
+
 import { CwiExternalServicesApi, GetMerkleProofResultApi, GetMerkleProofServiceApi, GetRawTxResultApi, GetRawTxServiceApi } from "./Api/CwiExternalServicesApi"
 import { MapiCallbackApi, PostRawTxResultApi, PostRawTxServiceApi } from "./Api/CwiExternalServicesApi"
-import { ServiceCollection } from "./ServiceCollection"
 
+import { ServiceCollection } from "./ServiceCollection"
 import { postRawTxToGorillaPool, postRawTxToTaal } from "./postRawTxServices"
 import { getRawTxFromWhatsOnChain } from "./getRawTxServices"
 import { getProofFromGorillaPool, getProofFromMetastreme, getProofFromTaal, getProofFromWhatsOnChain, getProofFromWhatsOnChainTsc } from "./getProofServices"
-import { getMapiPostTxResponse } from "./merchantApiUtils"
-import { ERR_EXTSVS_DOUBLE_SPEND } from "./ERR_EXTSVS_errors"
-import { MapiPostTxResponseApi } from "./Api/MerchantApi"
 
 export interface CwiExternalServicesOptions {
     mainTaalApiKey?: string
@@ -55,8 +53,8 @@ export class CwiExternalServices implements CwiExternalServicesApi {
     }
 
     private makePostRawTxToTaal() {
-        return (rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi) => {
-            return postRawTxToTaal(rawTx, chain, callback, this.taalApiKey(chain))
+        return (txid: string | Buffer, rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi) => {
+            return postRawTxToTaal(txid, rawTx, chain, callback, this.taalApiKey(chain))
         }
     }
 
@@ -71,34 +69,7 @@ export class CwiExternalServices implements CwiExternalServicesApi {
         const txid = doubleSha256BE(rawTx)
 
         return await Promise.all(this.postRawTxs.allServices.map(async service => {
-            const r = await service(rawTx, chain, callback)
-
-            // Standardize results while preserving evidence for history logging.
-            
-            let payload: MapiPostTxResponseApi | undefined
-            // If mapi response, confirm signature of payload
-            if (r.status === 'success' || !r.error) {
-                try {
-                    payload = r.mapi ? getMapiPostTxResponse(r.mapi, txid) : undefined
-                } catch (e: unknown) {
-                    r.status = 'error'
-                    r.error = CwiError.fromUnknown(e)
-                }
-            }
-            if (r.status === 'success') {
-                // TODO: This is a kludge. Protocol should encode this explicitly.
-                // "resultDescription": "" | "Transaction already mined into block" | "Already known"
-                const d = (payload?.resultDescription || '').toLowerCase()
-                r.alreadyMined = d.indexOf('already mined') > -1
-                r.alreadyKnown = r.alreadyMined || d.indexOf('already known') > -1
-            } else {
-                if (payload) {
-                    // TODO: This is a kludge. Protocol should encode this explicitly.
-                    // currently mapi has no reliable way of knowing this...
-                    if (payload.conflictedWith)
-                        r.error = new ERR_EXTSVS_DOUBLE_SPEND()
-                }
-            }
+            const r = await service(txid, rawTx, chain, callback)
             return r
         }))
     }

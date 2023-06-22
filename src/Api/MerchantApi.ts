@@ -122,16 +122,21 @@ export interface MapiTxidReturnResultApi {
     "currentHighestBlockHeight":1535997,"txSecondMempoolExpiry":0,"failureRetryable":false
 }
 */
+
 /**
- * Mapi payload from broadcast of a raw transaction for processing.
+ * As defined in https://github.com/bitcoin-sv-specs/brfc-merchantapi/blob/master/README.md
  */
-export interface MapiPostTxResponseApi extends MapiTxidReturnResultApi {
-    resultDescription?: string // empty on success, error description on failure.
-    txSecondMempoolExpiry?: number // duration (minutes) Tx will be kept in the secondary mempool
+export interface MapiPostTxPayloadApi {
+    apiVersion: string // "1.5.0"
+    timestamp: string // "2022-11-04T11:15:05.1234567Z"
+    txid: string // hex encoded transaction hash
+    returnResult: string // "success"
+    resultDescription: string // ""
+    minerId: string // hex encoded public key
+    currentHighestBlockHash?: string // "00000000000001f6c0cb9038ac6eadbc1738dc9f86be50cca6724ef7a6e2f157"
+    currentHighestBlockHeight?: number // 1558364
+    txSecondMempoolExpiry?: number // 0
+    failureRetryable?: boolean
     warnings?: unknown[] // any DSNT protocol warnings provided by the system
-    failureRetryable?: boolean // if true, transaction may be resubmitted later
     conflictedWith?: unknown[] // list of double spend transactions
-    minerId?: string // "030d1fe5c1b560efe196ba40540ce9017c20daa9504c4c4cec6184fc702d9f274e",
-    currentHighestBlockHash?: string // "00000000000004e382da3ae133702f2b51e9bc4921d1804a705976708f4a7bfd",
-    currentHighestBlockHeight?: number // 1552242,
 }

@@ -1,6 +1,6 @@
 import { asString, bsv } from "cwi-base";
 
-import { MapiCallbackPayloadApi, MapiPostTxResponseApi, MapiResponseApi, MapiTxidReturnResultApi, MapiTxStatusPayloadApi } from "./Api/MerchantApi";
+import { MapiCallbackPayloadApi, MapiPostTxPayloadApi, MapiResponseApi, MapiTxidReturnResultApi, MapiTxStatusPayloadApi } from "./Api/MerchantApi";
 import {
     ERR_EXTSVS_MAPI_SIGNATURE_INVALID,
     ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING,
@@ -98,8 +98,8 @@ export function verifyMapiResponseForTxid<T extends MapiTxidReturnResultApi>(res
     return payload;
 }
 
-export function getMapiPostTxResponse(response: MapiResponseApi, txid?: string | Buffer, checkFailure?: boolean) {
-    const payload = verifyMapiResponseForTxid<MapiPostTxResponseApi>(response, txid, checkFailure)
+export function getMapiPostTxPayload(response: MapiResponseApi, txid?: string | Buffer, checkFailure?: boolean) : MapiPostTxPayloadApi {
+    const payload = verifyMapiResponseForTxid<MapiPostTxPayloadApi>(response, txid, checkFailure)
     return payload
 }
 

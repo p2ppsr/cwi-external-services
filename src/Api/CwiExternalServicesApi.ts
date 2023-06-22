@@ -1,5 +1,5 @@
 import { Chain, CwiError } from "cwi-base"
-import { MapiResponseApi, TscMerkleProofApi } from "./MerchantApi"
+import { MapiPostTxPayloadApi, MapiResponseApi, MapiTxStatusPayloadApi, TscMerkleProofApi } from "./MerchantApi"
 
 /**
  * Defines standard interfaces to access functionality implemented by external transaction processing services.
@@ -92,7 +92,7 @@ export interface MapiCallbackApi {
     url: string
 }
 
-export type PostRawTxServiceApi = (rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi) => Promise<PostRawTxResultApi>
+export type PostRawTxServiceApi = (txid: string | Buffer, rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi) => Promise<PostRawTxResultApi>
 
 /**
  * Properties on result returned from `CwiExternalServicesApi` function `getMerkleProof`.
@@ -167,9 +167,13 @@ export interface PostRawTxResultApi {
      */
     status: 'success' | 'error'
     /**
-     * Valid when the service responds with mapi signed payload.
+     * Raw mapi response including stringified payload
      */
     mapi?: MapiResponseApi
+    /**
+     * Parsed and signature verified mapi payload
+     */
+    payload?: MapiPostTxPayloadApi
     /**
      * When status is 'error', provides code and description
      * 

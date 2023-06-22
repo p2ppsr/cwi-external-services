@@ -3,7 +3,8 @@ import axios from 'axios'
 import { Chain, CwiError, ERR_BAD_REQUEST, asString, bsv, crypto, randomBytesBase64 } from 'cwi-base'
 import { MapiCallbackApi, PostRawTxResultApi } from './Api/CwiExternalServicesApi'
 import { MapiResponseApi } from './Api/MerchantApi'
-import { ERR_EXTSVS_MAPI_MISSING } from './ERR_EXTSVS_errors'
+import { ERR_EXTSVS_DOUBLE_SPEND, ERR_EXTSVS_MAPI_MISSING } from './ERR_EXTSVS_errors'
+import { getMapiPostTxPayload } from './merchantApiUtils'
 
 export interface PostTransactionMapiMinerApi {
     name: string
@@ -30,21 +31,22 @@ const testMapiMinerTaal: PostTransactionMapiMinerApi = {
     authType: 'bearer',
 }
 
-export async function postRawTxToGorillaPool(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi) : Promise<PostRawTxResultApi> {
+export async function postRawTxToGorillaPool(txid: string | Buffer, rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi) : Promise<PostRawTxResultApi> {
     if (chain === 'test') return { name: 'GorillaPool', status: 'error', error: new ERR_BAD_REQUEST('GorillaPool does not support testNet.') }
-    return await postRawTxToMapiMiner(rawTx, mainMapiMinerGorillaPool, callback)
+    return await postRawTxToMapiMiner(txid, rawTx, mainMapiMinerGorillaPool, callback)
 }
 
-export function postRawTxToTaal(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi, apiKey?: string) : Promise<PostRawTxResultApi> {
+export function postRawTxToTaal(txid: string | Buffer, rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi, apiKey?: string) : Promise<PostRawTxResultApi> {
     const miner = {...(chain === 'main' ? mainMapiMinerTaal : testMapiMinerTaal)}
     if (apiKey)
         miner.authToken = apiKey
-    return postRawTxToMapiMiner(rawTx, miner, callback)
+    return postRawTxToMapiMiner(txid, rawTx, miner, callback)
 }
 
-export async function postRawTxToMapiMiner(rawTx: string | Buffer, miner: PostTransactionMapiMinerApi, callback?: MapiCallbackApi): Promise<PostRawTxResultApi> {
+export async function postRawTxToMapiMiner(txid: string | Buffer, rawTx: string | Buffer, miner: PostTransactionMapiMinerApi, callback?: MapiCallbackApi): Promise<PostRawTxResultApi> {
 
     let callbackToken: string | undefined = undefined
+    let mapi: MapiResponseApi | undefined = undefined
 
     try {
         let callbackUrl: string | undefined = undefined
@@ -76,26 +78,41 @@ export async function postRawTxToMapiMiner(rawTx: string | Buffer, miner: PostTr
             }
         )
         
-        const r: PostRawTxResultApi = {
-            name: miner.name,
-            callbackID: callbackToken,
-            status: data?.status === 200 && data?.data ? 'success' : 'error',
-            mapi: data?.data
-        }
+        if (!data || data.status !== 200) throw new ERR_BAD_REQUEST(data?.statusText)
 
-        if (!r.mapi?.payload) {
-            r.status = 'error'
-            r.error = new ERR_EXTSVS_MAPI_MISSING(data?.data.message || data.statusText)
+        mapi = data?.data
+
+        if (!mapi || data?.data.message) throw new ERR_EXTSVS_MAPI_MISSING(data?.data.message || data.statusText)
+            
+        const payload = getMapiPostTxPayload(mapi, txid)
+
+        if (payload.conflictedWith) throw new ERR_EXTSVS_DOUBLE_SPEND()
+
+        // TODO: This is a kludge. Protocol should encode this explicitly.
+        // "resultDescription": "" | "Transaction already mined into block" | "Already known"
+        const d = (payload?.resultDescription || '').toLowerCase()
+        const alreadyMined = d.indexOf('already mined') > -1
+        const alreadyKnown = alreadyMined || d.indexOf('already known') > -1
+
+        const r: PostRawTxResultApi = {
+            status: 'success',
+            payload: payload,
+            alreadyKnown,
+            alreadyMined,
+            callbackID: callbackToken,
+            name: miner.name,
+            mapi: mapi
         }
 
         return r
 
     } catch (err: unknown) {
         return {
-            name: miner.name,
             status: 'error',
             error: CwiError.fromUnknown(err),
-            callbackID: callbackToken
+            callbackID: callbackToken,
+            name: miner.name,
+            mapi
         }
     }
 }
