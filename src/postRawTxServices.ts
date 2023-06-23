@@ -3,7 +3,7 @@ import axios from 'axios'
 import { Chain, CwiError, ERR_BAD_REQUEST, asString, bsv, crypto, randomBytesBase64 } from 'cwi-base'
 import { MapiCallbackApi, PostRawTxResultApi } from './Api/CwiExternalServicesApi'
 import { MapiResponseApi } from './Api/MerchantApi'
-import { ERR_EXTSVS_DOUBLE_SPEND, ERR_EXTSVS_MAPI_MISSING } from './ERR_EXTSVS_errors'
+import { ERR_EXTSVS_ALREADY_MINED, ERR_EXTSVS_DOUBLE_SPEND, ERR_EXTSVS_INVALID_TRANSACTION, ERR_EXTSVS_MAPI_MISSING } from './ERR_EXTSVS_errors'
 import { getMapiPostTxPayload } from './merchantApiUtils'
 
 export interface PostTransactionMapiMinerApi {
@@ -93,12 +93,20 @@ export async function postRawTxToMapiMiner(txid: string | Buffer, rawTx: string 
         const d = (payload?.resultDescription || '').toLowerCase()
         const alreadyMined = d.indexOf('already mined') > -1
         const alreadyKnown = alreadyMined || d.indexOf('already known') > -1
+        
+        if (alreadyMined) {
+            // This transaction was previously broadcast and already exists in the block chain
+            throw new ERR_EXTSVS_ALREADY_MINED(payload.resultDescription)
+        }
+
+        if (payload.returnResult !== 'success') {
+            throw new ERR_EXTSVS_INVALID_TRANSACTION(payload.resultDescription)
+        }
 
         const r: PostRawTxResultApi = {
             status: 'success',
             payload: payload,
             alreadyKnown,
-            alreadyMined,
             callbackID: callbackToken,
             name: miner.name,
             mapi: mapi

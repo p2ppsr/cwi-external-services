@@ -68,3 +68,7 @@ export class ERR_EXTSVS_INVALID_TRANSACTION extends CwiError { constructor(descr
  * Transaction is a double spend.
  */
 export class ERR_EXTSVS_DOUBLE_SPEND extends CwiError { constructor() { super('ERR_EXTSVS_DOUBLE_SPEND', 'Transaction is a double spend.') } }
+/**
+ * Transaction was already mined.
+ */
+export class ERR_EXTSVS_ALREADY_MINED extends CwiError { constructor(description?: string) { super('ERR_EXTSVS_ALREADY_MINED', description || 'Transaction was already mined.') } }

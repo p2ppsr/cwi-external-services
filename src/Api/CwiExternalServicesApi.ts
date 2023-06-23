@@ -1,5 +1,5 @@
 import { Chain, CwiError } from "cwi-base"
-import { MapiPostTxPayloadApi, MapiResponseApi, MapiTxStatusPayloadApi, TscMerkleProofApi } from "./MerchantApi"
+import { MapiPostTxPayloadApi, MapiResponseApi, TscMerkleProofApi } from "./MerchantApi"
 
 /**
  * Defines standard interfaces to access functionality implemented by external transaction processing services.
@@ -180,6 +180,7 @@ export interface PostRawTxResultApi {
      * Specific potential errors:
      * ERR_BAD_REQUEST
      * ERR_EXTSVS_DOUBLE_SPEND
+     * ERR_EXTSVS_ALREADY_MINED (description has error details)
      * ERR_EXTSVS_INVALID_TRANSACTION (description has error details)
      * ERR_EXTSVS_TXID_INVALID (service response txid doesn't match rawTx)
      * ERR_EXTSVS_MAPI_SIGNATURE_INVALID
@@ -194,9 +195,5 @@ export interface PostRawTxResultApi {
      * Potentially stop posting to additional transaction processors.
      */
     alreadyKnown?: boolean
-    /**
-     * if true, the transaction has been mined
-     */
-    alreadyMined?: boolean
 }
 
