@@ -2,7 +2,7 @@
 import axios from 'axios'
 import { Chain, CwiError, ERR_BAD_REQUEST, asString, bsv, crypto, randomBytesBase64 } from 'cwi-base'
 import { MapiCallbackApi, PostRawTxResultApi } from './Api/CwiExternalServicesApi'
-import { MapiResponseApi } from './Api/MerchantApi'
+import { MapiResponseApi } from 'cwi-base/src/Api/MerchantApi'
 import { ERR_EXTSVS_ALREADY_MINED, ERR_EXTSVS_DOUBLE_SPEND, ERR_EXTSVS_INVALID_TRANSACTION, ERR_EXTSVS_MAPI_MISSING } from './ERR_EXTSVS_errors'
 import { getMapiPostTxPayload } from './merchantApiUtils'
 
