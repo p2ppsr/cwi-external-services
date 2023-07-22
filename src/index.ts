@@ -1,7 +1,5 @@
 export * from './ERR_EXTSVS_errors'
 export * from './Api/CwiExternalServicesApi'
-export * from 'cwi-base/src/Api/EnvelopeApi'
-export * from 'cwi-base/src/Api/MerchantApi'
 export * from './merchantApiUtils'
 export * from './getMerkleProofV1'
 export * from './checkMerkleProof'
