@@ -113,7 +113,11 @@ export async function getMerkleProofFromTaal(txid: string | Buffer, apiKey: stri
 
         return proof
 
-    } catch { /* ignore */ }
+    } catch (e: unknown) {
+        // const err = CwiError.fromUnknown(e)
+        // console.log(err)
+         /* ignore */
+    }
 
     return undefined
 }
