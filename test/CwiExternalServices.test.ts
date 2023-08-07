@@ -1,9 +1,21 @@
+import { GetMerkleProofResultApi } from '../src/Api/CwiExternalServicesApi'
 import { CwiExternalServices } from '../src/CwiExternalServices'
 
 describe('CwiExternalServices.test', () => {
     const services: CwiExternalServices = new CwiExternalServices()
 
     //beforeAll(async () => { })
+
+    test('getMerkleProof mainnet 461e9163247cf967df672845595e6294231f5e2a0159f45cb2c92669b7a2a062', async () => {
+        const txid = '461e9163247cf967df672845595e6294231f5e2a0159f45cb2c92669b7a2a062'
+        const count = services.getProofs.count
+        const rs: GetMerkleProofResultApi[] = []
+        for (let i = 0; i < count; i++) {
+            const r = await services.getMerkleProof(txid, 'main', true)
+            expect(r).toBeTruthy()
+            rs.push(r)
+        }
+    }, 300000)
 
     test('getMerkleProof testnet 3ab58b16e760915124b55bbcafb5ed941f6216222c40f4520071b022e7dc36ad', async () => {
         const txid = '3ab58b16e760915124b55bbcafb5ed941f6216222c40f4520071b022e7dc36ad'
