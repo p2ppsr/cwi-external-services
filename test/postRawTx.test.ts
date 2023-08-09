@@ -1,6 +1,5 @@
 import { ERR_BAD_REQUEST } from 'cwi-base';
 import { CwiExternalServices } from '../src/CwiExternalServices';
-import { ERR_EXTSVS_MAPI_MISSING } from '../src/ERR_EXTSVS_errors';
 
 describe("postRawTx.test", () => {
     const services: CwiExternalServices = new CwiExternalServices()
