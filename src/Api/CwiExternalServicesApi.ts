@@ -1,5 +1,5 @@
 import { Chain, CwiError } from "cwi-base"
-import { MapiPostTxPayloadApi, MapiResponseApi, TscMerkleProofApi } from "cwi-base/src/Api/MerchantApi"
+import { MapiPostTxPayloadApi, MapiResponseApi, TscMerkleProofApi } from "cwi-base"
 
 /**
  * Defines standard interfaces to access functionality implemented by external transaction processing services.
