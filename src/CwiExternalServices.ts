@@ -1,12 +1,20 @@
-import { Chain, ERR_MISSING_PARAMETER, ERR_TXID_INVALID, asString, doubleSha256BE } from "cwi-base"
+import { Chain, ERR_INTERNAL, ERR_MISSING_PARAMETER, ERR_TXID_INVALID, asString, doubleSha256BE } from "cwi-base"
 
-import { CwiExternalServicesApi, GetMerkleProofResultApi, GetMerkleProofServiceApi, GetRawTxResultApi, GetRawTxServiceApi } from "./Api/CwiExternalServicesApi"
-import { MapiCallbackApi, PostRawTxResultApi, PostRawTxServiceApi } from "./Api/CwiExternalServicesApi"
+import {
+    CwiExternalServicesApi, GetMerkleProofResultApi, GetMerkleProofServiceApi, GetRawTxResultApi,
+    GetRawTxServiceApi, GetUtxoStatusOutputFormatApi, GetUtxoStatusResultApi,
+    GetUtxoStatusServiceApi,
+    MapiCallbackApi, PostRawTxResultApi, PostRawTxServiceApi 
+} from "./Api/CwiExternalServicesApi"
 
 import { ServiceCollection } from "./ServiceCollection"
+
 import { postRawTxToGorillaPool, postRawTxToTaal } from "./postRawTxServices"
 import { getRawTxFromWhatsOnChain } from "./getRawTxServices"
-import { getProofFromGorillaPool, getProofFromMetastreme, getProofFromTaal, getProofFromWhatsOnChain, getProofFromWhatsOnChainTsc } from "./getProofServices"
+import {
+    getProofFromGorillaPool, getProofFromMetastreme, getProofFromTaal, getProofFromWhatsOnChain, getProofFromWhatsOnChainTsc
+} from "./getProofServices"
+import { getUtxoStatusFromWhatsOnChain } from "./getUtxoStatusServices"
 
 export interface CwiExternalServicesOptions {
     mainTaalApiKey?: string
@@ -27,6 +35,7 @@ export class CwiExternalServices implements CwiExternalServicesApi {
     getProofs: ServiceCollection<GetMerkleProofServiceApi>
     getRawTxs: ServiceCollection<GetRawTxServiceApi>
     postRawTxs: ServiceCollection<PostRawTxServiceApi>
+    getUtxoStats: ServiceCollection<GetUtxoStatusServiceApi>
 
     constructor(options?: CwiExternalServicesOptions) {
         this.options = options || CwiExternalServices.createDefaultOptions()
@@ -44,6 +53,9 @@ export class CwiExternalServices implements CwiExternalServicesApi {
         this.postRawTxs = new ServiceCollection<PostRawTxServiceApi>()
         .add({ name: 'GorillaPool', service: postRawTxToGorillaPool })
         .add({ name: 'Taal', service: this.makePostRawTxToTaal() })
+        
+        this.getUtxoStats = new ServiceCollection<GetUtxoStatusServiceApi>()
+        .add({ name: 'WhatsOnChain', service: getUtxoStatusFromWhatsOnChain})
     }
 
     private taalApiKey(chain: Chain) {
@@ -64,8 +76,30 @@ export class CwiExternalServices implements CwiExternalServicesApi {
         }
     }
 
+    async getUtxoStatus(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi, useNext?: boolean): Promise<GetUtxoStatusResultApi> {
+        const services = this.getUtxoStats
+        if (useNext)
+            services.next()
+
+        let r0: GetUtxoStatusResultApi = { name: "<noservices>", status: "error", error: new ERR_INTERNAL('No services available.') }
+
+        for (let tries = 0; tries < services.count; tries++) {
+            const service = services.service
+            const r = await service(output, chain, outputFormat)
+            if (r.status === 'success') {
+                r0 = r
+                break
+            }
+            services.next()
+        }
+        return r0
+    }
+
     async postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]> {
         
+        // eslint-disable-next-line no-debugger
+        debugger;
+
         const txid = doubleSha256BE(rawTx)
 
         return await Promise.all(this.postRawTxs.allServices.map(async service => {

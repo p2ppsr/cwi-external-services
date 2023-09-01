@@ -30,4 +30,14 @@ describe('CwiExternalServices.test', () => {
         expect(r.rawTx?.length).toBe(244)
     }, 300000)
 
+    test('getUtxoStatus', async () => {
+        const script = '76A91490C52A563D0D1E53A0FCDA9C1385C514EB36635288AC'
+        const chain = 'test'
+        const p = await services.getUtxoStatus(script, chain)
+        expect(p).toBeTruthy()
+        expect(p.name).toBe('WoC')
+        expect(p.status).toBe('success')
+        expect(p.isUtxo).toBe(true)
+        expect(p.error).toBeUndefined()
+    }, 300000)
 })

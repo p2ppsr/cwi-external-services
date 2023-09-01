@@ -65,7 +65,27 @@ export interface CwiExternalServicesApi {
      */
     postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]>
 
+    /**
+     * Attempts to determine the UTXO status of a transaction output.
+     * 
+     * Cycles through configured transaction processing services attempting to get a valid response.
+     * 
+     * @param output transaction output identifier in format determined by `outputFormat`.
+     * @param chain which chain to post to, all of rawTx's inputs must be unspent on this chain.
+     * @param outputFormat optional, supported values:
+     *      'hashLE' little-endian sha256 hash of output script
+     *      'hashBE' big-endian sha256 hash of output script
+     *      'script' entire transaction output script
+     *      undefined if asBuffer length of `output` is 32 then 'hashBE`, otherwise 'script'.
+     * @param useNext optional, forces skip to next service before starting service requests cycle.
+     */
+    getUtxoStatus(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi, useNext?: boolean): Promise<GetUtxoStatusResultApi>
+
 }
+
+export type GetUtxoStatusOutputFormatApi = 'hashLE' | 'hashBE' | 'script'
+
+export type GetUtxoStatusServiceApi = (output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi) => Promise<GetUtxoStatusResultApi>
 
 export type GetMerkleProofServiceApi = (txid: string | Buffer, chain: Chain) => Promise<GetMerkleProofResultApi>
 
@@ -197,3 +217,46 @@ export interface PostRawTxResultApi {
     alreadyKnown?: boolean
 }
 
+export interface GetUtxoStatusResultApi {
+    /**
+     * The name of the service to which the transaction was submitted for processing
+     */
+    name: string
+    /**
+     * 'success' - the operation was successful, non-error results are valid.
+     * 'error' - the operation failed, error may have relevant information.
+     */
+    status: 'success' | 'error'
+    /**
+     * When status is 'error', provides code and description
+     */ 
+    error?: CwiError
+    /**
+     * true if the output is associated with at least one unspent transaction output
+     */
+    isUtxo?: boolean
+    /**
+     * if isUtxo, the block height containing the matching unspent transaction output
+     * 
+     * typically there will be only one, but future orphans can result in multiple values
+     */
+    height?: number[]
+    /**
+     * if isUtxo, the transaction hash (txid) of the transaction containing the matching unspent transaction output
+     * 
+     * typically there will be only one, but future orphans can result in multiple values
+     */
+    txid?: string[]
+    /**
+     * if isUtxo, the output index in the transaction containing of the matching unspent transaction output
+     * 
+     * typically there will be only one, but future orphans can result in multiple values
+     */
+    index?: number[]
+    /**
+     * if isUtxo, the amount of the matching unspent transaction output
+     * 
+     * typically there will be only one, but future orphans can result in multiple values
+     */
+    amount?: number[]
+}
