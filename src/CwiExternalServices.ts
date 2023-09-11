@@ -81,7 +81,7 @@ export class CwiExternalServices implements CwiExternalServicesApi {
         if (useNext)
             services.next()
 
-        let r0: GetUtxoStatusResultApi = { name: "<noservices>", status: "error", error: new ERR_INTERNAL('No services available.') }
+        let r0: GetUtxoStatusResultApi = { name: "<noservices>", status: "error", error: new ERR_INTERNAL('No services available.'), details: [] }
 
         for (let tries = 0; tries < services.count; tries++) {
             const service = services.service

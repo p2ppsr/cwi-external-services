@@ -14,7 +14,7 @@ export async function getUtxoStatusFromWhatsOnChain(output: string | Buffer, cha
 : Promise<GetUtxoStatusResultApi>
 {
     
-    const r: GetUtxoStatusResultApi = { name: 'WoC', status: 'error', error: new ERR_INTERNAL() }
+    const r: GetUtxoStatusResultApi = { name: 'WoC', status: 'error', error: new ERR_INTERNAL(), details: [] }
 
     try {
         
@@ -33,15 +33,13 @@ export async function getUtxoStatusFromWhatsOnChain(output: string | Buffer, cha
                 r.status = 'success'
                 r.error = undefined
                 r.isUtxo = true
-                r.txid = []
-                r.amount = []
-                r.height = []
-                r.index = []
                 for (const s of <WhatsOnChainUtxoStatus[]>data) {
-                    r.txid.push(s.tx_hash)
-                    r.amount.push(s.value)
-                    r.height.push(s.height)
-                    r.index.push(s.tx_pos)
+                    r.details.push({
+                        txid: s.tx_hash,
+                        amount: s.value,
+                        height: s.height,
+                        index: s.tx_pos
+                    })
                 }
             }
         } else {

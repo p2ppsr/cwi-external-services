@@ -217,6 +217,33 @@ export interface PostRawTxResultApi {
     alreadyKnown?: boolean
 }
 
+export interface GetUtxoStatusDetailsApi {
+    /**
+     * if isUtxo, the block height containing the matching unspent transaction output
+     * 
+     * typically there will be only one, but future orphans can result in multiple values
+     */
+    height?: number
+    /**
+     * if isUtxo, the transaction hash (txid) of the transaction containing the matching unspent transaction output
+     * 
+     * typically there will be only one, but future orphans can result in multiple values
+     */
+    txid?: string
+    /**
+     * if isUtxo, the output index in the transaction containing of the matching unspent transaction output
+     * 
+     * typically there will be only one, but future orphans can result in multiple values
+     */
+    index?: number
+    /**
+     * if isUtxo, the amount of the matching unspent transaction output
+     * 
+     * typically there will be only one, but future orphans can result in multiple values
+     */
+    amount?: number
+}
+
 export interface GetUtxoStatusResultApi {
     /**
      * The name of the service to which the transaction was submitted for processing
@@ -236,27 +263,10 @@ export interface GetUtxoStatusResultApi {
      */
     isUtxo?: boolean
     /**
-     * if isUtxo, the block height containing the matching unspent transaction output
+     * Additional details about occurances of this output script as a utxo.
      * 
-     * typically there will be only one, but future orphans can result in multiple values
+     * Normally there will be one item in the array but due to the possibility of orphan races
+     * there could be more than one block in which it is a valid utxo.
      */
-    height?: number[]
-    /**
-     * if isUtxo, the transaction hash (txid) of the transaction containing the matching unspent transaction output
-     * 
-     * typically there will be only one, but future orphans can result in multiple values
-     */
-    txid?: string[]
-    /**
-     * if isUtxo, the output index in the transaction containing of the matching unspent transaction output
-     * 
-     * typically there will be only one, but future orphans can result in multiple values
-     */
-    index?: number[]
-    /**
-     * if isUtxo, the amount of the matching unspent transaction output
-     * 
-     * typically there will be only one, but future orphans can result in multiple values
-     */
-    amount?: number[]
+    details: GetUtxoStatusDetailsApi[]
 }
