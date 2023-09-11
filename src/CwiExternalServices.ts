@@ -32,10 +32,10 @@ export class CwiExternalServices implements CwiExternalServicesApi {
 
     options: CwiExternalServicesOptions
 
-    getProofs: ServiceCollection<GetMerkleProofServiceApi>
-    getRawTxs: ServiceCollection<GetRawTxServiceApi>
-    postRawTxs: ServiceCollection<PostRawTxServiceApi>
-    getUtxoStats: ServiceCollection<GetUtxoStatusServiceApi>
+    private getProofs: ServiceCollection<GetMerkleProofServiceApi>
+    private getRawTxs: ServiceCollection<GetRawTxServiceApi>
+    private postRawTxs: ServiceCollection<PostRawTxServiceApi>
+    private getUtxoStats: ServiceCollection<GetUtxoStatusServiceApi>
 
     constructor(options?: CwiExternalServicesOptions) {
         this.options = options || CwiExternalServices.createDefaultOptions()
