@@ -4,6 +4,1437 @@ Implementations of external service APIs.
 
 Standardized service APIs for use within CWI.
 
+## API
+
+<!--#region ts2md-api-merged-here-->
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+### Interfaces
+
+| | |
+| --- | --- |
+| [CwiExternalServicesApi](#interface-cwiexternalservicesapi) | [MapiPostTxPayloadApi](#interface-mapiposttxpayloadapi) |
+| [CwiExternalServicesOptions](#interface-cwiexternalservicesoptions) | [MapiResponseApi](#interface-mapiresponseapi) |
+| [GetMerkleProofResultApi](#interface-getmerkleproofresultapi) | [MapiTxStatusPayloadApi](#interface-mapitxstatuspayloadapi) |
+| [GetRawTxResultApi](#interface-getrawtxresultapi) | [MapiTxidReturnResultApi](#interface-mapitxidreturnresultapi) |
+| [GetUtxoStatusDetailsApi](#interface-getutxostatusdetailsapi) | [PostRawTxResultApi](#interface-postrawtxresultapi) |
+| [GetUtxoStatusResultApi](#interface-getutxostatusresultapi) | [PostTransactionMapiMinerApi](#interface-posttransactionmapiminerapi) |
+| [MapiCallbackApi](#interface-mapicallbackapi) | [TscMerkleProofApi](#interface-tscmerkleproofapi) |
+| [MapiCallbackPayloadApi](#interface-mapicallbackpayloadapi) |  |
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+
+#### Interface: CwiExternalServicesApi
+
+##### Description
+
+Defines standard interfaces to access functionality implemented by external transaction processing services.
+
+```ts
+export interface CwiExternalServicesApi {
+    getRawTx(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetRawTxResultApi>;
+    getMerkleProof(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetMerkleProofResultApi>;
+    postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]>;
+    getUtxoStatus(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi, useNext?: boolean): Promise<GetUtxoStatusResultApi>;
+}
+```
+
+<details>
+
+<summary>Interface CwiExternalServicesApi Member Details</summary>
+
+###### getRawTx
+
+Attempts to obtain the raw transaction bytes associated with a 32 byte transaction hash (txid).
+
+Cycles through configured transaction processing services attempting to get a valid response.
+
+On success:
+Result txid is the requested transaction hash
+Result rawTx will be Buffer containing raw transaction bytes.
+Result name will be the responding service's identifying name.
+Returns result without incrementing active service.
+
+On failure:
+Result txid is the requested transaction hash
+Result mapi will be the first mapi response obtained (service name and response), or null
+Result error will be the first error thrown (service name and CwiError), or null
+Increments to next configured service and tries again until all services have been tried.
+
+###### getMerkleProof
+
+Attempts to obtain the merkle proof associated with a 32 byte transaction hash (txid).
+
+Cycles through configured transaction processing services attempting to get a valid response.
+
+On success:
+Result txid is the requested transaction hash
+Result proof will be the merkle proof.
+Result name will be the responding service's identifying name.
+Returns result without incrementing active service.
+
+On failure:
+Result txid is the requested transaction hash
+Result mapi will be the first mapi response obtained (service name and response), or null
+Result error will be the first error thrown (service name and CwiError), or null
+Increments to next configured service and tries again until all services have been tried.
+
+###### postRawTx
+
+Attempts to post a new transaction to each configured external transaction processing service.
+
+Asynchronously posts the transaction simultaneously to all the configured services.
+
+###### getUtxoStatus
+
+Attempts to determine the UTXO status of a transaction output.
+
+Cycles through configured transaction processing services attempting to get a valid response.
+
+</details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: MapiCallbackApi
+
+##### Description
+
+An API that enables unique callback IDs to be generated for potentially multiple independent
+callback clients.
+
+```ts
+export interface MapiCallbackApi {
+    getId: () => Promise<string>;
+    url: string;
+}
+```
+
+<details>
+
+<summary>Interface MapiCallbackApi Member Details</summary>
+
+###### getId
+
+Each call to this method generates a unique callbackID string and creates a record of the
+circumstances under which it was generated.
+
+###### url
+
+The public url to which callbacks will occur.
+
+Callback requests must include a previously `getId` generated callbackID which must match
+an already existing callback record.
+
+</details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: GetMerkleProofResultApi
+
+##### Description
+
+Properties on result returned from `CwiExternalServicesApi` function `getMerkleProof`.
+
+```ts
+export interface GetMerkleProofResultApi {
+    name?: string;
+    proof?: TscMerkleProofApi | TscMerkleProofApi[];
+    mapi?: {
+        name?: string;
+        resp: MapiResponseApi;
+    };
+    error?: {
+        name?: string;
+        err: CwiError;
+    };
+}
+```
+
+<details>
+
+<summary>Interface GetMerkleProofResultApi Member Details</summary>
+
+###### name
+
+The name of the service returning the proof, or undefined if no proof
+
+###### proof
+
+Multiple proofs may be returned when a transaction also appears in
+one or more orphaned blocks
+
+###### mapi
+
+The first valid mapi response received from a service, if any.
+Relevant when no proof was received.
+
+###### error
+
+The first exception error that occurred during processing, if any.
+
+</details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: GetRawTxResultApi
+
+##### Description
+
+Properties on result returned from `CwiExternalServicesApi` function `getRawTx`.
+
+```ts
+export interface GetRawTxResultApi {
+    txid: string;
+    name?: string;
+    rawTx?: Buffer;
+    mapi?: {
+        name?: string;
+        resp: MapiResponseApi;
+    };
+    error?: {
+        name?: string;
+        err: CwiError;
+    };
+}
+```
+
+<details>
+
+<summary>Interface GetRawTxResultApi Member Details</summary>
+
+###### txid
+
+Transaction hash or rawTx (and of initial request)
+
+###### name
+
+The name of the service returning the rawTx, or undefined if no rawTx
+
+###### rawTx
+
+Multiple proofs may be returned when a transaction also appears in
+one or more orphaned blocks
+
+###### mapi
+
+The first valid mapi response received from a service, if any.
+Relevant when no proof was received.
+
+###### error
+
+The first exception error that occurred during processing, if any.
+
+</details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: PostRawTxResultApi
+
+##### Description
+
+Properties on array items of result returned from `CwiExternalServicesApi` function `postRawTx`.
+
+```ts
+export interface PostRawTxResultApi {
+    name: string;
+    callbackID?: string;
+    status: "success" | "error";
+    mapi?: MapiResponseApi;
+    payload?: MapiPostTxPayloadApi;
+    error?: CwiError;
+    alreadyKnown?: boolean;
+}
+```
+
+<details>
+
+<summary>Interface PostRawTxResultApi Member Details</summary>
+
+###### name
+
+The name of the service to which the transaction was submitted for processing
+
+###### callbackID
+
+callbackID associated with this request
+
+###### status
+
+'success' - The transaction was accepted for processing
+
+###### mapi
+
+Raw mapi response including stringified payload
+
+###### payload
+
+Parsed and signature verified mapi payload
+
+###### error
+
+When status is 'error', provides code and description
+
+Specific potential errors:
+ERR_BAD_REQUEST
+ERR_EXTSVS_DOUBLE_SPEND
+ERR_EXTSVS_ALREADY_MINED (description has error details)
+ERR_EXTSVS_INVALID_TRANSACTION (description has error details)
+ERR_EXTSVS_TXID_INVALID (service response txid doesn't match rawTx)
+ERR_EXTSVS_MAPI_SIGNATURE_INVALID
+ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING
+ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE
+ERR_EXTSVS_MAPI_MISSING (description has service request error details)
+
+###### alreadyKnown
+
+if true, the transaction was already known to this service. Usually treat as a success.
+
+Potentially stop posting to additional transaction processors.
+
+</details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: GetUtxoStatusDetailsApi
+
+```ts
+export interface GetUtxoStatusDetailsApi {
+    height?: number;
+    txid?: string;
+    index?: number;
+    amount?: number;
+}
+```
+
+<details>
+
+<summary>Interface GetUtxoStatusDetailsApi Member Details</summary>
+
+###### height
+
+if isUtxo, the block height containing the matching unspent transaction output
+
+typically there will be only one, but future orphans can result in multiple values
+
+###### txid
+
+if isUtxo, the transaction hash (txid) of the transaction containing the matching unspent transaction output
+
+typically there will be only one, but future orphans can result in multiple values
+
+###### index
+
+if isUtxo, the output index in the transaction containing of the matching unspent transaction output
+
+typically there will be only one, but future orphans can result in multiple values
+
+###### amount
+
+if isUtxo, the amount of the matching unspent transaction output
+
+typically there will be only one, but future orphans can result in multiple values
+
+</details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: GetUtxoStatusResultApi
+
+```ts
+export interface GetUtxoStatusResultApi {
+    name: string;
+    status: "success" | "error";
+    error?: CwiError;
+    isUtxo?: boolean;
+    details: GetUtxoStatusDetailsApi[];
+}
+```
+
+<details>
+
+<summary>Interface GetUtxoStatusResultApi Member Details</summary>
+
+###### name
+
+The name of the service to which the transaction was submitted for processing
+
+###### status
+
+'success' - the operation was successful, non-error results are valid.
+'error' - the operation failed, error may have relevant information.
+
+###### error
+
+When status is 'error', provides code and description
+
+###### isUtxo
+
+true if the output is associated with at least one unspent transaction output
+
+###### details
+
+Additional details about occurances of this output script as a utxo.
+
+Normally there will be one item in the array but due to the possibility of orphan races
+there could be more than one block in which it is a valid utxo.
+
+</details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: MapiResponseApi
+
+```ts
+export interface MapiResponseApi {
+    payload: string;
+    signature: string;
+    publicKey: string;
+    encoding?: string;
+    mimetype?: string;
+}
+```
+
+<details>
+
+<summary>Interface MapiResponseApi Member Details</summary>
+
+###### payload
+
+Contents of the envelope.
+Validate using signature and publicKey.
+encoding and mimetype may assist with decoding validated payload.
+
+###### signature
+
+signature producted by correpsonding private key on payload data
+
+###### publicKey
+
+public key to use to verify signature of payload data
+
+###### encoding
+
+encoding of the payload data
+
+###### mimetype
+
+mime type of the payload data
+
+</details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: TscMerkleProofApi
+
+##### Description
+
+As defined in https://github.com/bitcoin-sv-specs/brfc-merchantapi/blob/master/README.md
+
+```ts
+export interface TscMerkleProofApi {
+    height?: number;
+    index: number;
+    txOrId: string | Buffer;
+    target: string | Buffer;
+    nodes: string[] | Buffer;
+    targetType?: "hash" | "header" | "merkleRoot" | "height";
+    proofType?: "branch" | "tree";
+    composite?: boolean;
+}
+```
+
+<details>
+
+<summary>Interface TscMerkleProofApi Member Details</summary>
+
+###### height
+
+The most efficient way of confirming a proof should also be the most common,
+when the containing block's height is known.
+
+###### index
+
+Index of transaction in its block. First transaction is index zero.
+
+###### txOrId
+
+Full transaction (length > 32 bytes) or just its double SHA256 hash (length === 32 bytes).
+If string, encoding is hex.
+
+###### target
+
+Merkle root (length === 32) or serialized block header containing it (length === 80).
+If string, encoding is hex.
+
+###### nodes
+
+Merkle tree sibling hash values required to compute root from txid.
+Duplicates (sibling hash === computed hash) are indicated by "*" or type byte === 1.
+type byte === 2...
+Strings are encoded as hex.
+
+</details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: MapiTxStatusPayloadApi
+
+##### Description
+
+As defined in https://github.com/bitcoin-sv-specs/brfc-merchantapi/blob/master/README.md
+
+```ts
+export interface MapiTxStatusPayloadApi {
+    apiVersion: string;
+    timestamp: string;
+    txid: string;
+    returnResult: string;
+    blockHash: string;
+    blockHeight: number;
+    confirmations: number;
+    minerId: string;
+    txSecondMempoolExpiry: number;
+    merkleProof?: TscMerkleProofApi;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: MapiCallbackPayloadApi
+
+##### Description
+
+As defined in https://github.com/bitcoin-sv-specs/brfc-merchantapi/blob/master/README.md
+
+```ts
+export interface MapiCallbackPayloadApi {
+    apiVersion: string;
+    timestamp: string;
+    blockHash: string;
+    blockHeight: number;
+    callbackTxId: string;
+    callbackReason: string;
+    callbackPayload: string;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: MapiTxidReturnResultApi
+
+##### Description
+
+Used to parse payloads when only confirmation that a miner acknowledges a specific txid matters.
+
+```ts
+export interface MapiTxidReturnResultApi {
+    apiVersion?: string;
+    timestamp?: string;
+    txid: string;
+    returnResult: string;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: MapiPostTxPayloadApi
+
+##### Description
+
+As defined in https://github.com/bitcoin-sv-specs/brfc-merchantapi/blob/master/README.md
+
+```ts
+export interface MapiPostTxPayloadApi {
+    apiVersion: string;
+    timestamp: string;
+    txid: string;
+    returnResult: string;
+    resultDescription: string;
+    minerId: string;
+    currentHighestBlockHash?: string;
+    currentHighestBlockHeight?: number;
+    txSecondMempoolExpiry?: number;
+    failureRetryable?: boolean;
+    warnings?: unknown[];
+    conflictedWith?: unknown[];
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: PostTransactionMapiMinerApi
+
+```ts
+export interface PostTransactionMapiMinerApi {
+    name: string;
+    url: string;
+    authType: "none" | "bearer";
+    authToken?: string;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: CwiExternalServicesOptions
+
+```ts
+export interface CwiExternalServicesOptions {
+    mainTaalApiKey?: string;
+    testTaalApiKey?: string;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+### Classes
+
+| | |
+| --- | --- |
+| [CwiExternalServices](#class-cwiexternalservices) | [ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE](#class-err_extsvs_mapi_unsupported_mimetype) |
+| [ERR_EXTSVS_ALREADY_MINED](#class-err_extsvs_already_mined) | [ERR_EXTSVS_MAPI_UNSUPPORTED_RETURNRESULT](#class-err_extsvs_mapi_unsupported_returnresult) |
+| [ERR_EXTSVS_BLOCK_HASH_MISSING](#class-err_extsvs_block_hash_missing) | [ERR_EXTSVS_MERKLEPROOF_NODE_TYPE](#class-err_extsvs_merkleproof_node_type) |
+| [ERR_EXTSVS_BLOCK_HEIGHT_MISSING](#class-err_extsvs_block_height_missing) | [ERR_EXTSVS_MERKLEPROOF_PARSING](#class-err_extsvs_merkleproof_parsing) |
+| [ERR_EXTSVS_DOUBLE_SPEND](#class-err_extsvs_double_spend) | [ERR_EXTSVS_MERKLEPROOF_TAGET_TYPE](#class-err_extsvs_merkleproof_taget_type) |
+| [ERR_EXTSVS_ENVELOPE_DEPTH](#class-err_extsvs_envelope_depth) | [ERR_EXTSVS_MERKLEPROOF_UNSUPPORTED](#class-err_extsvs_merkleproof_unsupported) |
+| [ERR_EXTSVS_INVALID_TRANSACTION](#class-err_extsvs_invalid_transaction) | [ERR_EXTSVS_MERKLEROOT_INVALID](#class-err_extsvs_merkleroot_invalid) |
+| [ERR_EXTSVS_MAPI_MISSING](#class-err_extsvs_mapi_missing) | [ERR_EXTSVS_MERKLEROOT_MISSING](#class-err_extsvs_merkleroot_missing) |
+| [ERR_EXTSVS_MAPI_SIGNATURE_INVALID](#class-err_extsvs_mapi_signature_invalid) | [ERR_EXTSVS_TXID_INVALID](#class-err_extsvs_txid_invalid) |
+| [ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING](#class-err_extsvs_mapi_unsupported_encoding) | [ServiceCollection](#class-servicecollection) |
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+
+#### Class: ERR_EXTSVS_TXID_INVALID
+
+##### Description
+
+Expected txid ${expected} doesn't match proof txid ${actual}
+
+```ts
+export class ERR_EXTSVS_TXID_INVALID extends CwiError {
+    constructor(expected?: string, actual?: string) 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Class: ERR_EXTSVS_BLOCK_HASH_MISSING
+
+##### Description
+
+Header for block hash ${hash} was not found.
+
+```ts
+export class ERR_EXTSVS_BLOCK_HASH_MISSING extends CwiError {
+    constructor(hash?: string) 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Class: ERR_EXTSVS_BLOCK_HEIGHT_MISSING
+
+##### Description
+
+Header for block height ${height} was not found.
+
+```ts
+export class ERR_EXTSVS_BLOCK_HEIGHT_MISSING extends CwiError {
+    constructor(height?: number) 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Class: ERR_EXTSVS_ENVELOPE_DEPTH
+
+##### Description
+
+Exceeded max envelope depth ${maxDepth}
+
+```ts
+export class ERR_EXTSVS_ENVELOPE_DEPTH extends CwiError {
+    constructor(maxDepth: number) 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Class: ERR_EXTSVS_MERKLEROOT_INVALID
+
+##### Description
+
+Expected merkleRoot ${expected} doesn't match computed ${actual}
+
+```ts
+export class ERR_EXTSVS_MERKLEROOT_INVALID extends CwiError {
+    constructor(expected?: string, actual?: string) 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Class: ERR_EXTSVS_MERKLEROOT_MISSING
+
+##### Description
+
+MerkleRoot ${merkleRoot} was not found in active chain.
+
+```ts
+export class ERR_EXTSVS_MERKLEROOT_MISSING extends CwiError {
+    constructor(merkleRoot?: string) 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Class: ERR_EXTSVS_MERKLEPROOF_TAGET_TYPE
+
+##### Description
+
+Unsupported merkle proof target type ${targetType}.
+
+```ts
+export class ERR_EXTSVS_MERKLEPROOF_TAGET_TYPE extends CwiError {
+    constructor(targetType?: string | number) 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Class: ERR_EXTSVS_MERKLEPROOF_NODE_TYPE
+
+##### Description
+
+Unsupported merkle proof node type ${nodeType}.
+
+```ts
+export class ERR_EXTSVS_MERKLEPROOF_NODE_TYPE extends CwiError {
+    constructor(nodeType?: string | number) 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Class: ERR_EXTSVS_MERKLEPROOF_PARSING
+
+##### Description
+
+Merkle proof parsing error.
+
+```ts
+export class ERR_EXTSVS_MERKLEPROOF_PARSING extends CwiError {
+    constructor() 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Class: ERR_EXTSVS_MERKLEPROOF_UNSUPPORTED
+
+##### Description
+
+Merkle proof unsuported feature ${feature}.
+
+```ts
+export class ERR_EXTSVS_MERKLEPROOF_UNSUPPORTED extends CwiError {
+    constructor(feature?: string) 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Class: ERR_EXTSVS_MAPI_MISSING
+
+##### Description
+
+Required Mapi response is missing.
+
+```ts
+export class ERR_EXTSVS_MAPI_MISSING extends CwiError {
+    constructor(description?: string) 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Class: ERR_EXTSVS_MAPI_SIGNATURE_INVALID
+
+##### Description
+
+Mapi response signature is invalid.
+
+```ts
+export class ERR_EXTSVS_MAPI_SIGNATURE_INVALID extends CwiError {
+    constructor() 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Class: ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE
+
+##### Description
+
+mAPI response unsupported mimetype ${mimeType}
+
+```ts
+export class ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE extends CwiError {
+    constructor(mimeType?: string) 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Class: ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING
+
+##### Description
+
+mAPI response unsupported encoding ${encoding}
+
+```ts
+export class ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING extends CwiError {
+    constructor(encoding?: string) 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Class: ERR_EXTSVS_MAPI_UNSUPPORTED_RETURNRESULT
+
+##### Description
+
+mAPI response unsupported returnResult ${result}
+
+```ts
+export class ERR_EXTSVS_MAPI_UNSUPPORTED_RETURNRESULT extends CwiError {
+    constructor(result?: string) 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Class: ERR_EXTSVS_INVALID_TRANSACTION
+
+##### Description
+
+Transaction is invalid.
+
+```ts
+export class ERR_EXTSVS_INVALID_TRANSACTION extends CwiError {
+    constructor(description?: string) 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Class: ERR_EXTSVS_DOUBLE_SPEND
+
+##### Description
+
+Transaction is a double spend.
+
+```ts
+export class ERR_EXTSVS_DOUBLE_SPEND extends CwiError {
+    constructor() 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Class: ERR_EXTSVS_ALREADY_MINED
+
+##### Description
+
+Transaction was already mined.
+
+```ts
+export class ERR_EXTSVS_ALREADY_MINED extends CwiError {
+    constructor(description?: string) 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Class: ServiceCollection
+
+```ts
+export class ServiceCollection<T> {
+    services: {
+        name: string;
+        service: T;
+    }[];
+    _index: number;
+    constructor() 
+    add(s: {
+        name: string;
+        service: T;
+    }): ServiceCollection<T> 
+    get name() 
+    get service() 
+    get allServices() 
+    get count() 
+    get index() 
+    next(): number 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Class: CwiExternalServices
+
+```ts
+export class CwiExternalServices implements CwiExternalServicesApi {
+    static createDefaultOptions(): CwiExternalServicesOptions 
+    options: CwiExternalServicesOptions;
+    constructor(options?: CwiExternalServicesOptions) 
+    async getUtxoStatus(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi, useNext?: boolean): Promise<GetUtxoStatusResultApi> 
+    async postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]> 
+    async getRawTx(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetRawTxResultApi> 
+    async getMerkleProof(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetMerkleProofResultApi> 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+### Functions
+
+| | |
+| --- | --- |
+| [checkMapiResponse](#function-checkmapiresponse) | [getProofFromGorillaPool](#function-getprooffromgorillapool) |
+| [checkMapiResponseForTxid](#function-checkmapiresponsefortxid) | [getProofFromMetastreme](#function-getprooffrommetastreme) |
+| [checkMerkleProof](#function-checkmerkleproof) | [getProofFromTaal](#function-getprooffromtaal) |
+| [getMapiCallbackPayload](#function-getmapicallbackpayload) | [getProofFromWhatsOnChain](#function-getprooffromwhatsonchain) |
+| [getMapiJsonResponsePayload](#function-getmapijsonresponsepayload) | [getProofFromWhatsOnChainTsc](#function-getprooffromwhatsonchaintsc) |
+| [getMapiPostTxPayload](#function-getmapiposttxpayload) | [getRawTxFromWhatsOnChain](#function-getrawtxfromwhatsonchain) |
+| [getMapiTxStatusPayload](#function-getmapitxstatuspayload) | [getSpentStatusForOutpoint](#function-getspentstatusforoutpoint) |
+| [getMerkleProofFromGorillaPool](#function-getmerkleprooffromgorillapool) | [getUtxoStatusFromWhatsOnChain](#function-getutxostatusfromwhatsonchain) |
+| [getMerkleProofFromMetastreme](#function-getmerkleprooffrommetastreme) | [postRawTxToGorillaPool](#function-postrawtxtogorillapool) |
+| [getMerkleProofFromTaal](#function-getmerkleprooffromtaal) | [postRawTxToMapiMiner](#function-postrawtxtomapiminer) |
+| [getMerkleProofFromWhatsOnChain](#function-getmerkleprooffromwhatsonchain) | [postRawTxToTaal](#function-postrawtxtotaal) |
+| [getMerkleProofFromWhatsOnChainTsc](#function-getmerkleprooffromwhatsonchaintsc) | [verifyMapiResponseForTxid](#function-verifymapiresponsefortxid) |
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+
+#### Function: checkMapiResponse
+
+##### Description
+
+Verifies the payload signature on a mAPI response object
+
+Throws an error if signature fails to validate.
+
+https://github.com/bitcoin-sv-specs/brfc-misc/tree/master/jsonenvelope
+
+```ts
+export function checkMapiResponse(response: MapiResponseApi) 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getMapiJsonResponsePayload
+
+##### Description
+
+Parses a mAPI mimetype 'application/json' response payload after verifying the envelope signature.
+
+Throws on verification errors.
+
+```ts
+export function getMapiJsonResponsePayload<T>(response: MapiResponseApi): T 
+```
+
+##### Returns
+
+parse JSON payload object
+
+<details>
+
+<summary>Function getMapiJsonResponsePayload Argument Details</summary>
+
+###### mAPI
+
+response</details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getMapiTxStatusPayload
+
+##### Description
+
+Validates the mapi response signature and parses payload as transaction status.
+
+Throws an error if payload txid doesn't match requested txid.
+
+Throws an error if payload returnResult is not 'success' or 'failure'.
+
+'failure' indicates the txid is unknown to the service.
+
+'success' indicates the txid is known to the service and status was returned.
+
+```ts
+export function getMapiTxStatusPayload(txid: string | Buffer | undefined, response: MapiResponseApi): MapiTxStatusPayloadApi 
+```
+
+<details>
+
+<summary>Function getMapiTxStatusPayload Argument Details</summary>
+
+###### txid
+
+hash of transaction whose status was requested</details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getMapiCallbackPayload
+
+```ts
+export function getMapiCallbackPayload(txid: string | Buffer | undefined, response: MapiResponseApi): MapiCallbackPayloadApi 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: verifyMapiResponseForTxid
+
+```ts
+export function verifyMapiResponseForTxid<T extends MapiTxidReturnResultApi>(response: MapiResponseApi, txid?: string | Buffer, checkFailure?: boolean): T 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getMapiPostTxPayload
+
+```ts
+export function getMapiPostTxPayload(response: MapiResponseApi, txid?: string | Buffer, checkFailure?: boolean): MapiPostTxPayloadApi 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: checkMapiResponseForTxid
+
+```ts
+export function checkMapiResponseForTxid(response: MapiResponseApi, txid?: string | Buffer): boolean 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getMerkleProofFromGorillaPool
+
+##### Description
+
+GorillaPool.io has a mapi transaction status endpoint for mainNet, not for testNet,
+and does NOT return merkle proofs...
+
+mapiResponse is signed and has txStatus payload.
+{
+  apiVersion: "",
+  timestamp: "2023-03-23T02:14:39.362Z",
+  txid: "9c31ed1dea4ec1aae0475addc0a74eaed68b718d9983d42b111c387d6696a949",
+  returnResult: "success",
+  resultDescription: "",
+  blockHash: "00000000000000000e155235fd83a8757c44c6299e63104fb12632368f3f0cc9",
+  blockHeight: 700000,
+  confirmations: 84353,
+  minerId: "03ad780153c47df915b3d2e23af727c68facaca4facd5f155bf5018b979b9aeb83",
+  txSecondMempoolExpiry: 0,
+}
+
+```ts
+export async function getMerkleProofFromGorillaPool(txid: string | Buffer): Promise<TscMerkleProofApi | undefined> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getMerkleProofFromTaal
+
+##### Description
+
+Taal.com has the most functional txStatus and merkleProof endpoint for both mainNet and testNet
+
+Proofs use targetType "header" which is converted to "merkleRoot".
+
+Proofs correctly use duplicate computed node value symbol "*".
+
+An apiKey must be used and must correspond to the target chain: mainNet or testNet.
+
+```ts
+export async function getMerkleProofFromTaal(txid: string | Buffer, apiKey: string): Promise<TscMerkleProofApi | undefined> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getMerkleProofFromMetastreme
+
+##### Description
+
+metastreme.com has a partially conforming merkleProof implementation.
+
+Both mainNet and testNet are supported.
+
+Proofs incorrectly included a copy of the computed value instead of "*" along right side of merkle tree.
+
+targetType of hash is used which prevents automatic proof checking as the target root value isn't known
+without a lookup request.
+
+```ts
+export async function getMerkleProofFromMetastreme(txid: string | Buffer, chain: Chain): Promise<TscMerkleProofApi | undefined> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getMerkleProofFromWhatsOnChain
+
+##### Description
+
+WhatOnChain.com has their own "hash/pos/R/L" proof format and a more TSC compliant proof format.
+
+The "/proof" endpoint returns an object for each node with "hash" and "pos" properties. "pos" can have values "R" or "L".
+Normally "pos" indicates which side of a concatenation the provided "hash" goes with one exception! EXCEPTION: When the
+provided should be "*" indicating edge-of-the-tree-duplicate-computed-value, they include the expected computed value and the pos value
+is always "L", even when it should really be "R". This only matters if you are trying to compute index from the "R" and "L" values.
+
+```ts
+export async function getMerkleProofFromWhatsOnChain(txid: string | Buffer, chain: Chain): Promise<TscMerkleProofApi | undefined> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getMerkleProofFromWhatsOnChainTsc
+
+##### Description
+
+WhatOnChain.com has their own "hash/pos/R/L" proof format and a more TSC compliant proof format.
+
+The "/proof/tsc" endpoint is much closer to the TSC specification. It provides "index" directly and each node is just the provided hash value.
+The "targetType" is unspecified and thus defaults to block header hash, requiring a Chaintracks lookup to get the merkleRoot...
+Duplicate hash values are provided in full instead of being replaced by "*".
+
+```ts
+export async function getMerkleProofFromWhatsOnChainTsc(txid: string | Buffer, chain: Chain): Promise<TscMerkleProofApi | undefined> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: checkMerkleProof
+
+##### Description
+
+Implement merkle proof per https://tsc.bitcoinassociation.net/standards/merkle-proof-standardised-format/
+
+We extend the current standard by implementing targetType 'height' (binary value 3).
+This extension avoids the need to maintain a merkleroot or block hash index for all headers,
+reducing the space required by 50%.
+
+Other extensions are not currently supported.
+
+Supports partial and full binary format as well as hex strings.
+
+External Assumptions:
+1. The raw transaction is in-hand and is either duplicated in the proof or matches the starting hash
+   used to evaluate the merkle tree branch.
+
+Checking the proof verifies these claims:
+1. The merkleRoot determined by the targetType is confirmed to match a block header on the active chain.
+2. Computing a merkleRoot value starting with the transaction hash, using the proof nodes yields a
+   match for the target value.
+
+Implications:
+1. The transaction in-hand is valid and was included in a block on the active chain.
+
+```ts
+export async function checkMerkleProof(txid: string | Buffer, proof: TscMerkleProofApi | Buffer, chaintracks: ChaintracksClientApi): Promise<BlockHeader> 
+```
+
+##### Returns
+
+The block header containing the verified merkleRoot
+
+<details>
+
+<summary>Function checkMerkleProof Argument Details</summary>
+
+###### txid
+
+the transaction hash of the in-hand transaction to which this proof applies.</details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: postRawTxToGorillaPool
+
+```ts
+export async function postRawTxToGorillaPool(txid: string | Buffer, rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: postRawTxToTaal
+
+```ts
+export function postRawTxToTaal(txid: string | Buffer, rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi, apiKey?: string): Promise<PostRawTxResultApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: postRawTxToMapiMiner
+
+```ts
+export async function postRawTxToMapiMiner(txid: string | Buffer, rawTx: string | Buffer, miner: PostTransactionMapiMinerApi, callback?: MapiCallbackApi): Promise<PostRawTxResultApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getRawTxFromWhatsOnChain
+
+```ts
+export async function getRawTxFromWhatsOnChain(txid: string | Buffer, chain: Chain): Promise<GetRawTxResultApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getProofFromGorillaPool
+
+##### Description
+
+GorillaPool.io MAINNET ONLY
+
+has a mapi transaction status endpoint for mainNet, not for testNet,
+and does NOT return merkle proofs...
+
+mapiResponse is signed and has txStatus payload.
+{
+  apiVersion: "",
+  timestamp: "2023-03-23T02:14:39.362Z",
+  txid: "9c31ed1dea4ec1aae0475addc0a74eaed68b718d9983d42b111c387d6696a949",
+  returnResult: "success",
+  resultDescription: "",
+  blockHash: "00000000000000000e155235fd83a8757c44c6299e63104fb12632368f3f0cc9",
+  blockHeight: 700000,
+  confirmations: 84353,
+  minerId: "03ad780153c47df915b3d2e23af727c68facaca4facd5f155bf5018b979b9aeb83",
+  txSecondMempoolExpiry: 0,
+}
+
+```ts
+export async function getProofFromGorillaPool(txid: string | Buffer, chain: Chain): Promise<GetMerkleProofResultApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getProofFromTaal
+
+##### Description
+
+Taal.com has the most functional txStatus and merkleProof endpoint for both mainNet and testNet
+
+Proofs use targetType "header" which is converted to "merkleRoot".
+
+Proofs correctly use duplicate computed node value symbol "*".
+
+An apiKey must be used and must correspond to the target chain: mainNet or testNet.
+
+```ts
+export async function getProofFromTaal(txid: string | Buffer, apiKey: string): Promise<GetMerkleProofResultApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getProofFromMetastreme
+
+##### Description
+
+metastreme.com has a partially conforming merkleProof implementation.
+
+Both mainNet and testNet are supported.
+
+Proofs incorrectly included a copy of the computed value instead of "*" along right side of merkle tree.
+
+targetType of hash
+
+```ts
+export async function getProofFromMetastreme(txid: string | Buffer, chain: Chain): Promise<GetMerkleProofResultApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getProofFromWhatsOnChain
+
+##### Description
+
+WhatOnChain.com has their own "hash/pos/R/L" proof format and a more TSC compliant proof format.
+
+The "/proof" endpoint returns an object for each node with "hash" and "pos" properties. "pos" can have values "R" or "L".
+Normally "pos" indicates which side of a concatenation the provided "hash" goes with one exception! EXCEPTION: When the
+provided should be "*" indicating edge-of-the-tree-duplicate-computed-value, they include the expected computed value and the pos value
+is always "L", even when it should really be "R". This only matters if you are trying to compute index from the "R" and "L" values.
+
+```ts
+export async function getProofFromWhatsOnChain(txid: string | Buffer, chain: Chain): Promise<GetMerkleProofResultApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getProofFromWhatsOnChainTsc
+
+##### Description
+
+WhatOnChain.com has their own "hash/pos/R/L" proof format and a more TSC compliant proof format.
+
+The "/proof/tsc" endpoint is much closer to the TSC specification. It provides "index" directly and each node is just the provided hash value.
+The "targetType" is unspecified and thus defaults to block header hash, requiring a Chaintracks lookup to get the merkleRoot...
+Duplicate hash values are provided in full instead of being replaced by "*".
+
+```ts
+export async function getProofFromWhatsOnChainTsc(txid: string | Buffer, chain: Chain): Promise<GetMerkleProofResultApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getUtxoStatusFromWhatsOnChain
+
+```ts
+export async function getUtxoStatusFromWhatsOnChain(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi): Promise<GetUtxoStatusResultApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getSpentStatusForOutpoint
+
+##### Description
+
+Attempts to validate whether or not an outpoint has been spent by using the WhatsOnChain API
+
+```ts
+export async function getSpentStatusForOutpoint(outpoint: string, chain: Chain): Promise<boolean> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+### Types
+
+| |
+| --- |
+| [GetMerkleProofServiceApi](#type-getmerkleproofserviceapi) |
+| [GetRawTxServiceApi](#type-getrawtxserviceapi) |
+| [GetUtxoStatusOutputFormatApi](#type-getutxostatusoutputformatapi) |
+| [GetUtxoStatusServiceApi](#type-getutxostatusserviceapi) |
+| [PostRawTxServiceApi](#type-postrawtxserviceapi) |
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+
+#### Type: GetUtxoStatusOutputFormatApi
+
+```ts
+export type GetUtxoStatusOutputFormatApi = "hashLE" | "hashBE" | "script"
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Type: GetUtxoStatusServiceApi
+
+```ts
+export type GetUtxoStatusServiceApi = (output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi) => Promise<GetUtxoStatusResultApi>
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Type: GetMerkleProofServiceApi
+
+```ts
+export type GetMerkleProofServiceApi = (txid: string | Buffer, chain: Chain) => Promise<GetMerkleProofResultApi>
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Type: GetRawTxServiceApi
+
+```ts
+export type GetRawTxServiceApi = (txid: string | Buffer, chain: Chain) => Promise<GetRawTxResultApi>
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Type: PostRawTxServiceApi
+
+```ts
+export type PostRawTxServiceApi = (txid: string | Buffer, rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi) => Promise<PostRawTxResultApi>
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+
+<!--#endregion ts2md-api-merged-here-->
+
 ## License
 
 The license for the code in this repository is the Open BSV License.
