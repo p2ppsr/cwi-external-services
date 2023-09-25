@@ -45,25 +45,7 @@ export interface CwiExternalServicesApi {
 
 <summary>Interface CwiExternalServicesApi Details</summary>
 
-###### getRawTx
-
-Attempts to obtain the raw transaction bytes associated with a 32 byte transaction hash (txid).
-
-Cycles through configured transaction processing services attempting to get a valid response.
-
-On success:
-Result txid is the requested transaction hash
-Result rawTx will be Buffer containing raw transaction bytes.
-Result name will be the responding service's identifying name.
-Returns result without incrementing active service.
-
-On failure:
-Result txid is the requested transaction hash
-Result mapi will be the first mapi response obtained (service name and response), or null
-Result error will be the first error thrown (service name and CwiError), or null
-Increments to next configured service and tries again until all services have been tried.
-
-###### getMerkleProof
+##### Interface CwiExternalServicesApi Method getMerkleProof
 
 Attempts to obtain the merkle proof associated with a 32 byte transaction hash (txid).
 
@@ -81,17 +63,135 @@ Result mapi will be the first mapi response obtained (service name and response)
 Result error will be the first error thrown (service name and CwiError), or null
 Increments to next configured service and tries again until all services have been tried.
 
-###### postRawTx
+```ts
+getMerkleProof(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetMerkleProofResultApi>
+```
+
+<details>
+
+<summary>Interface CwiExternalServicesApi Method getMerkleProof Details</summary>
+
+###### txid
+
+transaction hash for which proof is requested
+
+###### chain
+
+which chain to look on
+
+###### useNext
+
+optional, forces skip to next service before starting service requests cycle.
+
+</details>
+
+##### Interface CwiExternalServicesApi Method getRawTx
+
+Attempts to obtain the raw transaction bytes associated with a 32 byte transaction hash (txid).
+
+Cycles through configured transaction processing services attempting to get a valid response.
+
+On success:
+Result txid is the requested transaction hash
+Result rawTx will be Buffer containing raw transaction bytes.
+Result name will be the responding service's identifying name.
+Returns result without incrementing active service.
+
+On failure:
+Result txid is the requested transaction hash
+Result mapi will be the first mapi response obtained (service name and response), or null
+Result error will be the first error thrown (service name and CwiError), or null
+Increments to next configured service and tries again until all services have been tried.
+
+```ts
+getRawTx(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetRawTxResultApi>
+```
+
+<details>
+
+<summary>Interface CwiExternalServicesApi Method getRawTx Details</summary>
+
+###### txid
+
+transaction hash for which raw transaction bytes are requested
+
+###### chain
+
+which chain to look on
+
+###### useNext
+
+optional, forces skip to next service before starting service requests cycle.
+
+</details>
+
+##### Interface CwiExternalServicesApi Method getUtxoStatus
+
+Attempts to determine the UTXO status of a transaction output.
+
+Cycles through configured transaction processing services attempting to get a valid response.
+
+```ts
+getUtxoStatus(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi, useNext?: boolean): Promise<GetUtxoStatusResultApi>
+```
+
+<details>
+
+<summary>Interface CwiExternalServicesApi Method getUtxoStatus Details</summary>
+
+###### output
+
+transaction output identifier in format determined by `outputFormat`.
+
+###### chain
+
+which chain to post to, all of rawTx's inputs must be unspent on this chain.
+
+###### outputFormat
+
+optional, supported values:
+'hashLE' little-endian sha256 hash of output script
+'hashBE' big-endian sha256 hash of output script
+'script' entire transaction output script
+undefined if asBuffer length of `output` is 32 then 'hashBE`, otherwise 'script'.
+
+###### useNext
+
+optional, forces skip to next service before starting service requests cycle.
+
+</details>
+
+##### Interface CwiExternalServicesApi Method postRawTx
 
 Attempts to post a new transaction to each configured external transaction processing service.
 
 Asynchronously posts the transaction simultaneously to all the configured services.
 
-###### getUtxoStatus
+```ts
+postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]>
+```
 
-Attempts to determine the UTXO status of a transaction output.
+<details>
 
-Cycles through configured transaction processing services attempting to get a valid response.
+<summary>Interface CwiExternalServicesApi Method postRawTx Details</summary>
+
+###### Returns
+
+an array of `PostRawTxResultApi` objects with results of posting to each service
+
+###### rawTx
+
+new raw transaction to post for processing
+
+###### chain
+
+which chain to post to, all of rawTx's inputs must be unspent on this chain.
+
+###### callback
+
+optional, controls whether and how each service is to make transaction status update callbacks.
+
+</details>
 
 </details>
 
@@ -116,17 +216,25 @@ export interface MapiCallbackApi {
 
 <summary>Interface MapiCallbackApi Details</summary>
 
-###### getId
+##### Interface MapiCallbackApi Property getId
 
 Each call to this method generates a unique callbackID string and creates a record of the
 circumstances under which it was generated.
 
-###### url
+```ts
+getId: () => Promise<string>
+```
+
+##### Interface MapiCallbackApi Property url
 
 The public url to which callbacks will occur.
 
 Callback requests must include a previously `getId` generated callbackID which must match
 an already existing callback record.
+
+```ts
+url: string
+```
 
 </details>
 
@@ -158,23 +266,45 @@ export interface GetMerkleProofResultApi {
 
 <summary>Interface GetMerkleProofResultApi Details</summary>
 
-###### name
+##### Interface GetMerkleProofResultApi Property error
 
-The name of the service returning the proof, or undefined if no proof
+The first exception error that occurred during processing, if any.
 
-###### proof
+```ts
+error?: {
+    name?: string;
+    err: CwiError;
+}
+```
 
-Multiple proofs may be returned when a transaction also appears in
-one or more orphaned blocks
-
-###### mapi
+##### Interface GetMerkleProofResultApi Property mapi
 
 The first valid mapi response received from a service, if any.
 Relevant when no proof was received.
 
-###### error
+```ts
+mapi?: {
+    name?: string;
+    resp: MapiResponseApi;
+}
+```
 
-The first exception error that occurred during processing, if any.
+##### Interface GetMerkleProofResultApi Property name
+
+The name of the service returning the proof, or undefined if no proof
+
+```ts
+name?: string
+```
+
+##### Interface GetMerkleProofResultApi Property proof
+
+Multiple proofs may be returned when a transaction also appears in
+one or more orphaned blocks
+
+```ts
+proof?: TscMerkleProofApi | TscMerkleProofApi[]
+```
 
 </details>
 
@@ -207,27 +337,53 @@ export interface GetRawTxResultApi {
 
 <summary>Interface GetRawTxResultApi Details</summary>
 
-###### txid
+##### Interface GetRawTxResultApi Property error
 
-Transaction hash or rawTx (and of initial request)
+The first exception error that occurred during processing, if any.
 
-###### name
+```ts
+error?: {
+    name?: string;
+    err: CwiError;
+}
+```
 
-The name of the service returning the rawTx, or undefined if no rawTx
-
-###### rawTx
-
-Multiple proofs may be returned when a transaction also appears in
-one or more orphaned blocks
-
-###### mapi
+##### Interface GetRawTxResultApi Property mapi
 
 The first valid mapi response received from a service, if any.
 Relevant when no proof was received.
 
-###### error
+```ts
+mapi?: {
+    name?: string;
+    resp: MapiResponseApi;
+}
+```
 
-The first exception error that occurred during processing, if any.
+##### Interface GetRawTxResultApi Property name
+
+The name of the service returning the rawTx, or undefined if no rawTx
+
+```ts
+name?: string
+```
+
+##### Interface GetRawTxResultApi Property rawTx
+
+Multiple proofs may be returned when a transaction also appears in
+one or more orphaned blocks
+
+```ts
+rawTx?: Buffer
+```
+
+##### Interface GetRawTxResultApi Property txid
+
+Transaction hash or rawTx (and of initial request)
+
+```ts
+txid: string
+```
 
 </details>
 
@@ -256,27 +412,25 @@ export interface PostRawTxResultApi {
 
 <summary>Interface PostRawTxResultApi Details</summary>
 
-###### name
+##### Interface PostRawTxResultApi Property alreadyKnown
 
-The name of the service to which the transaction was submitted for processing
+if true, the transaction was already known to this service. Usually treat as a success.
 
-###### callbackID
+Potentially stop posting to additional transaction processors.
+
+```ts
+alreadyKnown?: boolean
+```
+
+##### Interface PostRawTxResultApi Property callbackID
 
 callbackID associated with this request
 
-###### status
+```ts
+callbackID?: string
+```
 
-'success' - The transaction was accepted for processing
-
-###### mapi
-
-Raw mapi response including stringified payload
-
-###### payload
-
-Parsed and signature verified mapi payload
-
-###### error
+##### Interface PostRawTxResultApi Property error
 
 When status is 'error', provides code and description
 
@@ -291,11 +445,41 @@ ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING
 ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE
 ERR_EXTSVS_MAPI_MISSING (description has service request error details)
 
-###### alreadyKnown
+```ts
+error?: CwiError
+```
 
-if true, the transaction was already known to this service. Usually treat as a success.
+##### Interface PostRawTxResultApi Property mapi
 
-Potentially stop posting to additional transaction processors.
+Raw mapi response including stringified payload
+
+```ts
+mapi?: MapiResponseApi
+```
+
+##### Interface PostRawTxResultApi Property name
+
+The name of the service to which the transaction was submitted for processing
+
+```ts
+name: string
+```
+
+##### Interface PostRawTxResultApi Property payload
+
+Parsed and signature verified mapi payload
+
+```ts
+payload?: MapiPostTxPayloadApi
+```
+
+##### Interface PostRawTxResultApi Property status
+
+'success' - The transaction was accepted for processing
+
+```ts
+status: "success" | "error"
+```
 
 </details>
 
@@ -317,29 +501,29 @@ export interface GetUtxoStatusDetailsApi {
 
 <summary>Interface GetUtxoStatusDetailsApi Details</summary>
 
-###### height
+##### Interface GetUtxoStatusDetailsApi Property amount
 
-if isUtxo, the block height containing the matching unspent transaction output
+```ts
+amount?: number
+```
 
-typically there will be only one, but future orphans can result in multiple values
+##### Interface GetUtxoStatusDetailsApi Property height
 
-###### txid
+```ts
+height?: number
+```
 
-if isUtxo, the transaction hash (txid) of the transaction containing the matching unspent transaction output
+##### Interface GetUtxoStatusDetailsApi Property index
 
-typically there will be only one, but future orphans can result in multiple values
+```ts
+index?: number
+```
 
-###### index
+##### Interface GetUtxoStatusDetailsApi Property txid
 
-if isUtxo, the output index in the transaction containing of the matching unspent transaction output
-
-typically there will be only one, but future orphans can result in multiple values
-
-###### amount
-
-if isUtxo, the amount of the matching unspent transaction output
-
-typically there will be only one, but future orphans can result in multiple values
+```ts
+txid?: string
+```
 
 </details>
 
@@ -362,29 +546,35 @@ export interface GetUtxoStatusResultApi {
 
 <summary>Interface GetUtxoStatusResultApi Details</summary>
 
-###### name
+##### Interface GetUtxoStatusResultApi Property details
 
-The name of the service to which the transaction was submitted for processing
+```ts
+details: GetUtxoStatusDetailsApi[]
+```
 
-###### status
+##### Interface GetUtxoStatusResultApi Property error
 
-'success' - the operation was successful, non-error results are valid.
-'error' - the operation failed, error may have relevant information.
+```ts
+error?: CwiError
+```
 
-###### error
+##### Interface GetUtxoStatusResultApi Property isUtxo
 
-When status is 'error', provides code and description
+```ts
+isUtxo?: boolean
+```
 
-###### isUtxo
+##### Interface GetUtxoStatusResultApi Property name
 
-true if the output is associated with at least one unspent transaction output
+```ts
+name: string
+```
 
-###### details
+##### Interface GetUtxoStatusResultApi Property status
 
-Additional details about occurances of this output script as a utxo.
-
-Normally there will be one item in the array but due to the possibility of orphan races
-there could be more than one block in which it is a valid utxo.
+```ts
+status: "success" | "error"
+```
 
 </details>
 
@@ -407,27 +597,35 @@ export interface MapiResponseApi {
 
 <summary>Interface MapiResponseApi Details</summary>
 
-###### payload
+##### Interface MapiResponseApi Property encoding
 
-Contents of the envelope.
-Validate using signature and publicKey.
-encoding and mimetype may assist with decoding validated payload.
+```ts
+encoding?: string
+```
 
-###### signature
+##### Interface MapiResponseApi Property mimetype
 
-signature producted by correpsonding private key on payload data
+```ts
+mimetype?: string
+```
 
-###### publicKey
+##### Interface MapiResponseApi Property payload
 
-public key to use to verify signature of payload data
+```ts
+payload: string
+```
 
-###### encoding
+##### Interface MapiResponseApi Property publicKey
 
-encoding of the payload data
+```ts
+publicKey: string
+```
 
-###### mimetype
+##### Interface MapiResponseApi Property signature
 
-mime type of the payload data
+```ts
+signature: string
+```
 
 </details>
 
@@ -457,31 +655,69 @@ export interface TscMerkleProofApi {
 
 <summary>Interface TscMerkleProofApi Details</summary>
 
-###### height
+##### Interface TscMerkleProofApi Property composite
+
+```ts
+composite?: boolean
+```
+
+##### Interface TscMerkleProofApi Property height
 
 The most efficient way of confirming a proof should also be the most common,
 when the containing block's height is known.
 
-###### index
+```ts
+height?: number
+```
+
+##### Interface TscMerkleProofApi Property index
 
 Index of transaction in its block. First transaction is index zero.
 
-###### txOrId
+```ts
+index: number
+```
 
-Full transaction (length > 32 bytes) or just its double SHA256 hash (length === 32 bytes).
-If string, encoding is hex.
-
-###### target
-
-Merkle root (length === 32) or serialized block header containing it (length === 80).
-If string, encoding is hex.
-
-###### nodes
+##### Interface TscMerkleProofApi Property nodes
 
 Merkle tree sibling hash values required to compute root from txid.
 Duplicates (sibling hash === computed hash) are indicated by "*" or type byte === 1.
 type byte === 2...
 Strings are encoded as hex.
+
+```ts
+nodes: string[] | Buffer
+```
+
+##### Interface TscMerkleProofApi Property proofType
+
+```ts
+proofType?: "branch" | "tree"
+```
+
+##### Interface TscMerkleProofApi Property target
+
+Merkle root (length === 32) or serialized block header containing it (length === 80).
+If string, encoding is hex.
+
+```ts
+target: string | Buffer
+```
+
+##### Interface TscMerkleProofApi Property targetType
+
+```ts
+targetType?: "hash" | "header" | "merkleRoot" | "height"
+```
+
+##### Interface TscMerkleProofApi Property txOrId
+
+Full transaction (length > 32 bytes) or just its double SHA256 hash (length === 32 bytes).
+If string, encoding is hex.
+
+```ts
+txOrId: string | Buffer
+```
 
 </details>
 
@@ -509,6 +745,72 @@ export interface MapiTxStatusPayloadApi {
 }
 ```
 
+<details>
+
+<summary>Interface MapiTxStatusPayloadApi Details</summary>
+
+##### Interface MapiTxStatusPayloadApi Property apiVersion
+
+```ts
+apiVersion: string
+```
+
+##### Interface MapiTxStatusPayloadApi Property blockHash
+
+```ts
+blockHash: string
+```
+
+##### Interface MapiTxStatusPayloadApi Property blockHeight
+
+```ts
+blockHeight: number
+```
+
+##### Interface MapiTxStatusPayloadApi Property confirmations
+
+```ts
+confirmations: number
+```
+
+##### Interface MapiTxStatusPayloadApi Property merkleProof
+
+```ts
+merkleProof?: TscMerkleProofApi
+```
+
+##### Interface MapiTxStatusPayloadApi Property minerId
+
+```ts
+minerId: string
+```
+
+##### Interface MapiTxStatusPayloadApi Property returnResult
+
+```ts
+returnResult: string
+```
+
+##### Interface MapiTxStatusPayloadApi Property timestamp
+
+```ts
+timestamp: string
+```
+
+##### Interface MapiTxStatusPayloadApi Property txSecondMempoolExpiry
+
+```ts
+txSecondMempoolExpiry: number
+```
+
+##### Interface MapiTxStatusPayloadApi Property txid
+
+```ts
+txid: string
+```
+
+</details>
+
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
@@ -530,6 +832,54 @@ export interface MapiCallbackPayloadApi {
 }
 ```
 
+<details>
+
+<summary>Interface MapiCallbackPayloadApi Details</summary>
+
+##### Interface MapiCallbackPayloadApi Property apiVersion
+
+```ts
+apiVersion: string
+```
+
+##### Interface MapiCallbackPayloadApi Property blockHash
+
+```ts
+blockHash: string
+```
+
+##### Interface MapiCallbackPayloadApi Property blockHeight
+
+```ts
+blockHeight: number
+```
+
+##### Interface MapiCallbackPayloadApi Property callbackPayload
+
+```ts
+callbackPayload: string
+```
+
+##### Interface MapiCallbackPayloadApi Property callbackReason
+
+```ts
+callbackReason: string
+```
+
+##### Interface MapiCallbackPayloadApi Property callbackTxId
+
+```ts
+callbackTxId: string
+```
+
+##### Interface MapiCallbackPayloadApi Property timestamp
+
+```ts
+timestamp: string
+```
+
+</details>
+
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
@@ -547,6 +897,36 @@ export interface MapiTxidReturnResultApi {
     returnResult: string;
 }
 ```
+
+<details>
+
+<summary>Interface MapiTxidReturnResultApi Details</summary>
+
+##### Interface MapiTxidReturnResultApi Property apiVersion
+
+```ts
+apiVersion?: string
+```
+
+##### Interface MapiTxidReturnResultApi Property returnResult
+
+```ts
+returnResult: string
+```
+
+##### Interface MapiTxidReturnResultApi Property timestamp
+
+```ts
+timestamp?: string
+```
+
+##### Interface MapiTxidReturnResultApi Property txid
+
+```ts
+txid: string
+```
+
+</details>
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -574,6 +954,84 @@ export interface MapiPostTxPayloadApi {
 }
 ```
 
+<details>
+
+<summary>Interface MapiPostTxPayloadApi Details</summary>
+
+##### Interface MapiPostTxPayloadApi Property apiVersion
+
+```ts
+apiVersion: string
+```
+
+##### Interface MapiPostTxPayloadApi Property conflictedWith
+
+```ts
+conflictedWith?: unknown[]
+```
+
+##### Interface MapiPostTxPayloadApi Property currentHighestBlockHash
+
+```ts
+currentHighestBlockHash?: string
+```
+
+##### Interface MapiPostTxPayloadApi Property currentHighestBlockHeight
+
+```ts
+currentHighestBlockHeight?: number
+```
+
+##### Interface MapiPostTxPayloadApi Property failureRetryable
+
+```ts
+failureRetryable?: boolean
+```
+
+##### Interface MapiPostTxPayloadApi Property minerId
+
+```ts
+minerId: string
+```
+
+##### Interface MapiPostTxPayloadApi Property resultDescription
+
+```ts
+resultDescription: string
+```
+
+##### Interface MapiPostTxPayloadApi Property returnResult
+
+```ts
+returnResult: string
+```
+
+##### Interface MapiPostTxPayloadApi Property timestamp
+
+```ts
+timestamp: string
+```
+
+##### Interface MapiPostTxPayloadApi Property txSecondMempoolExpiry
+
+```ts
+txSecondMempoolExpiry?: number
+```
+
+##### Interface MapiPostTxPayloadApi Property txid
+
+```ts
+txid: string
+```
+
+##### Interface MapiPostTxPayloadApi Property warnings
+
+```ts
+warnings?: unknown[]
+```
+
+</details>
+
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
@@ -588,6 +1046,36 @@ export interface PostTransactionMapiMinerApi {
 }
 ```
 
+<details>
+
+<summary>Interface PostTransactionMapiMinerApi Details</summary>
+
+##### Interface PostTransactionMapiMinerApi Property authToken
+
+```ts
+authToken?: string
+```
+
+##### Interface PostTransactionMapiMinerApi Property authType
+
+```ts
+authType: "none" | "bearer"
+```
+
+##### Interface PostTransactionMapiMinerApi Property name
+
+```ts
+name: string
+```
+
+##### Interface PostTransactionMapiMinerApi Property url
+
+```ts
+url: string
+```
+
+</details>
+
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
@@ -599,6 +1087,24 @@ export interface CwiExternalServicesOptions {
     testTaalApiKey?: string;
 }
 ```
+
+<details>
+
+<summary>Interface CwiExternalServicesOptions Details</summary>
+
+##### Interface CwiExternalServicesOptions Property mainTaalApiKey
+
+```ts
+mainTaalApiKey?: string
+```
+
+##### Interface CwiExternalServicesOptions Property testTaalApiKey
+
+```ts
+testTaalApiKey?: string
+```
+
+</details>
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
