@@ -43,7 +43,7 @@ export interface CwiExternalServicesApi {
 
 <details>
 
-<summary>Interface CwiExternalServicesApi Member Details</summary>
+<summary>Interface CwiExternalServicesApi Details</summary>
 
 ###### getRawTx
 
@@ -114,7 +114,7 @@ export interface MapiCallbackApi {
 
 <details>
 
-<summary>Interface MapiCallbackApi Member Details</summary>
+<summary>Interface MapiCallbackApi Details</summary>
 
 ###### getId
 
@@ -156,7 +156,7 @@ export interface GetMerkleProofResultApi {
 
 <details>
 
-<summary>Interface GetMerkleProofResultApi Member Details</summary>
+<summary>Interface GetMerkleProofResultApi Details</summary>
 
 ###### name
 
@@ -205,7 +205,7 @@ export interface GetRawTxResultApi {
 
 <details>
 
-<summary>Interface GetRawTxResultApi Member Details</summary>
+<summary>Interface GetRawTxResultApi Details</summary>
 
 ###### txid
 
@@ -254,7 +254,7 @@ export interface PostRawTxResultApi {
 
 <details>
 
-<summary>Interface PostRawTxResultApi Member Details</summary>
+<summary>Interface PostRawTxResultApi Details</summary>
 
 ###### name
 
@@ -315,7 +315,7 @@ export interface GetUtxoStatusDetailsApi {
 
 <details>
 
-<summary>Interface GetUtxoStatusDetailsApi Member Details</summary>
+<summary>Interface GetUtxoStatusDetailsApi Details</summary>
 
 ###### height
 
@@ -360,7 +360,7 @@ export interface GetUtxoStatusResultApi {
 
 <details>
 
-<summary>Interface GetUtxoStatusResultApi Member Details</summary>
+<summary>Interface GetUtxoStatusResultApi Details</summary>
 
 ###### name
 
@@ -405,7 +405,7 @@ export interface MapiResponseApi {
 
 <details>
 
-<summary>Interface MapiResponseApi Member Details</summary>
+<summary>Interface MapiResponseApi Details</summary>
 
 ###### payload
 
@@ -455,7 +455,7 @@ export interface TscMerkleProofApi {
 
 <details>
 
-<summary>Interface TscMerkleProofApi Member Details</summary>
+<summary>Interface TscMerkleProofApi Details</summary>
 
 ###### height
 
@@ -634,6 +634,18 @@ export class ERR_EXTSVS_TXID_INVALID extends CwiError {
 }
 ```
 
+<details>
+
+<summary>Class ERR_EXTSVS_TXID_INVALID Details</summary>
+
+##### Class ERR_EXTSVS_TXID_INVALID Constructor 
+
+```ts
+constructor(expected?: string, actual?: string) 
+```
+
+</details>
+
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
@@ -648,6 +660,18 @@ export class ERR_EXTSVS_BLOCK_HASH_MISSING extends CwiError {
     constructor(hash?: string) 
 }
 ```
+
+<details>
+
+<summary>Class ERR_EXTSVS_BLOCK_HASH_MISSING Details</summary>
+
+##### Class ERR_EXTSVS_BLOCK_HASH_MISSING Constructor 
+
+```ts
+constructor(hash?: string) 
+```
+
+</details>
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -664,6 +688,18 @@ export class ERR_EXTSVS_BLOCK_HEIGHT_MISSING extends CwiError {
 }
 ```
 
+<details>
+
+<summary>Class ERR_EXTSVS_BLOCK_HEIGHT_MISSING Details</summary>
+
+##### Class ERR_EXTSVS_BLOCK_HEIGHT_MISSING Constructor 
+
+```ts
+constructor(height?: number) 
+```
+
+</details>
+
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
@@ -678,6 +714,18 @@ export class ERR_EXTSVS_ENVELOPE_DEPTH extends CwiError {
     constructor(maxDepth: number) 
 }
 ```
+
+<details>
+
+<summary>Class ERR_EXTSVS_ENVELOPE_DEPTH Details</summary>
+
+##### Class ERR_EXTSVS_ENVELOPE_DEPTH Constructor 
+
+```ts
+constructor(maxDepth: number) 
+```
+
+</details>
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -694,6 +742,18 @@ export class ERR_EXTSVS_MERKLEROOT_INVALID extends CwiError {
 }
 ```
 
+<details>
+
+<summary>Class ERR_EXTSVS_MERKLEROOT_INVALID Details</summary>
+
+##### Class ERR_EXTSVS_MERKLEROOT_INVALID Constructor 
+
+```ts
+constructor(expected?: string, actual?: string) 
+```
+
+</details>
+
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
@@ -708,6 +768,18 @@ export class ERR_EXTSVS_MERKLEROOT_MISSING extends CwiError {
     constructor(merkleRoot?: string) 
 }
 ```
+
+<details>
+
+<summary>Class ERR_EXTSVS_MERKLEROOT_MISSING Details</summary>
+
+##### Class ERR_EXTSVS_MERKLEROOT_MISSING Constructor 
+
+```ts
+constructor(merkleRoot?: string) 
+```
+
+</details>
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -724,6 +796,18 @@ export class ERR_EXTSVS_MERKLEPROOF_TAGET_TYPE extends CwiError {
 }
 ```
 
+<details>
+
+<summary>Class ERR_EXTSVS_MERKLEPROOF_TAGET_TYPE Details</summary>
+
+##### Class ERR_EXTSVS_MERKLEPROOF_TAGET_TYPE Constructor 
+
+```ts
+constructor(targetType?: string | number) 
+```
+
+</details>
+
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
@@ -738,6 +822,18 @@ export class ERR_EXTSVS_MERKLEPROOF_NODE_TYPE extends CwiError {
     constructor(nodeType?: string | number) 
 }
 ```
+
+<details>
+
+<summary>Class ERR_EXTSVS_MERKLEPROOF_NODE_TYPE Details</summary>
+
+##### Class ERR_EXTSVS_MERKLEPROOF_NODE_TYPE Constructor 
+
+```ts
+constructor(nodeType?: string | number) 
+```
+
+</details>
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -754,6 +850,18 @@ export class ERR_EXTSVS_MERKLEPROOF_PARSING extends CwiError {
 }
 ```
 
+<details>
+
+<summary>Class ERR_EXTSVS_MERKLEPROOF_PARSING Details</summary>
+
+##### Class ERR_EXTSVS_MERKLEPROOF_PARSING Constructor 
+
+```ts
+constructor() 
+```
+
+</details>
+
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
@@ -768,6 +876,18 @@ export class ERR_EXTSVS_MERKLEPROOF_UNSUPPORTED extends CwiError {
     constructor(feature?: string) 
 }
 ```
+
+<details>
+
+<summary>Class ERR_EXTSVS_MERKLEPROOF_UNSUPPORTED Details</summary>
+
+##### Class ERR_EXTSVS_MERKLEPROOF_UNSUPPORTED Constructor 
+
+```ts
+constructor(feature?: string) 
+```
+
+</details>
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -784,6 +904,18 @@ export class ERR_EXTSVS_MAPI_MISSING extends CwiError {
 }
 ```
 
+<details>
+
+<summary>Class ERR_EXTSVS_MAPI_MISSING Details</summary>
+
+##### Class ERR_EXTSVS_MAPI_MISSING Constructor 
+
+```ts
+constructor(description?: string) 
+```
+
+</details>
+
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
@@ -798,6 +930,18 @@ export class ERR_EXTSVS_MAPI_SIGNATURE_INVALID extends CwiError {
     constructor() 
 }
 ```
+
+<details>
+
+<summary>Class ERR_EXTSVS_MAPI_SIGNATURE_INVALID Details</summary>
+
+##### Class ERR_EXTSVS_MAPI_SIGNATURE_INVALID Constructor 
+
+```ts
+constructor() 
+```
+
+</details>
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -814,6 +958,18 @@ export class ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE extends CwiError {
 }
 ```
 
+<details>
+
+<summary>Class ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE Details</summary>
+
+##### Class ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE Constructor 
+
+```ts
+constructor(mimeType?: string) 
+```
+
+</details>
+
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
@@ -828,6 +984,18 @@ export class ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING extends CwiError {
     constructor(encoding?: string) 
 }
 ```
+
+<details>
+
+<summary>Class ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING Details</summary>
+
+##### Class ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING Constructor 
+
+```ts
+constructor(encoding?: string) 
+```
+
+</details>
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -844,6 +1012,18 @@ export class ERR_EXTSVS_MAPI_UNSUPPORTED_RETURNRESULT extends CwiError {
 }
 ```
 
+<details>
+
+<summary>Class ERR_EXTSVS_MAPI_UNSUPPORTED_RETURNRESULT Details</summary>
+
+##### Class ERR_EXTSVS_MAPI_UNSUPPORTED_RETURNRESULT Constructor 
+
+```ts
+constructor(result?: string) 
+```
+
+</details>
+
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
@@ -858,6 +1038,18 @@ export class ERR_EXTSVS_INVALID_TRANSACTION extends CwiError {
     constructor(description?: string) 
 }
 ```
+
+<details>
+
+<summary>Class ERR_EXTSVS_INVALID_TRANSACTION Details</summary>
+
+##### Class ERR_EXTSVS_INVALID_TRANSACTION Constructor 
+
+```ts
+constructor(description?: string) 
+```
+
+</details>
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -874,6 +1066,18 @@ export class ERR_EXTSVS_DOUBLE_SPEND extends CwiError {
 }
 ```
 
+<details>
+
+<summary>Class ERR_EXTSVS_DOUBLE_SPEND Details</summary>
+
+##### Class ERR_EXTSVS_DOUBLE_SPEND Constructor 
+
+```ts
+constructor() 
+```
+
+</details>
+
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
@@ -888,6 +1092,18 @@ export class ERR_EXTSVS_ALREADY_MINED extends CwiError {
     constructor(description?: string) 
 }
 ```
+
+<details>
+
+<summary>Class ERR_EXTSVS_ALREADY_MINED Details</summary>
+
+##### Class ERR_EXTSVS_ALREADY_MINED Constructor 
+
+```ts
+constructor(description?: string) 
+```
+
+</details>
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -915,6 +1131,48 @@ export class ServiceCollection<T> {
 }
 ```
 
+<details>
+
+<summary>Class ServiceCollection Details</summary>
+
+##### Class ServiceCollection Constructor 
+
+```ts
+constructor() 
+```
+
+##### Class ServiceCollection Property _index
+
+```ts
+_index: number
+```
+
+##### Class ServiceCollection Property services
+
+```ts
+services: {
+    name: string;
+    service: T;
+}[]
+```
+
+##### Class ServiceCollection Method add
+
+```ts
+add(s: {
+    name: string;
+    service: T;
+}): ServiceCollection<T> 
+```
+
+##### Class ServiceCollection Method next
+
+```ts
+next(): number 
+```
+
+</details>
+
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
@@ -931,6 +1189,54 @@ export class CwiExternalServices implements CwiExternalServicesApi {
     async getMerkleProof(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetMerkleProofResultApi> 
 }
 ```
+
+<details>
+
+<summary>Class CwiExternalServices Details</summary>
+
+##### Class CwiExternalServices Constructor 
+
+```ts
+constructor(options?: CwiExternalServicesOptions) 
+```
+
+##### Class CwiExternalServices Property options
+
+```ts
+options: CwiExternalServicesOptions
+```
+
+##### Class CwiExternalServices Method createDefaultOptions
+
+```ts
+static createDefaultOptions(): CwiExternalServicesOptions 
+```
+
+##### Class CwiExternalServices Method getMerkleProof
+
+```ts
+async getMerkleProof(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetMerkleProofResultApi> 
+```
+
+##### Class CwiExternalServices Method getRawTx
+
+```ts
+async getRawTx(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetRawTxResultApi> 
+```
+
+##### Class CwiExternalServices Method getUtxoStatus
+
+```ts
+async getUtxoStatus(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi, useNext?: boolean): Promise<GetUtxoStatusResultApi> 
+```
+
+##### Class CwiExternalServices Method postRawTx
+
+```ts
+async postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]> 
+```
+
+</details>
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -985,13 +1291,13 @@ Throws on verification errors.
 export function getMapiJsonResponsePayload<T>(response: MapiResponseApi): T 
 ```
 
+<details>
+
+<summary>Function getMapiJsonResponsePayload Details</summary>
+
 ##### Returns
 
 parse JSON payload object
-
-<details>
-
-<summary>Function getMapiJsonResponsePayload Argument Details</summary>
 
 ###### mAPI
 
@@ -1020,7 +1326,7 @@ export function getMapiTxStatusPayload(txid: string | Buffer | undefined, respon
 
 <details>
 
-<summary>Function getMapiTxStatusPayload Argument Details</summary>
+<summary>Function getMapiTxStatusPayload Details</summary>
 
 ###### txid
 
@@ -1197,13 +1503,13 @@ Implications:
 export async function checkMerkleProof(txid: string | Buffer, proof: TscMerkleProofApi | Buffer, chaintracks: ChaintracksClientApi): Promise<BlockHeader> 
 ```
 
+<details>
+
+<summary>Function checkMerkleProof Details</summary>
+
 ##### Returns
 
 The block header containing the verified merkleRoot
-
-<details>
-
-<summary>Function checkMerkleProof Argument Details</summary>
 
 ###### txid
 
