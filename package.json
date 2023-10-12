@@ -48,12 +48,12 @@
     "standard": "^17.1.0",
     "ts-jest": "^29.0.5",
     "ts-node": "^10.9.1",
-    "ts2md": "^0.1.15",
     "typescript": "^5.2.2"
   },
   "dependencies": {
     "axios": "^0.21.1",
     "bn.js": "^5.2.1",
-    "cwi-base": "^0.3.37"
+    "cwi-base": "^0.3.37",
+    "ts2md": "^0.1.17"
   }
 }
