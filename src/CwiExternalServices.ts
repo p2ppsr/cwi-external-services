@@ -76,6 +76,11 @@ export class CwiExternalServices implements CwiExternalServicesApi {
         }
     }
 
+    get getProofsCount() { return this.getProofs.count }
+    get getRawTxsCount() { return this.getRawTxs.count }
+    get postRawTxsCount() { return this.postRawTxs.count }
+    get getUtxoStatsCount() { return this.getUtxoStats.count }
+
     async getUtxoStatus(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi, useNext?: boolean): Promise<GetUtxoStatusResultApi> {
         const services = this.getUtxoStats
         if (useNext)

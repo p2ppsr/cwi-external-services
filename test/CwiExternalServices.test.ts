@@ -8,7 +8,7 @@ describe('CwiExternalServices.test', () => {
 
     test('getMerkleProof mainnet 461e9163247cf967df672845595e6294231f5e2a0159f45cb2c92669b7a2a062', async () => {
         const txid = '461e9163247cf967df672845595e6294231f5e2a0159f45cb2c92669b7a2a062'
-        const count = services.getProofs.count
+        const count = services.getProofsCount
         const rs: GetMerkleProofResultApi[] = []
         for (let i = 0; i < count; i++) {
             const r = await services.getMerkleProof(txid, 'main', true)
