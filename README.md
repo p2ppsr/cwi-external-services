@@ -1091,6 +1091,10 @@ export class CwiExternalServices implements CwiExternalServicesApi {
     static createDefaultOptions(): CwiExternalServicesOptions 
     options: CwiExternalServicesOptions;
     constructor(options?: CwiExternalServicesOptions) 
+    get getProofsCount() 
+    get getRawTxsCount() 
+    get postRawTxsCount() 
+    get getUtxoStatsCount() 
     async getUtxoStatus(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi, useNext?: boolean): Promise<GetUtxoStatusResultApi> 
     async postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]> 
     async getRawTx(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetRawTxResultApi> 
