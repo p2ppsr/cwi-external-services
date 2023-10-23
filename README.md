@@ -7,6 +7,7 @@ Standardized service APIs for use within CWI.
 ## API
 
 <!--#region ts2md-api-merged-here-->
+
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ### Interfaces

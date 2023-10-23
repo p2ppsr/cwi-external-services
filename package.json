@@ -1,6 +1,6 @@
 {
   "name": "cwi-external-services",
-  "version": "0.3.23",
+  "version": "0.3.24",
   "description": "Implementations of external service APIs and standardized APIs for use within CWI",
   "author": "Peer-to-peer Privacy Systems Research LLC",
   "license": "PROPRIETARY",
@@ -49,12 +49,12 @@
     "standard": "^17.1.0",
     "ts-jest": "^29.0.5",
     "ts-node": "^10.9.1",
+    "ts2md": "^0.1.20",
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^1.5.1",
     "bn.js": "^5.2.1",
-    "cwi-base": "^0.3.41",
-    "ts2md": "^0.1.17"
+    "cwi-base": "^0.3.42"
   }
 }
