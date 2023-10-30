@@ -102,8 +102,6 @@ export class CwiExternalServices implements CwiExternalServicesApi {
 
     async postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]> {
         
-        console.log('postRawTx')
-
         const txid = doubleSha256BE(rawTx)
 
         return await Promise.all(this.postRawTxs.allServices.map(async service => {

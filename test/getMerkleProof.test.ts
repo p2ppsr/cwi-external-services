@@ -2,7 +2,7 @@ import { getMerkleProofFromGorillaPool, getMerkleProofFromMetastreme, getMerkleP
 import { verifyDojoTransactionProof } from "./verifyDojoTransactionProofs";
 
 import * as dotenv from 'dotenv';
- dotenv.config();
+dotenv.config();
 
 describe("getMerkleProof", () => {
     const mainTaalApiKey = process.env.MAIN_TAAL_API_KEY || ''
