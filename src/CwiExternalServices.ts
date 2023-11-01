@@ -9,7 +9,7 @@ import {
 
 import { ServiceCollection } from "./ServiceCollection"
 
-import { postRawTxToGorillaPool, postRawTxToTaal } from "./postRawTxServices"
+import { postRawTxToGorillaPool, postRawTxToTaal, postRawTxToWhatsOnChain } from "./postRawTxServices"
 import { getRawTxFromWhatsOnChain } from "./getRawTxServices"
 import {
     getProofFromGorillaPool, getProofFromMetastreme, getProofFromTaal, getProofFromWhatsOnChain, getProofFromWhatsOnChainTsc
@@ -51,6 +51,7 @@ export class CwiExternalServices implements CwiExternalServicesApi {
         .add({ name: 'WhatsOnChain', service: getRawTxFromWhatsOnChain})
 
         this.postRawTxs = new ServiceCollection<PostRawTxServiceApi>()
+        .add({ name: 'WhatsOnChain', service: postRawTxToWhatsOnChain })
         .add({ name: 'GorillaPool', service: postRawTxToGorillaPool })
         .add({ name: 'Taal', service: this.makePostRawTxToTaal() })
         

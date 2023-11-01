@@ -1,4 +1,4 @@
-import { asString, bsv } from "cwi-base";
+import { asBuffer, asString, bsv } from "cwi-base";
 
 import { MapiCallbackPayloadApi, MapiPostTxPayloadApi, MapiResponseApi, MapiTxidReturnResultApi, MapiTxStatusPayloadApi } from "cwi-base/src/Api/MerchantApi";
 import {
@@ -28,6 +28,13 @@ export function checkMapiResponse(response: MapiResponseApi) {
     } catch (eu: unknown) {
         throw new ERR_EXTSVS_MAPI_SIGNATURE_INVALID()
     }
+}
+
+export function signMapiPayload(payload: string, privateKey: string) : string {
+    const payloadHash = bsv.Hash.sha256(Buffer.from(payload));
+    const key = bsv.PrivKey.fromBn(bsv.Bn.fromBuffer(asBuffer(privateKey)))
+    const signature = bsv.Ecdsa.sign(payloadHash, bsv.KeyPair.fromPrivKey(key))
+    return signature.toString()
 }
 
 /**

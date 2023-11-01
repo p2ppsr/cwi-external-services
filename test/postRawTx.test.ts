@@ -1,7 +1,14 @@
+import { postRawTxToWhatsOnChain } from '../src';
 import { CwiExternalServices } from '../src/CwiExternalServices';
 
 describe("postRawTx.test", () => {
     const services: CwiExternalServices = new CwiExternalServices()
+
+    test('postRawTxToWhatsOnChain', async () => {
+        const rawTx = '0200000002761d50a0a0078a1874862c1011ca6b084b2fe137c4f59bbdee6f6b97792c8e4f020000006a4730440220123eeab653ca5b5b5c1d5c315457facf05fb565ec1e708d0929650d60f40912702205654b3645e2cb98a84f5c7335f1b6255d1e93d8f66c918b6385ee09471f0b374412102faeb815c995772d071a7dd24c584dc10f9401790a816ce8ee02a69c9a77fe23afeffffff6c5ec011ea6ebac1194dd66bfae22821bf229ba03e98b4a7eb1c5f2466ca33bf000000008a47304402202b9361042b3af536347d324b04accfe1146e34a58b892c709418784a41c6b295022027507840ec381eade6c8b726b261bbad95a9daf6ac74622ea6ea5dfc7258e7574141047b18f712e04921b20480d28f70c8e1abecb7ba0f06d17b18e11b955427355a9f8c91fab08854d6607a297d8c9427f856699fe1c871bfc3a99f5fbdf6ae5cac21feffffff02e6e61b00000000001976a914cf99ea3fd68f8c50bace9795116acfb083da044f88acb00e4e02000000001976a914cfe18a551615d08e56463a3b027eddcb6218e00688ac2ec51700'
+        const r = await postRawTxToWhatsOnChain(undefined, rawTx, 'test', undefined)
+        expect(r).toBeTruthy()
+    }, 900000)
 
     test('postRawTx already mined testnet', async () => {
         const svcs = new CwiExternalServices({

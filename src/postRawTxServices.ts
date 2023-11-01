@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import axios from 'axios'
-import { Chain, CwiError, ERR_BAD_REQUEST, asString, bsv, crypto, randomBytesBase64 } from 'cwi-base'
+import { Chain, CwiError, ERR_BAD_REQUEST, asString, bsv, crypto, doubleSha256BE, identityKeyFromPrivateKey, randomBytesBase64 } from 'cwi-base'
 import { MapiCallbackApi, PostRawTxResultApi } from './Api/CwiExternalServicesApi'
-import { MapiResponseApi } from 'cwi-base/src/Api/MerchantApi'
-import { ERR_EXTSVS_ALREADY_MINED, ERR_EXTSVS_DOUBLE_SPEND, ERR_EXTSVS_INVALID_TRANSACTION, ERR_EXTSVS_MAPI_MISSING } from './ERR_EXTSVS_errors'
-import { getMapiPostTxPayload } from './merchantApiUtils'
+import { MapiPostTxPayloadApi, MapiResponseApi } from 'cwi-base/src/Api/MerchantApi'
+import { ERR_EXTSVS_ALREADY_MINED, ERR_EXTSVS_DOUBLE_SPEND, ERR_EXTSVS_INVALID_TRANSACTION, ERR_EXTSVS_INVALID_TXID, ERR_EXTSVS_MAPI_MISSING } from './ERR_EXTSVS_errors'
+import { checkMapiResponse, getMapiPostTxPayload, signMapiPayload } from './merchantApiUtils'
 
 export interface PostTransactionMapiMinerApi {
     name: string
@@ -121,6 +121,85 @@ export async function postRawTxToMapiMiner(txid: string | Buffer, rawTx: string 
             callbackID: callbackToken,
             name: miner.name,
             mapi
+        }
+    }
+}
+
+export async function postRawTxToWhatsOnChain(txid: string | Buffer | undefined, rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi)
+: Promise<PostRawTxResultApi>
+{
+    try {
+
+        const headers = {
+            'Content-Type': 'application/json'
+        }
+        const url = `https://api.whatsonchain.com/v1/bsv/${chain}/tx/raw`
+        const data = await axios.post(
+            url,
+            {
+                txHex: asString(rawTx)
+            },
+            {
+                headers,
+                validateStatus: () => true
+            }
+        )
+        
+        // { status: 200, statusText: 'OK', data: 'txid' }
+        // { status: 400, statusText: 'Bad Request', data: 'unexpected response code 500: Missing inputs' }
+        // eslint-disable-next-line no-debugger
+        debugger;
+        if (!data || data.status !== 200) throw new ERR_BAD_REQUEST(data?.statusText)
+
+        const txid = <string>data.data
+        
+        if (txid != asString(doubleSha256BE(rawTx))) throw new ERR_EXTSVS_INVALID_TXID()
+
+        const payloadData: MapiPostTxPayloadApi = {
+            apiVersion: "1.5.0",
+            timestamp: new Date().toISOString(),
+            txid,
+            returnResult: "success",
+            resultDescription: "",
+            minerId: ""
+        }
+        const payload = JSON.stringify(payloadData)
+        
+        const key = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+
+        const mapi: MapiResponseApi = {
+            payload,
+            signature: signMapiPayload(payload, key),
+            publicKey: identityKeyFromPrivateKey(key)            
+        }
+        
+        // eslint-disable-next-line no-debugger
+        debugger;
+        checkMapiResponse(mapi)
+            
+        // This transaction was previously broadcast and already exists in the block chain
+        // throw new ERR_EXTSVS_ALREADY_MINED(payload.resultDescription)
+
+        // throw new ERR_EXTSVS_INVALID_TRANSACTION(payload.resultDescription)
+
+        const r: PostRawTxResultApi = {
+            status: 'success',
+            payload: payloadData,
+            alreadyKnown: undefined,
+            callbackID: undefined,
+            name: 'WoC',
+            mapi: mapi
+        }
+
+        return r
+
+    } catch (err: unknown) {
+        return {
+            status: 'error',
+            error: CwiError.fromUnknown(err),
+            callbackID: undefined,
+            name: 'WoC',
+            mapi: undefined
         }
     }
 }

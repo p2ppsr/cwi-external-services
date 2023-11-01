@@ -65,6 +65,10 @@ export class ERR_EXTSVS_MAPI_UNSUPPORTED_RETURNRESULT extends CwiError { constru
  */
 export class ERR_EXTSVS_INVALID_TRANSACTION extends CwiError { constructor(description?: string) { super('ERR_EXTSVS_INVALID_TRANSACTION', description ?? 'Transaction is invalid.') } }
 /**
+ * Txid of broadcast transaction doesn't match returned txid.
+ */
+export class ERR_EXTSVS_INVALID_TXID extends CwiError { constructor(description?: string) { super('ERR_EXTSVS_INVALID_TXID', description ?? `Txid of broadcast transaction doesn't match returned txid.`) } }
+/**
  * Transaction is a double spend.
  */
 export class ERR_EXTSVS_DOUBLE_SPEND extends CwiError { constructor() { super('ERR_EXTSVS_DOUBLE_SPEND', 'Transaction is a double spend.') } }
