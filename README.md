@@ -817,9 +817,10 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 | [ERR_EXTSVS_DOUBLE_SPEND](#class-err_extsvs_double_spend) | [ERR_EXTSVS_MERKLEPROOF_TAGET_TYPE](#class-err_extsvs_merkleproof_taget_type) |
 | [ERR_EXTSVS_ENVELOPE_DEPTH](#class-err_extsvs_envelope_depth) | [ERR_EXTSVS_MERKLEPROOF_UNSUPPORTED](#class-err_extsvs_merkleproof_unsupported) |
 | [ERR_EXTSVS_INVALID_TRANSACTION](#class-err_extsvs_invalid_transaction) | [ERR_EXTSVS_MERKLEROOT_INVALID](#class-err_extsvs_merkleroot_invalid) |
-| [ERR_EXTSVS_MAPI_MISSING](#class-err_extsvs_mapi_missing) | [ERR_EXTSVS_MERKLEROOT_MISSING](#class-err_extsvs_merkleroot_missing) |
-| [ERR_EXTSVS_MAPI_SIGNATURE_INVALID](#class-err_extsvs_mapi_signature_invalid) | [ERR_EXTSVS_TXID_INVALID](#class-err_extsvs_txid_invalid) |
-| [ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING](#class-err_extsvs_mapi_unsupported_encoding) | [ServiceCollection](#class-servicecollection) |
+| [ERR_EXTSVS_INVALID_TXID](#class-err_extsvs_invalid_txid) | [ERR_EXTSVS_MERKLEROOT_MISSING](#class-err_extsvs_merkleroot_missing) |
+| [ERR_EXTSVS_MAPI_MISSING](#class-err_extsvs_mapi_missing) | [ERR_EXTSVS_TXID_INVALID](#class-err_extsvs_txid_invalid) |
+| [ERR_EXTSVS_MAPI_SIGNATURE_INVALID](#class-err_extsvs_mapi_signature_invalid) | [ServiceCollection](#class-servicecollection) |
+| [ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING](#class-err_extsvs_mapi_unsupported_encoding) |  |
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -1033,6 +1034,19 @@ export class ERR_EXTSVS_INVALID_TRANSACTION extends CwiError {
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
+#### Class: ERR_EXTSVS_INVALID_TXID
+
+Txid of broadcast transaction doesn't match returned txid.
+
+```ts
+export class ERR_EXTSVS_INVALID_TXID extends CwiError {
+    constructor(description?: string) 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
 #### Class: ERR_EXTSVS_DOUBLE_SPEND
 
 Transaction is a double spend.
@@ -1108,20 +1122,17 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 ---
 ### Functions
 
-| | |
-| --- | --- |
-| [checkMapiResponse](#function-checkmapiresponse) | [getProofFromGorillaPool](#function-getprooffromgorillapool) |
-| [checkMapiResponseForTxid](#function-checkmapiresponsefortxid) | [getProofFromMetastreme](#function-getprooffrommetastreme) |
-| [checkMerkleProof](#function-checkmerkleproof) | [getProofFromTaal](#function-getprooffromtaal) |
-| [getMapiCallbackPayload](#function-getmapicallbackpayload) | [getProofFromWhatsOnChain](#function-getprooffromwhatsonchain) |
-| [getMapiJsonResponsePayload](#function-getmapijsonresponsepayload) | [getProofFromWhatsOnChainTsc](#function-getprooffromwhatsonchaintsc) |
-| [getMapiPostTxPayload](#function-getmapiposttxpayload) | [getRawTxFromWhatsOnChain](#function-getrawtxfromwhatsonchain) |
-| [getMapiTxStatusPayload](#function-getmapitxstatuspayload) | [getSpentStatusForOutpoint](#function-getspentstatusforoutpoint) |
-| [getMerkleProofFromGorillaPool](#function-getmerkleprooffromgorillapool) | [getUtxoStatusFromWhatsOnChain](#function-getutxostatusfromwhatsonchain) |
-| [getMerkleProofFromMetastreme](#function-getmerkleprooffrommetastreme) | [postRawTxToGorillaPool](#function-postrawtxtogorillapool) |
-| [getMerkleProofFromTaal](#function-getmerkleprooffromtaal) | [postRawTxToMapiMiner](#function-postrawtxtomapiminer) |
-| [getMerkleProofFromWhatsOnChain](#function-getmerkleprooffromwhatsonchain) | [postRawTxToTaal](#function-postrawtxtotaal) |
-| [getMerkleProofFromWhatsOnChainTsc](#function-getmerkleprooffromwhatsonchaintsc) | [verifyMapiResponseForTxid](#function-verifymapiresponsefortxid) |
+| | | |
+| --- | --- | --- |
+| [checkMapiResponse](#function-checkmapiresponse) | [getMerkleProofFromTaal](#function-getmerkleprooffromtaal) | [getSpentStatusForOutpoint](#function-getspentstatusforoutpoint) |
+| [checkMapiResponseForTxid](#function-checkmapiresponsefortxid) | [getMerkleProofFromWhatsOnChain](#function-getmerkleprooffromwhatsonchain) | [getUtxoStatusFromWhatsOnChain](#function-getutxostatusfromwhatsonchain) |
+| [checkMerkleProof](#function-checkmerkleproof) | [getMerkleProofFromWhatsOnChainTsc](#function-getmerkleprooffromwhatsonchaintsc) | [postRawTxToGorillaPool](#function-postrawtxtogorillapool) |
+| [getMapiCallbackPayload](#function-getmapicallbackpayload) | [getProofFromGorillaPool](#function-getprooffromgorillapool) | [postRawTxToMapiMiner](#function-postrawtxtomapiminer) |
+| [getMapiJsonResponsePayload](#function-getmapijsonresponsepayload) | [getProofFromMetastreme](#function-getprooffrommetastreme) | [postRawTxToTaal](#function-postrawtxtotaal) |
+| [getMapiPostTxPayload](#function-getmapiposttxpayload) | [getProofFromTaal](#function-getprooffromtaal) | [postRawTxToWhatsOnChain](#function-postrawtxtowhatsonchain) |
+| [getMapiTxStatusPayload](#function-getmapitxstatuspayload) | [getProofFromWhatsOnChain](#function-getprooffromwhatsonchain) | [signMapiPayload](#function-signmapipayload) |
+| [getMerkleProofFromGorillaPool](#function-getmerkleprooffromgorillapool) | [getProofFromWhatsOnChainTsc](#function-getprooffromwhatsonchaintsc) | [verifyMapiResponseForTxid](#function-verifymapiresponsefortxid) |
+| [getMerkleProofFromMetastreme](#function-getmerkleprooffrommetastreme) | [getRawTxFromWhatsOnChain](#function-getrawtxfromwhatsonchain) |  |
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -1137,6 +1148,15 @@ https://github.com/bitcoin-sv-specs/brfc-misc/tree/master/jsonenvelope
 
 ```ts
 export function checkMapiResponse(response: MapiResponseApi) 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: signMapiPayload
+
+```ts
+export function signMapiPayload(payload: string, privateKey: string): string 
 ```
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
@@ -1396,6 +1416,15 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 
 ```ts
 export async function postRawTxToMapiMiner(txid: string | Buffer, rawTx: string | Buffer, miner: PostTransactionMapiMinerApi, callback?: MapiCallbackApi): Promise<PostRawTxResultApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: postRawTxToWhatsOnChain
+
+```ts
+export async function postRawTxToWhatsOnChain(txid: string | Buffer | undefined, rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi> 
 ```
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
