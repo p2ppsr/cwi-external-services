@@ -147,8 +147,6 @@ export async function postRawTxToWhatsOnChain(txid: string | Buffer | undefined,
         
         // { status: 200, statusText: 'OK', data: 'txid' }
         // { status: 400, statusText: 'Bad Request', data: 'unexpected response code 500: Missing inputs' }
-        // eslint-disable-next-line no-debugger
-        debugger;
         if (!data || data.status !== 200) throw new ERR_BAD_REQUEST(data?.statusText)
 
         const txid = <string>data.data
@@ -173,8 +171,6 @@ export async function postRawTxToWhatsOnChain(txid: string | Buffer | undefined,
             publicKey: identityKeyFromPrivateKey(key)            
         }
         
-        // eslint-disable-next-line no-debugger
-        debugger;
         checkMapiResponse(mapi)
             
         // This transaction was previously broadcast and already exists in the block chain
