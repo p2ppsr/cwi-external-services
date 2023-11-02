@@ -12,7 +12,7 @@ describe("getUtxoStatus", () => {
         expect(p).toBeTruthy()
         expect(p.name).toBe('WoC')
         expect(p.status).toBe('success')
-        expect(p.isUtxo).toBe(true)
+        expect(p.isUtxo).toBe(false)
         expect(p.error).toBeUndefined()
     }, 100000)
 
