@@ -1053,7 +1053,7 @@ Transaction is a double spend.
 
 ```ts
 export class ERR_EXTSVS_DOUBLE_SPEND extends CwiError {
-    constructor() 
+    constructor(description?: string) 
 }
 ```
 
