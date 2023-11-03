@@ -24,8 +24,8 @@ export interface CwiExternalServicesOptions {
 export class CwiExternalServices implements CwiExternalServicesApi {
     static createDefaultOptions() : CwiExternalServicesOptions {
         const o: CwiExternalServicesOptions = {
-            mainTaalApiKey: "mainnet_9596de07e92300c6287e4393594ae39c",
-            testTaalApiKey: "testnet_0e6cf72133b43ea2d7861da2a38684e3"
+            mainTaalApiKey: "mainnet_9596de07e92300c6287e4393594ae39c", // Tone's key, no plan
+            testTaalApiKey: "testnet_0e6cf72133b43ea2d7861da2a38684e3" // Tone's personal "starter" key
         }
         return o
     }
