@@ -78,15 +78,33 @@ export async function postRawTxToMapiMiner(txid: string | Buffer, rawTx: string 
             }
         )
         
-        if (!data || data.status !== 200) throw new ERR_BAD_REQUEST(data?.statusText)
+        if (!data) throw new ERR_BAD_REQUEST('no response object')
 
-        mapi = data?.data
+        const makeDescription = data => {
+            const dd = data.data
+            const errorData = {
+                status: data.status,
+                statusText: data.statusText,
+                data: undefined
+            }
+            if (dd) try {
+                errorData.data = JSON.parse(JSON.stringify(dd))
+            } catch { /* */ }
+            const description = JSON.stringify(errorData)
+            return description
+        }
 
-        if (!mapi || data?.data.message) throw new ERR_EXTSVS_MAPI_MISSING(data?.data.message || data.statusText)
+        if (data.status !== 200 || !data.data) {
+            throw new ERR_BAD_REQUEST(makeDescription(data))
+        }
+
+        mapi = data.data
+
+        if (!mapi || data.data.message) throw new ERR_EXTSVS_MAPI_MISSING(makeDescription(data))
             
         const payload = getMapiPostTxPayload(mapi, txid)
 
-        if (payload.conflictedWith) throw new ERR_EXTSVS_DOUBLE_SPEND()
+        if (payload.conflictedWith) throw new ERR_EXTSVS_DOUBLE_SPEND(makeDescription(data))
 
         // TODO: This is a kludge. Protocol should encode this explicitly.
         // "resultDescription": "" | "Transaction already mined into block" | "Already known"
@@ -96,11 +114,11 @@ export async function postRawTxToMapiMiner(txid: string | Buffer, rawTx: string 
         
         if (alreadyMined) {
             // This transaction was previously broadcast and already exists in the block chain
-            throw new ERR_EXTSVS_ALREADY_MINED(payload.resultDescription)
+            throw new ERR_EXTSVS_ALREADY_MINED(makeDescription(data))
         }
 
         if (payload.returnResult !== 'success') {
-            throw new ERR_EXTSVS_INVALID_TRANSACTION(payload.resultDescription)
+            throw new ERR_EXTSVS_INVALID_TRANSACTION(makeDescription(data))
         }
 
         const r: PostRawTxResultApi = {
