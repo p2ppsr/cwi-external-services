@@ -1,4 +1,4 @@
-import { asBuffer, asString, bsv } from "cwi-base";
+import { asBuffer, asString, bsv, identityKeyFromPrivateKey } from "cwi-base";
 
 import { MapiCallbackPayloadApi, MapiPostTxPayloadApi, MapiResponseApi, MapiTxidReturnResultApi, MapiTxStatusPayloadApi } from "cwi-base/src/Api/MerchantApi";
 import {
@@ -9,6 +9,30 @@ import {
     ERR_EXTSVS_TXID_INVALID
 } from "./ERR_EXTSVS_errors";
 
+export function createMapiPostTxResponse(txid: string, key: string, resultDescription: string, returnResult = "success")
+: { mapi: MapiResponseApi, payloadData: MapiPostTxPayloadApi }
+{
+    const publicKey = identityKeyFromPrivateKey(key)            
+
+    const payloadData: MapiPostTxPayloadApi = {
+        apiVersion: "1.5.0",
+        timestamp: new Date().toISOString(),
+        txid,
+        returnResult,
+        resultDescription,
+        minerId: publicKey
+    }
+
+    const payload = JSON.stringify(payloadData)
+    
+    const mapi: MapiResponseApi = {
+        payload,
+        signature: signMapiPayload(payload, key),
+        publicKey
+    }
+    
+    return { mapi, payloadData }
+}
 /**
  * Verifies the payload signature on a mAPI response object
  *
