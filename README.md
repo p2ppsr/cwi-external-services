@@ -1124,20 +1124,32 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 
 | | | |
 | --- | --- | --- |
-| [checkMapiResponse](#function-checkmapiresponse) | [getMerkleProofFromTaal](#function-getmerkleprooffromtaal) | [getSpentStatusForOutpoint](#function-getspentstatusforoutpoint) |
-| [checkMapiResponseForTxid](#function-checkmapiresponsefortxid) | [getMerkleProofFromWhatsOnChain](#function-getmerkleprooffromwhatsonchain) | [getUtxoStatusFromWhatsOnChain](#function-getutxostatusfromwhatsonchain) |
-| [checkMerkleProof](#function-checkmerkleproof) | [getMerkleProofFromWhatsOnChainTsc](#function-getmerkleprooffromwhatsonchaintsc) | [postRawTxToGorillaPool](#function-postrawtxtogorillapool) |
+| [checkMapiResponse](#function-checkmapiresponse) | [getMerkleProofFromMetastreme](#function-getmerkleprooffrommetastreme) | [getRawTxFromWhatsOnChain](#function-getrawtxfromwhatsonchain) |
+| [checkMapiResponseForTxid](#function-checkmapiresponsefortxid) | [getMerkleProofFromTaal](#function-getmerkleprooffromtaal) | [getSpentStatusForOutpoint](#function-getspentstatusforoutpoint) |
+| [checkMerkleProof](#function-checkmerkleproof) | [getMerkleProofFromWhatsOnChain](#function-getmerkleprooffromwhatsonchain) | [getUtxoStatusFromWhatsOnChain](#function-getutxostatusfromwhatsonchain) |
+| [createMapiPostTxResponse](#function-createmapiposttxresponse) | [getMerkleProofFromWhatsOnChainTsc](#function-getmerkleprooffromwhatsonchaintsc) | [postRawTxToGorillaPool](#function-postrawtxtogorillapool) |
 | [getMapiCallbackPayload](#function-getmapicallbackpayload) | [getProofFromGorillaPool](#function-getprooffromgorillapool) | [postRawTxToMapiMiner](#function-postrawtxtomapiminer) |
 | [getMapiJsonResponsePayload](#function-getmapijsonresponsepayload) | [getProofFromMetastreme](#function-getprooffrommetastreme) | [postRawTxToTaal](#function-postrawtxtotaal) |
 | [getMapiPostTxPayload](#function-getmapiposttxpayload) | [getProofFromTaal](#function-getprooffromtaal) | [postRawTxToWhatsOnChain](#function-postrawtxtowhatsonchain) |
 | [getMapiTxStatusPayload](#function-getmapitxstatuspayload) | [getProofFromWhatsOnChain](#function-getprooffromwhatsonchain) | [signMapiPayload](#function-signmapipayload) |
 | [getMerkleProofFromGorillaPool](#function-getmerkleprooffromgorillapool) | [getProofFromWhatsOnChainTsc](#function-getprooffromwhatsonchaintsc) | [verifyMapiResponseForTxid](#function-verifymapiresponsefortxid) |
-| [getMerkleProofFromMetastreme](#function-getmerkleprooffrommetastreme) | [getRawTxFromWhatsOnChain](#function-getrawtxfromwhatsonchain) |  |
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
 
+#### Function: createMapiPostTxResponse
+
+```ts
+export function createMapiPostTxResponse(txid: string, key: string, resultDescription: string, returnResult = "success"): {
+    mapi: MapiResponseApi;
+    payloadData: MapiPostTxPayloadApi;
+} 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
 #### Function: checkMapiResponse
 
 Verifies the payload signature on a mAPI response object
