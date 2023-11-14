@@ -165,11 +165,29 @@ export async function postRawTxToWhatsOnChain(txid: string | Buffer | undefined,
         
         // { status: 200, statusText: 'OK', data: 'txid' }
         // { status: 400, statusText: 'Bad Request', data: 'unexpected response code 500: Missing inputs' }
-        if (!data || data.status !== 200) throw new ERR_BAD_REQUEST(data?.statusText)
+        if (!data) throw new ERR_BAD_REQUEST('no response object')
+            
+        const makeDescription = data => {
+            const dd = data.data
+            const errorData = {
+                status: data.status,
+                statusText: data.statusText,
+                data: undefined
+            }
+            if (dd) try {
+                errorData.data = JSON.parse(JSON.stringify(dd))
+            } catch { /* */ }
+            const description = JSON.stringify(errorData)
+            return description
+        }
+
+        if (data.status !== 200 || !data.data) {
+            throw new ERR_BAD_REQUEST(makeDescription(data))
+        }
 
         const txid = <string>data.data
         
-        if (txid != asString(doubleSha256BE(rawTx))) throw new ERR_EXTSVS_INVALID_TXID()
+        if (txid != asString(doubleSha256BE(rawTx))) throw new ERR_EXTSVS_INVALID_TXID(makeDescription(data))
 
         const key = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
         const { mapi, payloadData } = createMapiPostTxResponse(txid, key, `Accepted by ${url}`)
