@@ -148,10 +148,18 @@ export async function postRawTxToWhatsOnChain(txid: string | Buffer | undefined,
 {
     try {
 
+        if (!txid) txid = doubleSha256BE(rawTx)
+        txid = asString(txid)
+
         const headers = {
             'Content-Type': 'application/json'
         }
         const url = `https://api.whatsonchain.com/v1/bsv/${chain}/tx/raw`
+
+        const key = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+        const { mapi, payloadData } = createMapiPostTxResponse(txid, key, `Accepted by ${url}`)
+        checkMapiResponse(mapi)
+            
         const data = await axios.post(
             url,
             {
@@ -181,24 +189,6 @@ export async function postRawTxToWhatsOnChain(txid: string | Buffer | undefined,
             return description
         }
 
-        if (data.status !== 200 || !data.data) {
-            throw new ERR_BAD_REQUEST(makeDescription(data))
-        }
-
-        const txid = <string>data.data
-        
-        if (txid != asString(doubleSha256BE(rawTx))) throw new ERR_EXTSVS_INVALID_TXID(makeDescription(data))
-
-        const key = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-        const { mapi, payloadData } = createMapiPostTxResponse(txid, key, `Accepted by ${url}`)
-        
-        checkMapiResponse(mapi)
-            
-        // This transaction was previously broadcast and already exists in the block chain
-        // throw new ERR_EXTSVS_ALREADY_MINED(payload.resultDescription)
-
-        // throw new ERR_EXTSVS_INVALID_TRANSACTION(payload.resultDescription)
-
         const r: PostRawTxResultApi = {
             status: 'success',
             payload: payloadData,
@@ -207,6 +197,24 @@ export async function postRawTxToWhatsOnChain(txid: string | Buffer | undefined,
             name: 'WoC',
             mapi: mapi
         }
+
+        if (data.status !== 200 || !data.data) {
+            const error = new ERR_BAD_REQUEST(makeDescription(data))
+            if (-1 < error.description.indexOf("txn-already-known")) {
+                r.alreadyKnown = true
+                return r
+            }
+            throw error
+        }
+
+        const txidR = <string>data.data
+        
+        if (txidR != txid) throw new ERR_EXTSVS_INVALID_TXID(makeDescription(data))
+
+        // This transaction was previously broadcast and already exists in the block chain
+        // throw new ERR_EXTSVS_ALREADY_MINED(payload.resultDescription)
+
+        // throw new ERR_EXTSVS_INVALID_TRANSACTION(payload.resultDescription)
 
         return r
 
