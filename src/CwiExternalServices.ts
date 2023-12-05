@@ -101,6 +101,18 @@ export class CwiExternalServices implements CwiExternalServicesApi {
         return r0
     }
 
+    async verifyOutput(output: { outputScript: Buffer | null, amount: number | null }, chain: Chain) : Promise<boolean> {
+        if (!output.outputScript || !output.amount) return false
+        const r = await this.getUtxoStatus(output.outputScript, chain, 'script')
+        let ok = false
+        if (r.status === 'success' && r.isUtxo) {
+            if (r.details.some(d => d.amount === output.amount)) {
+                ok = true
+            }
+        }
+        return ok
+    }
+
     async postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]> {
         
         const txid = doubleSha256BE(rawTx)
