@@ -1111,6 +1111,10 @@ export class CwiExternalServices implements CwiExternalServicesApi {
     get postRawTxsCount() 
     get getUtxoStatsCount() 
     async getUtxoStatus(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi, useNext?: boolean): Promise<GetUtxoStatusResultApi> 
+    async verifyOutput(output: {
+        outputScript: Buffer | null;
+        amount: number | null;
+    }, chain: Chain): Promise<boolean> 
     async postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]> 
     async getRawTx(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetRawTxResultApi> 
     async getMerkleProof(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetMerkleProofResultApi> 
