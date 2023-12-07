@@ -29,9 +29,7 @@
     "build:readme": "npx ts2md",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "tonpm": "npm run tonone && npm i cwi-base --silent",
-    "tonone": "npm remove cwi-base --silent"
+    "test:coverage": "jest --coverage"
   },
   "devDependencies": {
     "@types/bn.js": "^5.1.1",
