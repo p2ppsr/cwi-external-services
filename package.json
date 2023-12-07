@@ -52,6 +52,6 @@
   "dependencies": {
     "axios": "^0.21.1",
     "bn.js": "^5.2.1",
-    "cwi-base": "^0.3.90"
+    "cwi-base": "^0.3.91"
   }
 }
