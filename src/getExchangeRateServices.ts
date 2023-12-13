@@ -19,11 +19,15 @@ export async function updateBsvExchangeRate(rate?: BsvExchangeRateApi, updateMse
     if (wocrate.currency !== 'USD')
         wocrate.rate = NaN
 
-    return {
+    const newRate: BsvExchangeRateApi = {
         timestamp: new Date(),
         base: 'USD',
         rate: wocrate.rate
     }
+
+    console.log(`new bsv rate=${JSON.stringify(newRate)}`)
+
+    return newRate
 }
 
 export async function updateFiatExchangeRates(rates?: FiatExchangeRatesApi, updateMsecs?: number): Promise<FiatExchangeRatesApi> {
@@ -63,6 +67,8 @@ export async function updateFiatExchangeRates(rates?: FiatExchangeRatesApi, upda
 
     if (updates !== targetCurrencies.length)
         throw new ERR_BAD_REQUEST(`getExchangeRatesIo failed to update all target currencies`)
+
+    console.log(`new fiat rates=${JSON.stringify(r)}`)
 
     return r
 }
