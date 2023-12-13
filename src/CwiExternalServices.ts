@@ -1,7 +1,8 @@
 import { Chain, ERR_INTERNAL, ERR_MISSING_PARAMETER, ERR_TXID_INVALID, asString, doubleSha256BE } from "cwi-base"
 
 import {
-    CwiExternalServicesApi, GetMerkleProofResultApi, GetMerkleProofServiceApi, GetRawTxResultApi,
+    BsvExchangeRateApi,
+    CwiExternalServicesApi, FiatExchangeRatesApi, GetMerkleProofResultApi, GetMerkleProofServiceApi, GetRawTxResultApi,
     GetRawTxServiceApi, GetUtxoStatusOutputFormatApi, GetUtxoStatusResultApi,
     GetUtxoStatusServiceApi,
     MapiCallbackApi, PostRawTxResultApi, PostRawTxServiceApi 
@@ -15,17 +16,38 @@ import {
     getProofFromGorillaPool, getProofFromMetastreme, getProofFromTaal, getProofFromWhatsOnChain, getProofFromWhatsOnChainTsc
 } from "./getProofServices"
 import { getUtxoStatusFromWhatsOnChain } from "./getUtxoStatusServices"
+import { updateBsvExchangeRate, updateFiatExchangeRates } from "./getExchangeRateServices"
 
 export interface CwiExternalServicesOptions {
     mainTaalApiKey?: string
     testTaalApiKey?: string
+    bsvExchangeRate: BsvExchangeRateApi
+    bsvUpdateMsecs: number
+    fiatExchangeRates: FiatExchangeRatesApi
+    fiatUpdateMsecs: number
 }
 
 export class CwiExternalServices implements CwiExternalServicesApi {
     static createDefaultOptions() : CwiExternalServicesOptions {
         const o: CwiExternalServicesOptions = {
             mainTaalApiKey: "mainnet_9596de07e92300c6287e4393594ae39c", // Tone's key, no plan
-            testTaalApiKey: "testnet_0e6cf72133b43ea2d7861da2a38684e3" // Tone's personal "starter" key
+            testTaalApiKey: "testnet_0e6cf72133b43ea2d7861da2a38684e3", // Tone's personal "starter" key
+            bsvExchangeRate: {
+                timestamp: new Date('2023-12-13'),
+                base: "USD",
+                rate: 47.52
+            },
+            bsvUpdateMsecs: 1000 * 60 * 15, // 15 minutes
+            fiatExchangeRates: {
+                timestamp: new Date('2023-12-13'),
+                base: "USD",
+                rates: {
+                    "USD": 1,
+                    "GBP": 0.8,
+                    "EUR": 0.93
+                }
+            },
+            fiatUpdateMsecs: 1000 * 60 * 60 * 24, // 24 hours
         }
         return o
     }
@@ -57,6 +79,22 @@ export class CwiExternalServices implements CwiExternalServicesApi {
         
         this.getUtxoStats = new ServiceCollection<GetUtxoStatusServiceApi>()
         .add({ name: 'WhatsOnChain', service: getUtxoStatusFromWhatsOnChain})
+    }
+
+    async getBsvExchangeRate(): Promise<number> {
+        this.options.bsvExchangeRate = await updateBsvExchangeRate(this.options.bsvExchangeRate, this.options.bsvUpdateMsecs)
+        return this.options.bsvExchangeRate.rate
+    }
+
+    async getFiatExchangeRate(currency: "USD" | "GBP" | "EUR", base?: "USD" | "GBP" | "EUR"): Promise<number> {
+        const rates = await updateFiatExchangeRates(this.options.fiatExchangeRates, this.options.fiatUpdateMsecs)
+
+        this.options.fiatExchangeRates = rates
+
+        base ||= 'USD'
+        const rate = rates.rates[currency] / rates.rates[base]
+
+        return rate
     }
 
     private taalApiKey(chain: Chain) {

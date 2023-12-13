@@ -5,7 +5,19 @@ import { MapiPostTxPayloadApi, MapiResponseApi, TscMerkleProofApi } from "cwi-ba
  * Defines standard interfaces to access functionality implemented by external transaction processing services.
  */
 export interface CwiExternalServicesApi {
-    
+
+    /**
+     * Approximate exchange rate US Dollar / BSV, USD / BSV
+     * 
+     * This is the US Dollar price of one BSV
+     */
+    getBsvExchangeRate() : Promise<number>
+
+    /**
+     * Approximate exchange rate currency per base.
+     */
+    getFiatExchangeRate(currency: "USD" | "GBP" | "EUR", base?: "USD" | "GBP" | "EUR") : Promise<number>
+
     /**
      * Attempts to obtain the raw transaction bytes associated with a 32 byte transaction hash (txid).
      * 
@@ -269,4 +281,16 @@ export interface GetUtxoStatusResultApi {
      * there could be more than one block in which it is a valid utxo.
      */
     details: GetUtxoStatusDetailsApi[]
+}
+
+export interface BsvExchangeRateApi {
+    timestamp: Date,
+    base: "USD",
+    rate: number
+}
+
+export interface FiatExchangeRatesApi {
+    timestamp: Date,
+    base: "USD",
+    rates: Record<string, number>
 }
