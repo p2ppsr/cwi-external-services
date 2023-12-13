@@ -14,14 +14,15 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 
 | | |
 | --- | --- |
-| [CwiExternalServicesApi](#interface-cwiexternalservicesapi) | [MapiPostTxPayloadApi](#interface-mapiposttxpayloadapi) |
-| [CwiExternalServicesOptions](#interface-cwiexternalservicesoptions) | [MapiResponseApi](#interface-mapiresponseapi) |
-| [GetMerkleProofResultApi](#interface-getmerkleproofresultapi) | [MapiTxStatusPayloadApi](#interface-mapitxstatuspayloadapi) |
-| [GetRawTxResultApi](#interface-getrawtxresultapi) | [MapiTxidReturnResultApi](#interface-mapitxidreturnresultapi) |
-| [GetUtxoStatusDetailsApi](#interface-getutxostatusdetailsapi) | [PostRawTxResultApi](#interface-postrawtxresultapi) |
-| [GetUtxoStatusResultApi](#interface-getutxostatusresultapi) | [PostTransactionMapiMinerApi](#interface-posttransactionmapiminerapi) |
-| [MapiCallbackApi](#interface-mapicallbackapi) | [TscMerkleProofApi](#interface-tscmerkleproofapi) |
-| [MapiCallbackPayloadApi](#interface-mapicallbackpayloadapi) |  |
+| [BsvExchangeRateApi](#interface-bsvexchangerateapi) | [MapiCallbackApi](#interface-mapicallbackapi) |
+| [CwiExternalServicesApi](#interface-cwiexternalservicesapi) | [MapiCallbackPayloadApi](#interface-mapicallbackpayloadapi) |
+| [CwiExternalServicesOptions](#interface-cwiexternalservicesoptions) | [MapiPostTxPayloadApi](#interface-mapiposttxpayloadapi) |
+| [ExchangeRatesIoApi](#interface-exchangeratesioapi) | [MapiResponseApi](#interface-mapiresponseapi) |
+| [FiatExchangeRatesApi](#interface-fiatexchangeratesapi) | [MapiTxStatusPayloadApi](#interface-mapitxstatuspayloadapi) |
+| [GetMerkleProofResultApi](#interface-getmerkleproofresultapi) | [MapiTxidReturnResultApi](#interface-mapitxidreturnresultapi) |
+| [GetRawTxResultApi](#interface-getrawtxresultapi) | [PostRawTxResultApi](#interface-postrawtxresultapi) |
+| [GetUtxoStatusDetailsApi](#interface-getutxostatusdetailsapi) | [PostTransactionMapiMinerApi](#interface-posttransactionmapiminerapi) |
+| [GetUtxoStatusResultApi](#interface-getutxostatusresultapi) | [TscMerkleProofApi](#interface-tscmerkleproofapi) |
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -33,6 +34,8 @@ Defines standard interfaces to access functionality implemented by external tran
 
 ```ts
 export interface CwiExternalServicesApi {
+    getBsvExchangeRate(): Promise<number>;
+    getFiatExchangeRate(currency: "USD" | "GBP" | "EUR", base?: "USD" | "GBP" | "EUR"): Promise<number>;
     getRawTx(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetRawTxResultApi>;
     getMerkleProof(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetMerkleProofResultApi>;
     postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]>;
@@ -43,6 +46,24 @@ export interface CwiExternalServicesApi {
 <details>
 
 <summary>Interface CwiExternalServicesApi Details</summary>
+
+##### Method getBsvExchangeRate
+
+Approximate exchange rate US Dollar / BSV, USD / BSV
+
+This is the US Dollar price of one BSV
+
+```ts
+getBsvExchangeRate(): Promise<number>
+```
+
+##### Method getFiatExchangeRate
+
+Approximate exchange rate currency per base.
+
+```ts
+getFiatExchangeRate(currency: "USD" | "GBP" | "EUR", base?: "USD" | "GBP" | "EUR"): Promise<number>
+```
 
 ##### Method getMerkleProof
 
@@ -564,6 +585,32 @@ status: "success" | "error"
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
+#### Interface: BsvExchangeRateApi
+
+```ts
+export interface BsvExchangeRateApi {
+    timestamp: Date;
+    base: "USD";
+    rate: number;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: FiatExchangeRatesApi
+
+```ts
+export interface FiatExchangeRatesApi {
+    timestamp: Date;
+    base: "USD";
+    rates: Record<string, number>;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
 #### Interface: MapiResponseApi
 
 ```ts
@@ -794,12 +841,31 @@ export interface PostTransactionMapiMinerApi {
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
+#### Interface: ExchangeRatesIoApi
+
+```ts
+export interface ExchangeRatesIoApi {
+    success: boolean;
+    timestamp: number;
+    base: "EUR" | "USD";
+    date: string;
+    rates: Record<string, number>;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
 #### Interface: CwiExternalServicesOptions
 
 ```ts
 export interface CwiExternalServicesOptions {
     mainTaalApiKey?: string;
     testTaalApiKey?: string;
+    bsvExchangeRate: BsvExchangeRateApi;
+    bsvUpdateMsecs: number;
+    fiatExchangeRates: FiatExchangeRatesApi;
+    fiatUpdateMsecs: number;
 }
 ```
 
@@ -1106,6 +1172,8 @@ export class CwiExternalServices implements CwiExternalServicesApi {
     static createDefaultOptions(): CwiExternalServicesOptions 
     options: CwiExternalServicesOptions;
     constructor(options?: CwiExternalServicesOptions) 
+    async getBsvExchangeRate(): Promise<number> 
+    async getFiatExchangeRate(currency: "USD" | "GBP" | "EUR", base?: "USD" | "GBP" | "EUR"): Promise<number> 
     get getProofsCount() 
     get getRawTxsCount() 
     get postRawTxsCount() 
@@ -1128,15 +1196,16 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 
 | | | |
 | --- | --- | --- |
-| [checkMapiResponse](#function-checkmapiresponse) | [getMerkleProofFromMetastreme](#function-getmerkleprooffrommetastreme) | [getRawTxFromWhatsOnChain](#function-getrawtxfromwhatsonchain) |
-| [checkMapiResponseForTxid](#function-checkmapiresponsefortxid) | [getMerkleProofFromTaal](#function-getmerkleprooffromtaal) | [getSpentStatusForOutpoint](#function-getspentstatusforoutpoint) |
-| [checkMerkleProof](#function-checkmerkleproof) | [getMerkleProofFromWhatsOnChain](#function-getmerkleprooffromwhatsonchain) | [getUtxoStatusFromWhatsOnChain](#function-getutxostatusfromwhatsonchain) |
-| [createMapiPostTxResponse](#function-createmapiposttxresponse) | [getMerkleProofFromWhatsOnChainTsc](#function-getmerkleprooffromwhatsonchaintsc) | [postRawTxToGorillaPool](#function-postrawtxtogorillapool) |
-| [getMapiCallbackPayload](#function-getmapicallbackpayload) | [getProofFromGorillaPool](#function-getprooffromgorillapool) | [postRawTxToMapiMiner](#function-postrawtxtomapiminer) |
-| [getMapiJsonResponsePayload](#function-getmapijsonresponsepayload) | [getProofFromMetastreme](#function-getprooffrommetastreme) | [postRawTxToTaal](#function-postrawtxtotaal) |
-| [getMapiPostTxPayload](#function-getmapiposttxpayload) | [getProofFromTaal](#function-getprooffromtaal) | [postRawTxToWhatsOnChain](#function-postrawtxtowhatsonchain) |
-| [getMapiTxStatusPayload](#function-getmapitxstatuspayload) | [getProofFromWhatsOnChain](#function-getprooffromwhatsonchain) | [signMapiPayload](#function-signmapipayload) |
-| [getMerkleProofFromGorillaPool](#function-getmerkleprooffromgorillapool) | [getProofFromWhatsOnChainTsc](#function-getprooffromwhatsonchaintsc) | [verifyMapiResponseForTxid](#function-verifymapiresponsefortxid) |
+| [checkMapiResponse](#function-checkmapiresponse) | [getMerkleProofFromMetastreme](#function-getmerkleprooffrommetastreme) | [getSpentStatusForOutpoint](#function-getspentstatusforoutpoint) |
+| [checkMapiResponseForTxid](#function-checkmapiresponsefortxid) | [getMerkleProofFromTaal](#function-getmerkleprooffromtaal) | [getUtxoStatusFromWhatsOnChain](#function-getutxostatusfromwhatsonchain) |
+| [checkMerkleProof](#function-checkmerkleproof) | [getMerkleProofFromWhatsOnChain](#function-getmerkleprooffromwhatsonchain) | [postRawTxToGorillaPool](#function-postrawtxtogorillapool) |
+| [createMapiPostTxResponse](#function-createmapiposttxresponse) | [getMerkleProofFromWhatsOnChainTsc](#function-getmerkleprooffromwhatsonchaintsc) | [postRawTxToMapiMiner](#function-postrawtxtomapiminer) |
+| [getExchangeRatesIo](#function-getexchangeratesio) | [getProofFromGorillaPool](#function-getprooffromgorillapool) | [postRawTxToTaal](#function-postrawtxtotaal) |
+| [getMapiCallbackPayload](#function-getmapicallbackpayload) | [getProofFromMetastreme](#function-getprooffrommetastreme) | [postRawTxToWhatsOnChain](#function-postrawtxtowhatsonchain) |
+| [getMapiJsonResponsePayload](#function-getmapijsonresponsepayload) | [getProofFromTaal](#function-getprooffromtaal) | [signMapiPayload](#function-signmapipayload) |
+| [getMapiPostTxPayload](#function-getmapiposttxpayload) | [getProofFromWhatsOnChain](#function-getprooffromwhatsonchain) | [updateBsvExchangeRate](#function-updatebsvexchangerate) |
+| [getMapiTxStatusPayload](#function-getmapitxstatuspayload) | [getProofFromWhatsOnChainTsc](#function-getprooffromwhatsonchaintsc) | [updateFiatExchangeRates](#function-updatefiatexchangerates) |
+| [getMerkleProofFromGorillaPool](#function-getmerkleprooffromgorillapool) | [getRawTxFromWhatsOnChain](#function-getrawtxfromwhatsonchain) | [verifyMapiResponseForTxid](#function-verifymapiresponsefortxid) |
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -1552,6 +1621,33 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 
 ```ts
 export async function getUtxoStatusFromWhatsOnChain(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi): Promise<GetUtxoStatusResultApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: updateBsvExchangeRate
+
+```ts
+export async function updateBsvExchangeRate(rate?: BsvExchangeRateApi, updateMsecs?: number): Promise<BsvExchangeRateApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: updateFiatExchangeRates
+
+```ts
+export async function updateFiatExchangeRates(rates?: FiatExchangeRatesApi, updateMsecs?: number): Promise<FiatExchangeRatesApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getExchangeRatesIo
+
+```ts
+export async function getExchangeRatesIo(): Promise<ExchangeRatesIoApi> 
 ```
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
