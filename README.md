@@ -14,15 +14,16 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 
 | | |
 | --- | --- |
-| [BsvExchangeRateApi](#interface-bsvexchangerateapi) | [MapiCallbackApi](#interface-mapicallbackapi) |
-| [CwiExternalServicesApi](#interface-cwiexternalservicesapi) | [MapiCallbackPayloadApi](#interface-mapicallbackpayloadapi) |
-| [CwiExternalServicesOptions](#interface-cwiexternalservicesoptions) | [MapiPostTxPayloadApi](#interface-mapiposttxpayloadapi) |
-| [ExchangeRatesIoApi](#interface-exchangeratesioapi) | [MapiResponseApi](#interface-mapiresponseapi) |
-| [FiatExchangeRatesApi](#interface-fiatexchangeratesapi) | [MapiTxStatusPayloadApi](#interface-mapitxstatuspayloadapi) |
-| [GetMerkleProofResultApi](#interface-getmerkleproofresultapi) | [MapiTxidReturnResultApi](#interface-mapitxidreturnresultapi) |
-| [GetRawTxResultApi](#interface-getrawtxresultapi) | [PostRawTxResultApi](#interface-postrawtxresultapi) |
-| [GetUtxoStatusDetailsApi](#interface-getutxostatusdetailsapi) | [PostTransactionMapiMinerApi](#interface-posttransactionmapiminerapi) |
-| [GetUtxoStatusResultApi](#interface-getutxostatusresultapi) | [TscMerkleProofApi](#interface-tscmerkleproofapi) |
+| [BsvExchangeRateApi](#interface-bsvexchangerateapi) | [GetUtxoStatusResultApi](#interface-getutxostatusresultapi) |
+| [CwiExternalServicesApi](#interface-cwiexternalservicesapi) | [MapiCallbackApi](#interface-mapicallbackapi) |
+| [CwiExternalServicesOptions](#interface-cwiexternalservicesoptions) | [MapiCallbackPayloadApi](#interface-mapicallbackpayloadapi) |
+| [ExchangeRatesIoApi](#interface-exchangeratesioapi) | [MapiPostTxPayloadApi](#interface-mapiposttxpayloadapi) |
+| [FiatExchangeRatesApi](#interface-fiatexchangeratesapi) | [MapiResponseApi](#interface-mapiresponseapi) |
+| [GetMerkleProofResultApi](#interface-getmerkleproofresultapi) | [MapiTxStatusPayloadApi](#interface-mapitxstatuspayloadapi) |
+| [GetRawTxResultApi](#interface-getrawtxresultapi) | [MapiTxidReturnResultApi](#interface-mapitxidreturnresultapi) |
+| [GetScriptHistoryDetailsApi](#interface-getscripthistorydetailsapi) | [PostRawTxResultApi](#interface-postrawtxresultapi) |
+| [GetScriptHistoryResultApi](#interface-getscripthistoryresultapi) | [PostTransactionMapiMinerApi](#interface-posttransactionmapiminerapi) |
+| [GetUtxoStatusDetailsApi](#interface-getutxostatusdetailsapi) | [TscMerkleProofApi](#interface-tscmerkleproofapi) |
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -561,6 +562,100 @@ true if the output is associated with at least one unspent transaction output
 
 ```ts
 isUtxo?: boolean
+```
+
+##### Property name
+
+The name of the service to which the transaction was submitted for processing
+
+```ts
+name: string
+```
+
+##### Property status
+
+'success' - the operation was successful, non-error results are valid.
+'error' - the operation failed, error may have relevant information.
+
+```ts
+status: "success" | "error"
+```
+
+</details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: GetScriptHistoryDetailsApi
+
+```ts
+export interface GetScriptHistoryDetailsApi {
+    height?: number;
+    txid?: string;
+}
+```
+
+<details>
+
+<summary>Interface GetScriptHistoryDetailsApi Details</summary>
+
+##### Property height
+
+if isUtxo, the block height containing the matching unspent transaction output
+
+typically there will be only one, but future orphans can result in multiple values
+
+```ts
+height?: number
+```
+
+##### Property txid
+
+the transaction hash (txid) of the transaction containing the matching unspent transaction output
+
+typically there will be only one, but future orphans can result in multiple values
+
+```ts
+txid?: string
+```
+
+</details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: GetScriptHistoryResultApi
+
+```ts
+export interface GetScriptHistoryResultApi {
+    name: string;
+    status: "success" | "error";
+    error?: CwiError;
+    details: GetScriptHistoryDetailsApi[];
+}
+```
+
+<details>
+
+<summary>Interface GetScriptHistoryResultApi Details</summary>
+
+##### Property details
+
+Additional details about occurances of this output script.
+
+Normally there will be one item in the array for spent outputs with the txid
+of the spending transaction.
+
+```ts
+details: GetScriptHistoryDetailsApi[]
+```
+
+##### Property error
+
+When status is 'error', provides code and description
+
+```ts
+error?: CwiError
 ```
 
 ##### Property name
@@ -1179,6 +1274,7 @@ export class CwiExternalServices implements CwiExternalServicesApi {
     get postRawTxsCount() 
     get getUtxoStatsCount() 
     async getUtxoStatus(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi, useNext?: boolean): Promise<GetUtxoStatusResultApi> 
+    async getScriptHistory(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi, useNext?: boolean): Promise<GetScriptHistoryResultApi> 
     async verifyOutput(output: {
         outputScript: Buffer | null;
         amount: number | null;
@@ -1196,16 +1292,17 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 
 | | | |
 | --- | --- | --- |
-| [checkMapiResponse](#function-checkmapiresponse) | [getMerkleProofFromMetastreme](#function-getmerkleprooffrommetastreme) | [getSpentStatusForOutpoint](#function-getspentstatusforoutpoint) |
-| [checkMapiResponseForTxid](#function-checkmapiresponsefortxid) | [getMerkleProofFromTaal](#function-getmerkleprooffromtaal) | [getUtxoStatusFromWhatsOnChain](#function-getutxostatusfromwhatsonchain) |
-| [checkMerkleProof](#function-checkmerkleproof) | [getMerkleProofFromWhatsOnChain](#function-getmerkleprooffromwhatsonchain) | [postRawTxToGorillaPool](#function-postrawtxtogorillapool) |
-| [createMapiPostTxResponse](#function-createmapiposttxresponse) | [getMerkleProofFromWhatsOnChainTsc](#function-getmerkleprooffromwhatsonchaintsc) | [postRawTxToMapiMiner](#function-postrawtxtomapiminer) |
-| [getExchangeRatesIo](#function-getexchangeratesio) | [getProofFromGorillaPool](#function-getprooffromgorillapool) | [postRawTxToTaal](#function-postrawtxtotaal) |
-| [getMapiCallbackPayload](#function-getmapicallbackpayload) | [getProofFromMetastreme](#function-getprooffrommetastreme) | [postRawTxToWhatsOnChain](#function-postrawtxtowhatsonchain) |
-| [getMapiJsonResponsePayload](#function-getmapijsonresponsepayload) | [getProofFromTaal](#function-getprooffromtaal) | [signMapiPayload](#function-signmapipayload) |
-| [getMapiPostTxPayload](#function-getmapiposttxpayload) | [getProofFromWhatsOnChain](#function-getprooffromwhatsonchain) | [updateBsvExchangeRate](#function-updatebsvexchangerate) |
-| [getMapiTxStatusPayload](#function-getmapitxstatuspayload) | [getProofFromWhatsOnChainTsc](#function-getprooffromwhatsonchaintsc) | [updateFiatExchangeRates](#function-updatefiatexchangerates) |
-| [getMerkleProofFromGorillaPool](#function-getmerkleprooffromgorillapool) | [getRawTxFromWhatsOnChain](#function-getrawtxfromwhatsonchain) | [verifyMapiResponseForTxid](#function-verifymapiresponsefortxid) |
+| [checkMapiResponse](#function-checkmapiresponse) | [getMerkleProofFromTaal](#function-getmerkleprooffromtaal) | [getUtxoStatusFromWhatsOnChain](#function-getutxostatusfromwhatsonchain) |
+| [checkMapiResponseForTxid](#function-checkmapiresponsefortxid) | [getMerkleProofFromWhatsOnChain](#function-getmerkleprooffromwhatsonchain) | [postRawTxToGorillaPool](#function-postrawtxtogorillapool) |
+| [checkMerkleProof](#function-checkmerkleproof) | [getMerkleProofFromWhatsOnChainTsc](#function-getmerkleprooffromwhatsonchaintsc) | [postRawTxToMapiMiner](#function-postrawtxtomapiminer) |
+| [createMapiPostTxResponse](#function-createmapiposttxresponse) | [getProofFromGorillaPool](#function-getprooffromgorillapool) | [postRawTxToTaal](#function-postrawtxtotaal) |
+| [getExchangeRatesIo](#function-getexchangeratesio) | [getProofFromMetastreme](#function-getprooffrommetastreme) | [postRawTxToWhatsOnChain](#function-postrawtxtowhatsonchain) |
+| [getMapiCallbackPayload](#function-getmapicallbackpayload) | [getProofFromTaal](#function-getprooffromtaal) | [signMapiPayload](#function-signmapipayload) |
+| [getMapiJsonResponsePayload](#function-getmapijsonresponsepayload) | [getProofFromWhatsOnChain](#function-getprooffromwhatsonchain) | [updateBsvExchangeRate](#function-updatebsvexchangerate) |
+| [getMapiPostTxPayload](#function-getmapiposttxpayload) | [getProofFromWhatsOnChainTsc](#function-getprooffromwhatsonchaintsc) | [updateFiatExchangeRates](#function-updatefiatexchangerates) |
+| [getMapiTxStatusPayload](#function-getmapitxstatuspayload) | [getRawTxFromWhatsOnChain](#function-getrawtxfromwhatsonchain) | [validateScriptHash](#function-validatescripthash) |
+| [getMerkleProofFromGorillaPool](#function-getmerkleprooffromgorillapool) | [getScriptHistoryFromWhatsOnChain](#function-getscripthistoryfromwhatsonchain) | [verifyMapiResponseForTxid](#function-verifymapiresponsefortxid) |
+| [getMerkleProofFromMetastreme](#function-getmerkleprooffrommetastreme) | [getSpentStatusForOutpoint](#function-getspentstatusforoutpoint) |  |
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -1626,6 +1723,24 @@ export async function getUtxoStatusFromWhatsOnChain(output: string | Buffer, cha
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
+#### Function: getScriptHistoryFromWhatsOnChain
+
+```ts
+export async function getScriptHistoryFromWhatsOnChain(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi): Promise<GetScriptHistoryResultApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: validateScriptHash
+
+```ts
+export function validateScriptHash(output: string | Buffer, outputFormat?: GetUtxoStatusOutputFormatApi): string 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
 #### Function: updateBsvExchangeRate
 
 ```ts
@@ -1670,6 +1785,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 | --- |
 | [GetMerkleProofServiceApi](#type-getmerkleproofserviceapi) |
 | [GetRawTxServiceApi](#type-getrawtxserviceapi) |
+| [GetScriptHistoryServiceApi](#type-getscripthistoryserviceapi) |
 | [GetUtxoStatusOutputFormatApi](#type-getutxostatusoutputformatapi) |
 | [GetUtxoStatusServiceApi](#type-getutxostatusserviceapi) |
 | [PostRawTxServiceApi](#type-postrawtxserviceapi) |
@@ -1691,6 +1807,15 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 
 ```ts
 export type GetUtxoStatusServiceApi = (output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi) => Promise<GetUtxoStatusResultApi>
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Type: GetScriptHistoryServiceApi
+
+```ts
+export type GetScriptHistoryServiceApi = (output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi) => Promise<GetScriptHistoryResultApi>
 ```
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
