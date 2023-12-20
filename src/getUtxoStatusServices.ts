@@ -1,5 +1,5 @@
 import { Chain, CwiError, ERR_INTERNAL, ERR_INVALID_PARAMETER, asBuffer, asString, sha256Hash, swapByteOrder } from "cwi-base";
-import { GetUtxoStatusOutputFormatApi, GetUtxoStatusResultApi } from "./Api/CwiExternalServicesApi";
+import { GetScriptHistoryResultApi, GetUtxoStatusOutputFormatApi, GetUtxoStatusResultApi } from "./Api/CwiExternalServicesApi";
 
 import axios from 'axios'
 
@@ -53,7 +53,53 @@ export async function getUtxoStatusFromWhatsOnChain(output: string | Buffer, cha
     return r
 }
 
-function validateScriptHash(output: string | Buffer, outputFormat?: GetUtxoStatusOutputFormatApi) : string {
+interface WhatsOnChainScriptHistory {
+    value: number
+    height: number
+    tx_pos: number
+    tx_hash: string
+}
+
+export async function getScriptHistoryFromWhatsOnChain(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi)
+: Promise<GetScriptHistoryResultApi>
+{
+    
+    const r: GetScriptHistoryResultApi = { name: 'WoC', status: 'error', error: new ERR_INTERNAL(), details: [] }
+
+    try {
+        
+        const scriptHash = validateScriptHash(output, outputFormat)
+        
+        const url = `https://api.whatsonchain.com/v1/bsv/${chain}/script/${scriptHash}/history`
+
+        const { data } = await axios.get(url)
+        
+        if (Array.isArray(data)) {
+            if (data.length === 0) {
+                r.status = 'success'
+                r.error = undefined
+            } else {
+                r.status = 'success'
+                r.error = undefined
+                for (const s of <WhatsOnChainScriptHistory[]>data) {
+                    r.details.push({
+                        txid: s.tx_hash,
+                        height: s.height
+                    })
+                }
+            }
+        } else {
+            r.error = new ERR_INTERNAL(`Unexpected response from service url ${url}`)
+        }
+
+    } catch (eu: unknown) {
+        r.error = CwiError.fromUnknown(eu)
+    }
+
+    return r
+}
+
+export function validateScriptHash(output: string | Buffer, outputFormat?: GetUtxoStatusOutputFormatApi) : string {
     let b = asBuffer(output)
     if (!outputFormat) {
         if (b.length === 32)

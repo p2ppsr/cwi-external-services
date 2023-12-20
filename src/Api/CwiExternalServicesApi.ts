@@ -99,6 +99,8 @@ export type GetUtxoStatusOutputFormatApi = 'hashLE' | 'hashBE' | 'script'
 
 export type GetUtxoStatusServiceApi = (output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi) => Promise<GetUtxoStatusResultApi>
 
+export type GetScriptHistoryServiceApi = (output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi) => Promise<GetScriptHistoryResultApi>
+
 export type GetMerkleProofServiceApi = (txid: string | Buffer, chain: Chain) => Promise<GetMerkleProofResultApi>
 
 export type GetRawTxServiceApi = (txid: string | Buffer, chain: Chain) => Promise<GetRawTxResultApi>
@@ -281,6 +283,44 @@ export interface GetUtxoStatusResultApi {
      * there could be more than one block in which it is a valid utxo.
      */
     details: GetUtxoStatusDetailsApi[]
+}
+
+export interface GetScriptHistoryDetailsApi {
+    /**
+     * if isUtxo, the block height containing the matching unspent transaction output
+     * 
+     * typically there will be only one, but future orphans can result in multiple values
+     */
+    height?: number
+    /**
+     * the transaction hash (txid) of the transaction containing the matching unspent transaction output
+     * 
+     * typically there will be only one, but future orphans can result in multiple values
+     */
+    txid?: string
+}
+
+export interface GetScriptHistoryResultApi {
+    /**
+     * The name of the service to which the transaction was submitted for processing
+     */
+    name: string
+    /**
+     * 'success' - the operation was successful, non-error results are valid.
+     * 'error' - the operation failed, error may have relevant information.
+     */
+    status: 'success' | 'error'
+    /**
+     * When status is 'error', provides code and description
+     */ 
+    error?: CwiError
+    /**
+     * Additional details about occurances of this output script.
+     * 
+     * Normally there will be one item in the array for spent outputs with the txid
+     * of the spending transaction.
+     */
+    details: GetScriptHistoryDetailsApi[]
 }
 
 export interface BsvExchangeRateApi {

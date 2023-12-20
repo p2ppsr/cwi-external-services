@@ -3,7 +3,7 @@ import { Chain, ERR_INTERNAL, ERR_MISSING_PARAMETER, ERR_TXID_INVALID, asString,
 import {
     BsvExchangeRateApi,
     CwiExternalServicesApi, FiatExchangeRatesApi, GetMerkleProofResultApi, GetMerkleProofServiceApi, GetRawTxResultApi,
-    GetRawTxServiceApi, GetUtxoStatusOutputFormatApi, GetUtxoStatusResultApi,
+    GetRawTxServiceApi, GetScriptHistoryResultApi, GetScriptHistoryServiceApi, GetUtxoStatusOutputFormatApi, GetUtxoStatusResultApi,
     GetUtxoStatusServiceApi,
     MapiCallbackApi, PostRawTxResultApi, PostRawTxServiceApi 
 } from "./Api/CwiExternalServicesApi"
@@ -15,7 +15,7 @@ import { getRawTxFromWhatsOnChain } from "./getRawTxServices"
 import {
     getProofFromGorillaPool, getProofFromMetastreme, getProofFromTaal, getProofFromWhatsOnChain, getProofFromWhatsOnChainTsc
 } from "./getProofServices"
-import { getUtxoStatusFromWhatsOnChain } from "./getUtxoStatusServices"
+import { getScriptHistoryFromWhatsOnChain, getUtxoStatusFromWhatsOnChain } from "./getUtxoStatusServices"
 import { updateBsvExchangeRate, updateFiatExchangeRates } from "./getExchangeRateServices"
 
 export interface CwiExternalServicesOptions {
@@ -58,6 +58,7 @@ export class CwiExternalServices implements CwiExternalServicesApi {
     private getRawTxs: ServiceCollection<GetRawTxServiceApi>
     private postRawTxs: ServiceCollection<PostRawTxServiceApi>
     private getUtxoStats: ServiceCollection<GetUtxoStatusServiceApi>
+    private getScriptHistoryServices: ServiceCollection<GetScriptHistoryServiceApi>
 
     constructor(options?: CwiExternalServicesOptions) {
         this.options = options || CwiExternalServices.createDefaultOptions()
@@ -79,6 +80,9 @@ export class CwiExternalServices implements CwiExternalServicesApi {
         
         this.getUtxoStats = new ServiceCollection<GetUtxoStatusServiceApi>()
         .add({ name: 'WhatsOnChain', service: getUtxoStatusFromWhatsOnChain})
+        
+        this.getScriptHistoryServices = new ServiceCollection<GetScriptHistoryServiceApi>()
+        .add({ name: 'WhatsOnChain', service: getScriptHistoryFromWhatsOnChain})
     }
 
     async getBsvExchangeRate(): Promise<number> {
@@ -126,6 +130,25 @@ export class CwiExternalServices implements CwiExternalServicesApi {
             services.next()
 
         let r0: GetUtxoStatusResultApi = { name: "<noservices>", status: "error", error: new ERR_INTERNAL('No services available.'), details: [] }
+
+        for (let tries = 0; tries < services.count; tries++) {
+            const service = services.service
+            const r = await service(output, chain, outputFormat)
+            if (r.status === 'success') {
+                r0 = r
+                break
+            }
+            services.next()
+        }
+        return r0
+    }
+
+    async getScriptHistory(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi, useNext?: boolean): Promise<GetScriptHistoryResultApi> {
+        const services = this.getScriptHistoryServices
+        if (useNext)
+            services.next()
+
+        let r0: GetScriptHistoryResultApi = { name: "<noservices>", status: "error", error: new ERR_INTERNAL('No services available.'), details: [] }
 
         for (let tries = 0; tries < services.count; tries++) {
             const service = services.service
