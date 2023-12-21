@@ -287,17 +287,21 @@ export interface GetUtxoStatusResultApi {
 
 export interface GetScriptHistoryDetailsApi {
     /**
-     * if isUtxo, the block height containing the matching unspent transaction output
+     * the hash of the transaction referencing this output script, may be an input or output
+     */
+    txid: string
+    /**
+     * the block height of the transaction referencing this output script, may be an input or output
      * 
-     * typically there will be only one, but future orphans can result in multiple values
+     * typically valid if the transaction has been mined.
      */
     height?: number
     /**
-     * the transaction hash (txid) of the transaction containing the matching unspent transaction output
+     * the fee paid by the transaction referencing this output script, may be an input or output
      * 
-     * typically there will be only one, but future orphans can result in multiple values
+     * typically valid if the transaction has not been mined.
      */
-    txid?: string
+    fee?: number
 }
 
 export interface GetScriptHistoryResultApi {
@@ -316,9 +320,9 @@ export interface GetScriptHistoryResultApi {
     error?: CwiError
     /**
      * Additional details about occurances of this output script.
-     * 
-     * Normally there will be one item in the array for spent outputs with the txid
-     * of the spending transaction.
+     *
+     * Sorted by decreasing fee, then decreasing height.
+     * i.e. most likely spending transaction first. 
      */
     details: GetScriptHistoryDetailsApi[]
 }

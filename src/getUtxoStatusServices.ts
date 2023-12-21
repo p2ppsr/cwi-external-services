@@ -2,6 +2,7 @@ import { Chain, CwiError, ERR_INTERNAL, ERR_INVALID_PARAMETER, asBuffer, asStrin
 import { GetScriptHistoryResultApi, GetUtxoStatusOutputFormatApi, GetUtxoStatusResultApi } from "./Api/CwiExternalServicesApi";
 
 import axios from 'axios'
+import { ERR_EXTSVS_FAILURE } from "./ERR_EXTSVS_errors";
 
 interface WhatsOnChainUtxoStatus {
     value: number
@@ -16,11 +17,13 @@ export async function getUtxoStatusFromWhatsOnChain(output: string | Buffer, cha
     
     const r: GetUtxoStatusResultApi = { name: 'WoC', status: 'error', error: new ERR_INTERNAL(), details: [] }
 
+    let url: string = ''
+
     try {
         
         const scriptHash = validateScriptHash(output, outputFormat)
         
-        const url = `https://api.whatsonchain.com/v1/bsv/${chain}/script/${scriptHash}/unspent`
+        url = `https://api.whatsonchain.com/v1/bsv/${chain}/script/${scriptHash}/unspent`
 
         const { data } = await axios.get(url)
         
@@ -43,20 +46,19 @@ export async function getUtxoStatusFromWhatsOnChain(output: string | Buffer, cha
                 }
             }
         } else {
-            r.error = new ERR_INTERNAL(`Unexpected response from service url ${url}`)
+            throw new ERR_INTERNAL("data is not an array")
         }
 
     } catch (eu: unknown) {
-        r.error = CwiError.fromUnknown(eu)
+        r.error = new ERR_EXTSVS_FAILURE(url, CwiError.fromUnknown(eu))
     }
 
     return r
 }
 
 interface WhatsOnChainScriptHistory {
-    value: number
-    height: number
-    tx_pos: number
+    fee?: number
+    height?: number
     tx_hash: string
 }
 
@@ -66,11 +68,13 @@ export async function getScriptHistoryFromWhatsOnChain(output: string | Buffer, 
     
     const r: GetScriptHistoryResultApi = { name: 'WoC', status: 'error', error: new ERR_INTERNAL(), details: [] }
 
+    let url: string = ''
+
     try {
         
         const scriptHash = validateScriptHash(output, outputFormat)
         
-        const url = `https://api.whatsonchain.com/v1/bsv/${chain}/script/${scriptHash}/history`
+        url = `https://api.whatsonchain.com/v1/bsv/${chain}/script/${scriptHash}/history`
 
         const { data } = await axios.get(url)
         
@@ -84,16 +88,17 @@ export async function getScriptHistoryFromWhatsOnChain(output: string | Buffer, 
                 for (const s of <WhatsOnChainScriptHistory[]>data) {
                     r.details.push({
                         txid: s.tx_hash,
-                        height: s.height
+                        height: s.height || undefined,
+                        fee: s.fee
                     })
                 }
             }
         } else {
-            r.error = new ERR_INTERNAL(`Unexpected response from service url ${url}`)
+            throw new ERR_INTERNAL("data is not an array")
         }
 
     } catch (eu: unknown) {
-        r.error = CwiError.fromUnknown(eu)
+        r.error = new ERR_EXTSVS_FAILURE(url, CwiError.fromUnknown(eu))
     }
 
     return r

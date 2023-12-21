@@ -3,6 +3,10 @@ import { CwiError } from "cwi-base";
 /**
  * Expected txid ${expected} doesn't match proof txid ${actual}
  */
+export class ERR_EXTSVS_FAILURE extends CwiError { constructor(public url: string, public cwiError?: CwiError, description?: string) { super('ERR_EXTSVS_FAILURE', description || `External service failure: ${url}`) } }
+/**
+ * Expected txid ${expected} doesn't match proof txid ${actual}
+ */
 export class ERR_EXTSVS_TXID_INVALID extends CwiError { constructor(expected?: string, actual?: string) { super('ERR_EXTSVS_TXID_INVALID', `Expected txid ${expected} doesn't match proof txid ${actual}`) } }
 /**
  * Header for block hash ${hash} was not found.
@@ -70,6 +74,8 @@ export class ERR_EXTSVS_INVALID_TRANSACTION extends CwiError { constructor(descr
 export class ERR_EXTSVS_INVALID_TXID extends CwiError { constructor(description?: string) { super('ERR_EXTSVS_INVALID_TXID', description ?? `Txid of broadcast transaction doesn't match returned txid.`) } }
 /**
  * Transaction is a double spend.
+ * 
+ * This class does not include `spendingTransactions`, see `ERR_DOUBLE_SPEND` if required.
  */
 export class ERR_EXTSVS_DOUBLE_SPEND extends CwiError { constructor(description?: string) { super('ERR_EXTSVS_DOUBLE_SPEND', description ?? 'Transaction is a double spend.') } }
 /**

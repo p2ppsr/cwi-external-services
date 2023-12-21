@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import axios from 'axios'
-import { Chain, CwiError, ERR_BAD_REQUEST, asString, bsv, crypto, doubleSha256BE, identityKeyFromPrivateKey, randomBytesBase64 } from 'cwi-base'
+import { Chain, CwiError, ERR_BAD_REQUEST, asString, doubleSha256BE } from 'cwi-base'
 import { MapiCallbackApi, PostRawTxResultApi } from './Api/CwiExternalServicesApi'
-import { MapiPostTxPayloadApi, MapiResponseApi } from 'cwi-base/src/Api/MerchantApi'
-import { ERR_EXTSVS_ALREADY_MINED, ERR_EXTSVS_DOUBLE_SPEND, ERR_EXTSVS_INVALID_TRANSACTION, ERR_EXTSVS_INVALID_TXID, ERR_EXTSVS_MAPI_MISSING } from './ERR_EXTSVS_errors'
-import { checkMapiResponse, createMapiPostTxResponse, getMapiPostTxPayload, signMapiPayload } from './merchantApiUtils'
+import { MapiResponseApi } from 'cwi-base/src/Api/MerchantApi'
+import { ERR_EXTSVS_ALREADY_MINED, ERR_EXTSVS_DOUBLE_SPEND, ERR_EXTSVS_FAILURE, ERR_EXTSVS_INVALID_TRANSACTION, ERR_EXTSVS_INVALID_TXID, ERR_EXTSVS_MAPI_MISSING } from './ERR_EXTSVS_errors'
+import { checkMapiResponse, createMapiPostTxResponse, getMapiPostTxPayload } from './merchantApiUtils'
 
 export interface PostTransactionMapiMinerApi {
     name: string
@@ -48,6 +47,8 @@ export async function postRawTxToMapiMiner(txid: string | Buffer, rawTx: string 
     let callbackToken: string | undefined = undefined
     let mapi: MapiResponseApi | undefined = undefined
 
+    let url = ''
+
     try {
         let callbackUrl: string | undefined = undefined
 
@@ -62,8 +63,11 @@ export async function postRawTxToMapiMiner(txid: string | Buffer, rawTx: string 
         if (miner.authType === 'bearer') {
             headers['Authorization'] = `Bearer ${miner.authToken}`
         }
+
+        url = `${miner.url}/tx`
+
         const data = await axios.post(
-            `${miner.url}/tx`,
+            url,
             {
                 rawtx: asString(rawTx),
                 callbackUrl,
@@ -135,7 +139,7 @@ export async function postRawTxToMapiMiner(txid: string | Buffer, rawTx: string 
     } catch (err: unknown) {
         return {
             status: 'error',
-            error: CwiError.fromUnknown(err),
+            error: new ERR_EXTSVS_FAILURE(url, CwiError.fromUnknown(err)),
             callbackID: callbackToken,
             name: miner.name,
             mapi
@@ -143,9 +147,12 @@ export async function postRawTxToMapiMiner(txid: string | Buffer, rawTx: string 
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function postRawTxToWhatsOnChain(txid: string | Buffer | undefined, rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi)
 : Promise<PostRawTxResultApi>
 {
+    let url: string = ''
+
     try {
 
         if (!txid) txid = doubleSha256BE(rawTx)
@@ -154,7 +161,7 @@ export async function postRawTxToWhatsOnChain(txid: string | Buffer | undefined,
         const headers = {
             'Content-Type': 'application/json'
         }
-        const url = `https://api.whatsonchain.com/v1/bsv/${chain}/tx/raw`
+        url = `https://api.whatsonchain.com/v1/bsv/${chain}/tx/raw`
 
         const key = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
         const { mapi, payloadData } = createMapiPostTxResponse(txid, key, `Accepted by ${url}`)
@@ -221,7 +228,7 @@ export async function postRawTxToWhatsOnChain(txid: string | Buffer | undefined,
     } catch (err: unknown) {
         return {
             status: 'error',
-            error: CwiError.fromUnknown(err),
+            error: new ERR_EXTSVS_FAILURE(url, CwiError.fromUnknown(err)),
             callbackID: undefined,
             name: 'WoC',
             mapi: undefined
