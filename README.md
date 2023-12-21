@@ -590,8 +590,9 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 
 ```ts
 export interface GetScriptHistoryDetailsApi {
+    txid: string;
     height?: number;
-    txid?: string;
+    fee?: number;
 }
 ```
 
@@ -599,11 +600,21 @@ export interface GetScriptHistoryDetailsApi {
 
 <summary>Interface GetScriptHistoryDetailsApi Details</summary>
 
+##### Property fee
+
+the fee paid by the transaction referencing this output script, may be an input or output
+
+typically valid if the transaction has not been mined.
+
+```ts
+fee?: number
+```
+
 ##### Property height
 
-if isUtxo, the block height containing the matching unspent transaction output
+the block height of the transaction referencing this output script, may be an input or output
 
-typically there will be only one, but future orphans can result in multiple values
+typically valid if the transaction has been mined.
 
 ```ts
 height?: number
@@ -611,12 +622,10 @@ height?: number
 
 ##### Property txid
 
-the transaction hash (txid) of the transaction containing the matching unspent transaction output
-
-typically there will be only one, but future orphans can result in multiple values
+the hash of the transaction referencing this output script, may be an input or output
 
 ```ts
-txid?: string
+txid: string
 ```
 
 </details>
@@ -643,8 +652,8 @@ export interface GetScriptHistoryResultApi {
 
 Additional details about occurances of this output script.
 
-Normally there will be one item in the array for spent outputs with the txid
-of the spending transaction.
+Sorted by decreasing fee, then decreasing height.
+i.e. most likely spending transaction first.
 
 ```ts
 details: GetScriptHistoryDetailsApi[]
@@ -971,22 +980,35 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 
 | | |
 | --- | --- |
-| [CwiExternalServices](#class-cwiexternalservices) | [ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE](#class-err_extsvs_mapi_unsupported_mimetype) |
-| [ERR_EXTSVS_ALREADY_MINED](#class-err_extsvs_already_mined) | [ERR_EXTSVS_MAPI_UNSUPPORTED_RETURNRESULT](#class-err_extsvs_mapi_unsupported_returnresult) |
-| [ERR_EXTSVS_BLOCK_HASH_MISSING](#class-err_extsvs_block_hash_missing) | [ERR_EXTSVS_MERKLEPROOF_NODE_TYPE](#class-err_extsvs_merkleproof_node_type) |
-| [ERR_EXTSVS_BLOCK_HEIGHT_MISSING](#class-err_extsvs_block_height_missing) | [ERR_EXTSVS_MERKLEPROOF_PARSING](#class-err_extsvs_merkleproof_parsing) |
-| [ERR_EXTSVS_DOUBLE_SPEND](#class-err_extsvs_double_spend) | [ERR_EXTSVS_MERKLEPROOF_TAGET_TYPE](#class-err_extsvs_merkleproof_taget_type) |
-| [ERR_EXTSVS_ENVELOPE_DEPTH](#class-err_extsvs_envelope_depth) | [ERR_EXTSVS_MERKLEPROOF_UNSUPPORTED](#class-err_extsvs_merkleproof_unsupported) |
+| [CwiExternalServices](#class-cwiexternalservices) | [ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING](#class-err_extsvs_mapi_unsupported_encoding) |
+| [ERR_EXTSVS_ALREADY_MINED](#class-err_extsvs_already_mined) | [ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE](#class-err_extsvs_mapi_unsupported_mimetype) |
+| [ERR_EXTSVS_BLOCK_HASH_MISSING](#class-err_extsvs_block_hash_missing) | [ERR_EXTSVS_MAPI_UNSUPPORTED_RETURNRESULT](#class-err_extsvs_mapi_unsupported_returnresult) |
+| [ERR_EXTSVS_BLOCK_HEIGHT_MISSING](#class-err_extsvs_block_height_missing) | [ERR_EXTSVS_MERKLEPROOF_NODE_TYPE](#class-err_extsvs_merkleproof_node_type) |
+| [ERR_EXTSVS_DOUBLE_SPEND](#class-err_extsvs_double_spend) | [ERR_EXTSVS_MERKLEPROOF_PARSING](#class-err_extsvs_merkleproof_parsing) |
+| [ERR_EXTSVS_ENVELOPE_DEPTH](#class-err_extsvs_envelope_depth) | [ERR_EXTSVS_MERKLEPROOF_TAGET_TYPE](#class-err_extsvs_merkleproof_taget_type) |
+| [ERR_EXTSVS_FAILURE](#class-err_extsvs_failure) | [ERR_EXTSVS_MERKLEPROOF_UNSUPPORTED](#class-err_extsvs_merkleproof_unsupported) |
 | [ERR_EXTSVS_INVALID_TRANSACTION](#class-err_extsvs_invalid_transaction) | [ERR_EXTSVS_MERKLEROOT_INVALID](#class-err_extsvs_merkleroot_invalid) |
 | [ERR_EXTSVS_INVALID_TXID](#class-err_extsvs_invalid_txid) | [ERR_EXTSVS_MERKLEROOT_MISSING](#class-err_extsvs_merkleroot_missing) |
 | [ERR_EXTSVS_MAPI_MISSING](#class-err_extsvs_mapi_missing) | [ERR_EXTSVS_TXID_INVALID](#class-err_extsvs_txid_invalid) |
 | [ERR_EXTSVS_MAPI_SIGNATURE_INVALID](#class-err_extsvs_mapi_signature_invalid) | [ServiceCollection](#class-servicecollection) |
-| [ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING](#class-err_extsvs_mapi_unsupported_encoding) |  |
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
 
+#### Class: ERR_EXTSVS_FAILURE
+
+Expected txid ${expected} doesn't match proof txid ${actual}
+
+```ts
+export class ERR_EXTSVS_FAILURE extends CwiError {
+    constructor(public url: string, public cwiError?: CwiError, description?: string) 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
 #### Class: ERR_EXTSVS_TXID_INVALID
 
 Expected txid ${expected} doesn't match proof txid ${actual}
@@ -1211,6 +1233,8 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 #### Class: ERR_EXTSVS_DOUBLE_SPEND
 
 Transaction is a double spend.
+
+This class does not include `spendingTransactions`, see `ERR_DOUBLE_SPEND` if required.
 
 ```ts
 export class ERR_EXTSVS_DOUBLE_SPEND extends CwiError {
