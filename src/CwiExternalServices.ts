@@ -25,6 +25,7 @@ export interface CwiExternalServicesOptions {
     bsvUpdateMsecs: number
     fiatExchangeRates: FiatExchangeRatesApi
     fiatUpdateMsecs: number
+    disableMapiCallback?: boolean
 }
 
 export class CwiExternalServices implements CwiExternalServicesApi {
@@ -48,6 +49,7 @@ export class CwiExternalServices implements CwiExternalServicesApi {
                 }
             },
             fiatUpdateMsecs: 1000 * 60 * 60 * 24, // 24 hours
+            disableMapiCallback: true // Rely on DojoWatchman by default.
         }
         return o
     }
@@ -177,6 +179,9 @@ export class CwiExternalServices implements CwiExternalServicesApi {
     async postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]> {
         
         const txid = doubleSha256BE(rawTx)
+
+        if (this.options.disableMapiCallback)
+            callback = undefined
 
         return await Promise.all(this.postRawTxs.allServices.map(async service => {
             const r = await service(txid, rawTx, chain, callback)

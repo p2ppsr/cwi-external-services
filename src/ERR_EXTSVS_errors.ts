@@ -73,11 +73,11 @@ export class ERR_EXTSVS_INVALID_TRANSACTION extends CwiError { constructor(descr
  */
 export class ERR_EXTSVS_INVALID_TXID extends CwiError { constructor(description?: string) { super('ERR_EXTSVS_INVALID_TXID', description ?? `Txid of broadcast transaction doesn't match returned txid.`) } }
 /**
- * Transaction is a double spend.
+ * Transaction with txid of ${txid} is a double spend.
  * 
  * This class does not include `spendingTransactions`, see `ERR_DOUBLE_SPEND` if required.
  */
-export class ERR_EXTSVS_DOUBLE_SPEND extends CwiError { constructor(description?: string) { super('ERR_EXTSVS_DOUBLE_SPEND', description ?? 'Transaction is a double spend.') } }
+export class ERR_EXTSVS_DOUBLE_SPEND extends CwiError { constructor(public txid: string, description?: string) { super('ERR_EXTSVS_DOUBLE_SPEND', description ?? `Transaction with txid of ${txid} is a double spend.`) } }
 /**
  * Transaction was already mined.
  */

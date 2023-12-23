@@ -108,7 +108,7 @@ export async function postRawTxToMapiMiner(txid: string | Buffer, rawTx: string 
             
         const payload = getMapiPostTxPayload(mapi, txid)
 
-        if (payload.conflictedWith) throw new ERR_EXTSVS_DOUBLE_SPEND(makeDescription(data))
+        if (payload.conflictedWith) throw new ERR_EXTSVS_DOUBLE_SPEND(asString(txid), makeDescription(data))
 
         // TODO: This is a kludge. Protocol should encode this explicitly.
         // "resultDescription": "" | "Transaction already mined into block" | "Already known"
