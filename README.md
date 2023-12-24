@@ -970,6 +970,7 @@ export interface CwiExternalServicesOptions {
     bsvUpdateMsecs: number;
     fiatExchangeRates: FiatExchangeRatesApi;
     fiatUpdateMsecs: number;
+    disableMapiCallback?: boolean;
 }
 ```
 
@@ -1232,13 +1233,13 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 ---
 #### Class: ERR_EXTSVS_DOUBLE_SPEND
 
-Transaction is a double spend.
+Transaction with txid of ${txid} is a double spend.
 
 This class does not include `spendingTransactions`, see `ERR_DOUBLE_SPEND` if required.
 
 ```ts
 export class ERR_EXTSVS_DOUBLE_SPEND extends CwiError {
-    constructor(description?: string) 
+    constructor(public txid: string, description?: string) 
 }
 ```
 
