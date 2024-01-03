@@ -1,4 +1,4 @@
-import { CwiExternalServices, getExchangeRatesIo } from "../src"
+import { CwiExternalServices, getExchangeRatesIo, updateChaintracksFiatExchangeRates } from "../src"
 
 describe("exchangeRate Tests", () => {
 
@@ -41,6 +41,19 @@ describe("exchangeRate Tests", () => {
 
         r = await s.getFiatExchangeRate('GBP')
         expect(r).toBeGreaterThan(0)
+
+    }, 9000000)
+
+    test("4_updateChaintracksFiatExchangeRates", async () => {
+
+        const s = new CwiExternalServices()
+        const r = await updateChaintracksFiatExchangeRates(s.targetCurrencies, s.options)
+
+        expect(r.timestamp > new Date(Date.now() - 1000 * 60 * 60 * 48)).toBe(true)
+        expect(Object.keys(r.rates).length).toBe(3)
+        expect(Math.abs(r.rates['USD'] - 1)).toBeLessThan(0.00001)
+        expect(r.rates['EUR']).toBeGreaterThan(0)
+        expect(r.rates['GBP']).toBeGreaterThan(0)
 
     }, 9000000)
 

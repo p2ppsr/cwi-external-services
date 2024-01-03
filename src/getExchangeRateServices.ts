@@ -39,11 +39,12 @@ export async function updateChaintracksFiatExchangeRates(targetCurrencies: strin
 
     const r = await axios.get(url)
 
-    if (r.status !== 200 || !r.data) {
+    if (r.status !== 200 || !r.data || r.data.status != "success") {
         throw new ERR_BAD_REQUEST(`${url} returned status ${r.status}`)
     }
 
-    const rates = <FiatExchangeRatesApi>r.data
+    const rates = <FiatExchangeRatesApi>r.data.value
+    rates.timestamp = new Date(rates.timestamp)
 
     return rates
 }
