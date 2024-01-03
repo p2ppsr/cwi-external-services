@@ -12,6 +12,10 @@ export class ServiceCollection<T> {
         return this;
     }
 
+    remove(name: string) : void {
+        this.services = this.services.filter(s => s.name !== name)
+    }
+
     get name() { return this.services[this._index].name; }
 
     get service() { return this.services[this._index].service; }

@@ -1,11 +1,11 @@
-import { Chain, ERR_INTERNAL, ERR_MISSING_PARAMETER, ERR_TXID_INVALID, asString, doubleSha256BE } from "cwi-base"
+import { Chain, CwiError, ERR_INTERNAL, ERR_MISSING_PARAMETER, ERR_TXID_INVALID, asString, doubleSha256BE } from "cwi-base"
 
 import {
     BsvExchangeRateApi,
     CwiExternalServicesApi, FiatExchangeRatesApi, GetMerkleProofResultApi, GetMerkleProofServiceApi, GetRawTxResultApi,
     GetRawTxServiceApi, GetScriptHistoryResultApi, GetScriptHistoryServiceApi, GetUtxoStatusOutputFormatApi, GetUtxoStatusResultApi,
     GetUtxoStatusServiceApi,
-    MapiCallbackApi, PostRawTxResultApi, PostRawTxServiceApi 
+    MapiCallbackApi, PostRawTxResultApi, PostRawTxServiceApi, UpdateFiatExchangeRateServiceApi 
 } from "./Api/CwiExternalServicesApi"
 
 import { ServiceCollection } from "./ServiceCollection"
@@ -16,7 +16,7 @@ import {
     getProofFromGorillaPool, getProofFromMetastreme, getProofFromTaal, getProofFromWhatsOnChain, getProofFromWhatsOnChainTsc
 } from "./getProofServices"
 import { getScriptHistoryFromWhatsOnChain, getUtxoStatusFromWhatsOnChain } from "./getUtxoStatusServices"
-import { updateBsvExchangeRate, updateFiatExchangeRates } from "./getExchangeRateServices"
+import { updateBsvExchangeRate, updateChaintracksFiatExchangeRates, updateExchangeratesapi } from "./getExchangeRateServices"
 
 export interface CwiExternalServicesOptions {
     mainTaalApiKey?: string
@@ -25,7 +25,9 @@ export interface CwiExternalServicesOptions {
     bsvUpdateMsecs: number
     fiatExchangeRates: FiatExchangeRatesApi
     fiatUpdateMsecs: number
-    disableMapiCallback?: boolean
+    disableMapiCallback?: boolean,
+    exchangeratesapiKey?: string
+    chaintracksFiatExchangeRatesUrl?: string
 }
 
 export class CwiExternalServices implements CwiExternalServicesApi {
@@ -49,42 +51,49 @@ export class CwiExternalServices implements CwiExternalServicesApi {
                 }
             },
             fiatUpdateMsecs: 1000 * 60 * 60 * 24, // 24 hours
-            disableMapiCallback: true // Rely on DojoWatchman by default.
+            disableMapiCallback: true, // Rely on DojoWatchman by default.
+            exchangeratesapiKey: 'bd539d2ff492bcb5619d5f27726a766f',
+            chaintracksFiatExchangeRatesUrl: `http://npm-registry.babbage.systems:8084/getFiatExchangeRates`
         }
         return o
     }
 
     options: CwiExternalServicesOptions
 
-    private getProofs: ServiceCollection<GetMerkleProofServiceApi>
-    private getRawTxs: ServiceCollection<GetRawTxServiceApi>
-    private postRawTxs: ServiceCollection<PostRawTxServiceApi>
-    private getUtxoStats: ServiceCollection<GetUtxoStatusServiceApi>
-    private getScriptHistoryServices: ServiceCollection<GetScriptHistoryServiceApi>
+    getMerkleProofServices: ServiceCollection<GetMerkleProofServiceApi>
+    getRawTxServices: ServiceCollection<GetRawTxServiceApi>
+    postRawTxServices: ServiceCollection<PostRawTxServiceApi>
+    getUtxoStatusServices: ServiceCollection<GetUtxoStatusServiceApi>
+    getScriptHistoryServices: ServiceCollection<GetScriptHistoryServiceApi>
+    updateFiatExchangeRateServices: ServiceCollection<UpdateFiatExchangeRateServiceApi>
 
     constructor(options?: CwiExternalServicesOptions) {
         this.options = options || CwiExternalServices.createDefaultOptions()
         
-        this.getProofs = new ServiceCollection<GetMerkleProofServiceApi>()
+        this.getMerkleProofServices = new ServiceCollection<GetMerkleProofServiceApi>()
         .add({ name: 'WhatsOnChain', service: getProofFromWhatsOnChain})
         .add({ name: 'WhatsOnChainTsc', service: getProofFromWhatsOnChainTsc})
         .add({ name: 'MetaStreme', service: getProofFromMetastreme})
         .add({ name: 'GorillaPool', service: getProofFromGorillaPool})
         .add({ name: 'Taal', service: this.makeGetProofFromTaal() })
         
-        this.getRawTxs = new ServiceCollection<GetRawTxServiceApi>()
+        this.getRawTxServices = new ServiceCollection<GetRawTxServiceApi>()
         .add({ name: 'WhatsOnChain', service: getRawTxFromWhatsOnChain})
 
-        this.postRawTxs = new ServiceCollection<PostRawTxServiceApi>()
+        this.postRawTxServices = new ServiceCollection<PostRawTxServiceApi>()
         .add({ name: 'WhatsOnChain', service: postRawTxToWhatsOnChain })
         .add({ name: 'GorillaPool', service: postRawTxToGorillaPool })
         .add({ name: 'Taal', service: this.makePostRawTxToTaal() })
         
-        this.getUtxoStats = new ServiceCollection<GetUtxoStatusServiceApi>()
+        this.getUtxoStatusServices = new ServiceCollection<GetUtxoStatusServiceApi>()
         .add({ name: 'WhatsOnChain', service: getUtxoStatusFromWhatsOnChain})
         
         this.getScriptHistoryServices = new ServiceCollection<GetScriptHistoryServiceApi>()
         .add({ name: 'WhatsOnChain', service: getScriptHistoryFromWhatsOnChain})
+
+        this.updateFiatExchangeRateServices = new ServiceCollection<UpdateFiatExchangeRateServiceApi>()
+        .add({ name: 'ChaintracksService', service: updateChaintracksFiatExchangeRates })
+        .add({ name: 'exchangeratesapi', service: updateExchangeratesapi })
     }
 
     async getBsvExchangeRate(): Promise<number> {
@@ -93,7 +102,7 @@ export class CwiExternalServices implements CwiExternalServicesApi {
     }
 
     async getFiatExchangeRate(currency: "USD" | "GBP" | "EUR", base?: "USD" | "GBP" | "EUR"): Promise<number> {
-        const rates = await updateFiatExchangeRates(this.options.fiatExchangeRates, this.options.fiatUpdateMsecs)
+        const rates = await this.updateFiatExchangeRates(this.options.fiatExchangeRates, this.options.fiatUpdateMsecs)
 
         this.options.fiatExchangeRates = rates
 
@@ -101,6 +110,47 @@ export class CwiExternalServices implements CwiExternalServicesApi {
         const rate = rates.rates[currency] / rates.rates[base]
 
         return rate
+    }
+
+    targetCurrencies = ['USD', 'GBP', 'EUR']
+
+    async updateFiatExchangeRates(rates?: FiatExchangeRatesApi, updateMsecs?: number): Promise<FiatExchangeRatesApi> {
+
+        updateMsecs ||= 1000 * 60 * 15
+        const freshnessDate = new Date(Date.now() - updateMsecs)
+        if (rates) {
+            // Check if the rate we know is stale enough to update.
+            updateMsecs ||= 1000 * 60 * 15
+            if (rates.timestamp > freshnessDate)
+                return rates
+        }
+
+        const services = this.updateFiatExchangeRateServices
+
+        let r0: FiatExchangeRatesApi | undefined
+
+        for (let tries = 0; tries < services.count; tries++) {
+            const service = services.service
+            try {
+                const r = await service(this.targetCurrencies, this.options)
+                if (this.targetCurrencies.every(c => typeof r.rates[c] === 'number')) {
+                    r0 = r
+                    break
+                }
+            } catch (eu: unknown) {
+                const e = CwiError.fromUnknown(eu)
+                console.log(`updateFiatExchangeRates servcice name ${service.name} error ${e.message}`)
+            }
+            services.next()
+        }
+
+        if (!r0) {
+            console.error('Failed to update fiat exchange rates.')
+            if (!rates) throw new ERR_INTERNAL()
+            return rates
+        }
+
+        return r0
     }
 
     private taalApiKey(chain: Chain) {
@@ -121,13 +171,13 @@ export class CwiExternalServices implements CwiExternalServicesApi {
         }
     }
 
-    get getProofsCount() { return this.getProofs.count }
-    get getRawTxsCount() { return this.getRawTxs.count }
-    get postRawTxsCount() { return this.postRawTxs.count }
-    get getUtxoStatsCount() { return this.getUtxoStats.count }
+    get getProofsCount() { return this.getMerkleProofServices.count }
+    get getRawTxsCount() { return this.getRawTxServices.count }
+    get postRawTxsCount() { return this.postRawTxServices.count }
+    get getUtxoStatsCount() { return this.getUtxoStatusServices.count }
 
     async getUtxoStatus(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi, useNext?: boolean): Promise<GetUtxoStatusResultApi> {
-        const services = this.getUtxoStats
+        const services = this.getUtxoStatusServices
         if (useNext)
             services.next()
 
@@ -183,7 +233,7 @@ export class CwiExternalServices implements CwiExternalServicesApi {
         if (this.options.disableMapiCallback)
             callback = undefined
 
-        return await Promise.all(this.postRawTxs.allServices.map(async service => {
+        return await Promise.all(this.postRawTxServices.allServices.map(async service => {
             const r = await service(txid, rawTx, chain, callback)
             return r
         }))
@@ -192,12 +242,12 @@ export class CwiExternalServices implements CwiExternalServicesApi {
     async getRawTx(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetRawTxResultApi> {
         
         if (useNext)
-            this.getRawTxs.next()
+            this.getRawTxServices.next()
 
         const r0: GetRawTxResultApi = { txid: asString(txid) }
 
-        for (let tries = 0; tries < this.getRawTxs.count; tries++) {
-            const service = this.getRawTxs.service
+        for (let tries = 0; tries < this.getRawTxServices.count; tries++) {
+            const service = this.getRawTxServices.service
             const r = await service(txid, chain)
             if (r.rawTx) {
                 const hash = asString(doubleSha256BE(r.rawTx))
@@ -218,7 +268,7 @@ export class CwiExternalServices implements CwiExternalServicesApi {
                 // If we have an error and didn't before...
                 r0.error = r.error
 
-            this.getRawTxs.next()
+            this.getRawTxServices.next()
         }
         return r0
     }
@@ -226,12 +276,12 @@ export class CwiExternalServices implements CwiExternalServicesApi {
     async getMerkleProof(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetMerkleProofResultApi> {
         
         if (useNext)
-            this.getProofs.next()
+            this.getMerkleProofServices.next()
 
         const r0: GetMerkleProofResultApi = {}
 
-        for (let tries = 0; tries < this.getProofs.count; tries++) {
-            const service = this.getProofs.service
+        for (let tries = 0; tries < this.getMerkleProofServices.count; tries++) {
+            const service = this.getMerkleProofServices.service
             const r = await service(txid, chain)
             if (r.proof) {
                 // If we have a proof, call it done.
@@ -246,7 +296,7 @@ export class CwiExternalServices implements CwiExternalServicesApi {
                 // If we have an error and didn't before...
                 r0.error = r.error
 
-            this.getProofs.next()
+            this.getMerkleProofServices.next()
         }
         return r0
     }

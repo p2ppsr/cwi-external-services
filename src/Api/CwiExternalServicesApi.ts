@@ -1,5 +1,6 @@
 import { Chain, CwiError } from "cwi-base"
 import { MapiPostTxPayloadApi, MapiResponseApi, TscMerkleProofApi } from "cwi-base"
+import { CwiExternalServicesOptions } from "../CwiExternalServices"
 
 /**
  * Defines standard interfaces to access functionality implemented by external transaction processing services.
@@ -104,6 +105,8 @@ export type GetScriptHistoryServiceApi = (output: string | Buffer, chain: Chain,
 export type GetMerkleProofServiceApi = (txid: string | Buffer, chain: Chain) => Promise<GetMerkleProofResultApi>
 
 export type GetRawTxServiceApi = (txid: string | Buffer, chain: Chain) => Promise<GetRawTxResultApi>
+
+export type UpdateFiatExchangeRateServiceApi = (targetCurrencies: string[], options: CwiExternalServicesOptions) => Promise<FiatExchangeRatesApi>
 
 /**
  * An API that enables unique callback IDs to be generated for potentially multiple independent

@@ -1,4 +1,4 @@
-import { CwiExternalServices, getExchangeRatesIo, updateFiatExchangeRates } from "../src"
+import { CwiExternalServices, getExchangeRatesIo } from "../src"
 
 describe("exchangeRate Tests", () => {
 
@@ -13,7 +13,8 @@ describe("exchangeRate Tests", () => {
 
     test("1_getExchangeRatesIo", async () => {
 
-        const r = await getExchangeRatesIo()
+        const o = CwiExternalServices.createDefaultOptions()
+        const r = await getExchangeRatesIo(o.exchangeratesapiKey || '')
 
         expect(r.success).toBe(true)
 
@@ -21,7 +22,8 @@ describe("exchangeRate Tests", () => {
 
     test("2_updateFiatExchangeRates", async () => {
 
-        const r = await updateFiatExchangeRates()
+        const s = new CwiExternalServices()
+        const r = await s.updateFiatExchangeRates()
 
         expect(r.timestamp > new Date(Date.now() - 1000 * 60 * 60 * 48)).toBe(true)
         expect(Object.keys(r.rates).length).toBe(3)

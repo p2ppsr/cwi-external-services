@@ -1,7 +1,8 @@
 import axios from 'axios'
-import { ERR_BAD_REQUEST } from 'cwi-base'
+import { ERR_BAD_REQUEST, ERR_MISSING_PARAMETER } from 'cwi-base'
 import Whatsonchain from 'whatsonchain'
 import { BsvExchangeRateApi, FiatExchangeRatesApi } from './Api/CwiExternalServicesApi'
+import { CwiExternalServicesOptions } from './CwiExternalServices'
 
 export async function updateBsvExchangeRate(rate?: BsvExchangeRateApi, updateMsecs?: number): Promise<BsvExchangeRateApi> {
 
@@ -30,16 +31,29 @@ export async function updateBsvExchangeRate(rate?: BsvExchangeRateApi, updateMse
     return newRate
 }
 
-export async function updateFiatExchangeRates(rates?: FiatExchangeRatesApi, updateMsecs?: number): Promise<FiatExchangeRatesApi> {
+export async function updateChaintracksFiatExchangeRates(targetCurrencies: string[], options: CwiExternalServicesOptions): Promise<FiatExchangeRatesApi> {
+    const url = options.chaintracksFiatExchangeRatesUrl
 
-    if (rates) {
-        // Check if the rate we know is stale enough to update.
-        updateMsecs ||= 1000 * 60 * 15
-        if (new Date(Date.now() - updateMsecs) < rates.timestamp)
-            return rates
+    if (!url)
+        throw new ERR_MISSING_PARAMETER('options.chaintracksFiatExchangeRatesUrl', 'valid')
+
+    const r = await axios.get(url)
+
+    if (r.status !== 200 || !r.data) {
+        throw new ERR_BAD_REQUEST(`${url} returned status ${r.status}`)
     }
 
-    const iorates = await getExchangeRatesIo()
+    const rates = <FiatExchangeRatesApi>r.data
+
+    return rates
+}
+
+export async function updateExchangeratesapi(targetCurrencies: string[], options: CwiExternalServicesOptions): Promise<FiatExchangeRatesApi> {
+
+    if (!options.exchangeratesapiKey)
+        throw new ERR_MISSING_PARAMETER('options.exchangeratesapiKey', 'valid')
+
+    const iorates = await getExchangeRatesIo(options.exchangeratesapiKey)
 
     if (!iorates.success)
         throw new ERR_BAD_REQUEST(`getExchangeRatesIo returned success ${iorates.success}`)
@@ -54,8 +68,6 @@ export async function updateFiatExchangeRates(rates?: FiatExchangeRatesApi, upda
     }
 
     const basePerUsd = iorates.rates[iorates.base] / iorates.rates["USD"] 
-
-    const targetCurrencies = ['USD', 'GBP', 'EUR']
 
     let updates = 0
     for (const [key, value] of Object.entries(iorates.rates)) {
@@ -81,8 +93,8 @@ export interface ExchangeRatesIoApi {
     rates: Record<string, number>
 }
 
-export async function getExchangeRatesIo(): Promise<ExchangeRatesIoApi> {
-    const url = `http://api.exchangeratesapi.io/v1/latest?access_key=bd539d2ff492bcb5619d5f27726a766f`
+export async function getExchangeRatesIo(key: string): Promise<ExchangeRatesIoApi> {
+    const url = `http://api.exchangeratesapi.io/v1/latest?access_key=${key}`
 
     const r = await axios.get(url)
 
