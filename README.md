@@ -29,6 +29,270 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 
 ---
 
+#### Interface: MapiResponseApi
+
+```ts
+export interface MapiResponseApi {
+    payload: string;
+    signature: string;
+    publicKey: string;
+    encoding?: string;
+    mimetype?: string;
+}
+```
+
+<details>
+
+<summary>Interface MapiResponseApi Details</summary>
+
+##### Property encoding
+
+encoding of the payload data
+
+```ts
+encoding?: string
+```
+
+##### Property mimetype
+
+mime type of the payload data
+
+```ts
+mimetype?: string
+```
+
+##### Property payload
+
+Contents of the envelope.
+Validate using signature and publicKey.
+encoding and mimetype may assist with decoding validated payload.
+
+```ts
+payload: string
+```
+
+##### Property publicKey
+
+public key to use to verify signature of payload data
+
+```ts
+publicKey: string
+```
+
+##### Property signature
+
+signature producted by correpsonding private key on payload data
+
+```ts
+signature: string
+```
+
+</details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: TscMerkleProofApi
+
+As defined in https://github.com/bitcoin-sv-specs/brfc-merchantapi/blob/master/README.md
+
+```ts
+export interface TscMerkleProofApi {
+    height?: number;
+    index: number;
+    txOrId: string | Buffer;
+    target: string | Buffer;
+    nodes: string[] | Buffer;
+    targetType?: "hash" | "header" | "merkleRoot" | "height";
+    proofType?: "branch" | "tree";
+    composite?: boolean;
+}
+```
+
+<details>
+
+<summary>Interface TscMerkleProofApi Details</summary>
+
+##### Property height
+
+The most efficient way of confirming a proof should also be the most common,
+when the containing block's height is known.
+
+```ts
+height?: number
+```
+
+##### Property index
+
+Index of transaction in its block. First transaction is index zero.
+
+```ts
+index: number
+```
+
+##### Property nodes
+
+Merkle tree sibling hash values required to compute root from txid.
+Duplicates (sibling hash === computed hash) are indicated by "*" or type byte === 1.
+type byte === 2...
+Strings are encoded as hex.
+
+```ts
+nodes: string[] | Buffer
+```
+
+##### Property target
+
+Merkle root (length === 32) or serialized block header containing it (length === 80).
+If string, encoding is hex.
+
+```ts
+target: string | Buffer
+```
+
+##### Property txOrId
+
+Full transaction (length > 32 bytes) or just its double SHA256 hash (length === 32 bytes).
+If string, encoding is hex.
+
+```ts
+txOrId: string | Buffer
+```
+
+</details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: MapiTxStatusPayloadApi
+
+As defined in https://github.com/bitcoin-sv-specs/brfc-merchantapi/blob/master/README.md
+
+```ts
+export interface MapiTxStatusPayloadApi {
+    apiVersion: string;
+    timestamp: string;
+    txid: string;
+    returnResult: string;
+    blockHash: string;
+    blockHeight: number;
+    confirmations: number;
+    minerId: string;
+    txSecondMempoolExpiry: number;
+    merkleProof?: TscMerkleProofApi;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: MapiCallbackPayloadApi
+
+As defined in https://github.com/bitcoin-sv-specs/brfc-merchantapi/blob/master/README.md
+
+```ts
+export interface MapiCallbackPayloadApi {
+    apiVersion: string;
+    timestamp: string;
+    blockHash: string;
+    blockHeight: number;
+    callbackTxId: string;
+    callbackReason: string;
+    callbackPayload: string;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: MapiTxidReturnResultApi
+
+Used to parse payloads when only confirmation that a miner acknowledges a specific txid matters.
+
+```ts
+export interface MapiTxidReturnResultApi {
+    apiVersion?: string;
+    timestamp?: string;
+    txid: string;
+    returnResult: string;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: MapiPostTxPayloadApi
+
+As defined in https://github.com/bitcoin-sv-specs/brfc-merchantapi/blob/master/README.md
+
+```ts
+export interface MapiPostTxPayloadApi {
+    apiVersion: string;
+    timestamp: string;
+    txid: string;
+    returnResult: string;
+    resultDescription: string;
+    minerId: string;
+    currentHighestBlockHash?: string;
+    currentHighestBlockHeight?: number;
+    txSecondMempoolExpiry?: number;
+    failureRetryable?: boolean;
+    warnings?: unknown[];
+    conflictedWith?: unknown[];
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: PostTransactionMapiMinerApi
+
+```ts
+export interface PostTransactionMapiMinerApi {
+    name: string;
+    url: string;
+    authType: "none" | "bearer";
+    authToken?: string;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: ExchangeRatesIoApi
+
+```ts
+export interface ExchangeRatesIoApi {
+    success: boolean;
+    timestamp: number;
+    base: "EUR" | "USD";
+    date: string;
+    rates: Record<string, number>;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: CwiExternalServicesOptions
+
+```ts
+export interface CwiExternalServicesOptions {
+    mainTaalApiKey?: string;
+    testTaalApiKey?: string;
+    bsvExchangeRate: BsvExchangeRateApi;
+    bsvUpdateMsecs: number;
+    fiatExchangeRates: FiatExchangeRatesApi;
+    fiatUpdateMsecs: number;
+    disableMapiCallback?: boolean;
+    exchangeratesapiKey?: string;
+    chaintracksFiatExchangeRatesUrl?: string;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
 #### Interface: CwiExternalServicesApi
 
 Defines standard interfaces to access functionality implemented by external transaction processing services.
@@ -715,268 +979,6 @@ export interface FiatExchangeRatesApi {
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
-#### Interface: MapiResponseApi
-
-```ts
-export interface MapiResponseApi {
-    payload: string;
-    signature: string;
-    publicKey: string;
-    encoding?: string;
-    mimetype?: string;
-}
-```
-
-<details>
-
-<summary>Interface MapiResponseApi Details</summary>
-
-##### Property encoding
-
-encoding of the payload data
-
-```ts
-encoding?: string
-```
-
-##### Property mimetype
-
-mime type of the payload data
-
-```ts
-mimetype?: string
-```
-
-##### Property payload
-
-Contents of the envelope.
-Validate using signature and publicKey.
-encoding and mimetype may assist with decoding validated payload.
-
-```ts
-payload: string
-```
-
-##### Property publicKey
-
-public key to use to verify signature of payload data
-
-```ts
-publicKey: string
-```
-
-##### Property signature
-
-signature producted by correpsonding private key on payload data
-
-```ts
-signature: string
-```
-
-</details>
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Interface: TscMerkleProofApi
-
-As defined in https://github.com/bitcoin-sv-specs/brfc-merchantapi/blob/master/README.md
-
-```ts
-export interface TscMerkleProofApi {
-    height?: number;
-    index: number;
-    txOrId: string | Buffer;
-    target: string | Buffer;
-    nodes: string[] | Buffer;
-    targetType?: "hash" | "header" | "merkleRoot" | "height";
-    proofType?: "branch" | "tree";
-    composite?: boolean;
-}
-```
-
-<details>
-
-<summary>Interface TscMerkleProofApi Details</summary>
-
-##### Property height
-
-The most efficient way of confirming a proof should also be the most common,
-when the containing block's height is known.
-
-```ts
-height?: number
-```
-
-##### Property index
-
-Index of transaction in its block. First transaction is index zero.
-
-```ts
-index: number
-```
-
-##### Property nodes
-
-Merkle tree sibling hash values required to compute root from txid.
-Duplicates (sibling hash === computed hash) are indicated by "*" or type byte === 1.
-type byte === 2...
-Strings are encoded as hex.
-
-```ts
-nodes: string[] | Buffer
-```
-
-##### Property target
-
-Merkle root (length === 32) or serialized block header containing it (length === 80).
-If string, encoding is hex.
-
-```ts
-target: string | Buffer
-```
-
-##### Property txOrId
-
-Full transaction (length > 32 bytes) or just its double SHA256 hash (length === 32 bytes).
-If string, encoding is hex.
-
-```ts
-txOrId: string | Buffer
-```
-
-</details>
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Interface: MapiTxStatusPayloadApi
-
-As defined in https://github.com/bitcoin-sv-specs/brfc-merchantapi/blob/master/README.md
-
-```ts
-export interface MapiTxStatusPayloadApi {
-    apiVersion: string;
-    timestamp: string;
-    txid: string;
-    returnResult: string;
-    blockHash: string;
-    blockHeight: number;
-    confirmations: number;
-    minerId: string;
-    txSecondMempoolExpiry: number;
-    merkleProof?: TscMerkleProofApi;
-}
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Interface: MapiCallbackPayloadApi
-
-As defined in https://github.com/bitcoin-sv-specs/brfc-merchantapi/blob/master/README.md
-
-```ts
-export interface MapiCallbackPayloadApi {
-    apiVersion: string;
-    timestamp: string;
-    blockHash: string;
-    blockHeight: number;
-    callbackTxId: string;
-    callbackReason: string;
-    callbackPayload: string;
-}
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Interface: MapiTxidReturnResultApi
-
-Used to parse payloads when only confirmation that a miner acknowledges a specific txid matters.
-
-```ts
-export interface MapiTxidReturnResultApi {
-    apiVersion?: string;
-    timestamp?: string;
-    txid: string;
-    returnResult: string;
-}
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Interface: MapiPostTxPayloadApi
-
-As defined in https://github.com/bitcoin-sv-specs/brfc-merchantapi/blob/master/README.md
-
-```ts
-export interface MapiPostTxPayloadApi {
-    apiVersion: string;
-    timestamp: string;
-    txid: string;
-    returnResult: string;
-    resultDescription: string;
-    minerId: string;
-    currentHighestBlockHash?: string;
-    currentHighestBlockHeight?: number;
-    txSecondMempoolExpiry?: number;
-    failureRetryable?: boolean;
-    warnings?: unknown[];
-    conflictedWith?: unknown[];
-}
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Interface: PostTransactionMapiMinerApi
-
-```ts
-export interface PostTransactionMapiMinerApi {
-    name: string;
-    url: string;
-    authType: "none" | "bearer";
-    authToken?: string;
-}
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Interface: ExchangeRatesIoApi
-
-```ts
-export interface ExchangeRatesIoApi {
-    success: boolean;
-    timestamp: number;
-    base: "EUR" | "USD";
-    date: string;
-    rates: Record<string, number>;
-}
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Interface: CwiExternalServicesOptions
-
-```ts
-export interface CwiExternalServicesOptions {
-    mainTaalApiKey?: string;
-    testTaalApiKey?: string;
-    bsvExchangeRate: BsvExchangeRateApi;
-    bsvUpdateMsecs: number;
-    fiatExchangeRates: FiatExchangeRatesApi;
-    fiatUpdateMsecs: number;
-    disableMapiCallback?: boolean;
-}
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
 ### Classes
 
 | | |
@@ -1273,6 +1275,7 @@ export class ServiceCollection<T> {
         name: string;
         service: T;
     }): ServiceCollection<T> 
+    remove(name: string): void 
     get name() 
     get service() 
     get allServices() 
@@ -1291,9 +1294,17 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export class CwiExternalServices implements CwiExternalServicesApi {
     static createDefaultOptions(): CwiExternalServicesOptions 
     options: CwiExternalServicesOptions;
+    getMerkleProofServices: ServiceCollection<GetMerkleProofServiceApi>;
+    getRawTxServices: ServiceCollection<GetRawTxServiceApi>;
+    postRawTxServices: ServiceCollection<PostRawTxServiceApi>;
+    getUtxoStatusServices: ServiceCollection<GetUtxoStatusServiceApi>;
+    getScriptHistoryServices: ServiceCollection<GetScriptHistoryServiceApi>;
+    updateFiatExchangeRateServices: ServiceCollection<UpdateFiatExchangeRateServiceApi>;
     constructor(options?: CwiExternalServicesOptions) 
     async getBsvExchangeRate(): Promise<number> 
     async getFiatExchangeRate(currency: "USD" | "GBP" | "EUR", base?: "USD" | "GBP" | "EUR"): Promise<number> 
+    targetCurrencies = ["USD", "GBP", "EUR"];
+    async updateFiatExchangeRates(rates?: FiatExchangeRatesApi, updateMsecs?: number): Promise<FiatExchangeRatesApi> 
     get getProofsCount() 
     get getRawTxsCount() 
     get postRawTxsCount() 
@@ -1324,10 +1335,10 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 | [getExchangeRatesIo](#function-getexchangeratesio) | [getProofFromMetastreme](#function-getprooffrommetastreme) | [postRawTxToWhatsOnChain](#function-postrawtxtowhatsonchain) |
 | [getMapiCallbackPayload](#function-getmapicallbackpayload) | [getProofFromTaal](#function-getprooffromtaal) | [signMapiPayload](#function-signmapipayload) |
 | [getMapiJsonResponsePayload](#function-getmapijsonresponsepayload) | [getProofFromWhatsOnChain](#function-getprooffromwhatsonchain) | [updateBsvExchangeRate](#function-updatebsvexchangerate) |
-| [getMapiPostTxPayload](#function-getmapiposttxpayload) | [getProofFromWhatsOnChainTsc](#function-getprooffromwhatsonchaintsc) | [updateFiatExchangeRates](#function-updatefiatexchangerates) |
-| [getMapiTxStatusPayload](#function-getmapitxstatuspayload) | [getRawTxFromWhatsOnChain](#function-getrawtxfromwhatsonchain) | [validateScriptHash](#function-validatescripthash) |
-| [getMerkleProofFromGorillaPool](#function-getmerkleprooffromgorillapool) | [getScriptHistoryFromWhatsOnChain](#function-getscripthistoryfromwhatsonchain) | [verifyMapiResponseForTxid](#function-verifymapiresponsefortxid) |
-| [getMerkleProofFromMetastreme](#function-getmerkleprooffrommetastreme) | [getSpentStatusForOutpoint](#function-getspentstatusforoutpoint) |  |
+| [getMapiPostTxPayload](#function-getmapiposttxpayload) | [getProofFromWhatsOnChainTsc](#function-getprooffromwhatsonchaintsc) | [updateChaintracksFiatExchangeRates](#function-updatechaintracksfiatexchangerates) |
+| [getMapiTxStatusPayload](#function-getmapitxstatuspayload) | [getRawTxFromWhatsOnChain](#function-getrawtxfromwhatsonchain) | [updateExchangeratesapi](#function-updateexchangeratesapi) |
+| [getMerkleProofFromGorillaPool](#function-getmerkleprooffromgorillapool) | [getScriptHistoryFromWhatsOnChain](#function-getscripthistoryfromwhatsonchain) | [validateScriptHash](#function-validatescripthash) |
+| [getMerkleProofFromMetastreme](#function-getmerkleprooffrommetastreme) | [getSpentStatusForOutpoint](#function-getspentstatusforoutpoint) | [verifyMapiResponseForTxid](#function-verifymapiresponsefortxid) |
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -1459,144 +1470,6 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 ```ts
 export function checkMapiResponseForTxid(response: MapiResponseApi, txid?: string | Buffer): boolean 
 ```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Function: getMerkleProofFromGorillaPool
-
-GorillaPool.io has a mapi transaction status endpoint for mainNet, not for testNet,
-and does NOT return merkle proofs...
-
-mapiResponse is signed and has txStatus payload.
-{
-  apiVersion: "",
-  timestamp: "2023-03-23T02:14:39.362Z",
-  txid: "9c31ed1dea4ec1aae0475addc0a74eaed68b718d9983d42b111c387d6696a949",
-  returnResult: "success",
-  resultDescription: "",
-  blockHash: "00000000000000000e155235fd83a8757c44c6299e63104fb12632368f3f0cc9",
-  blockHeight: 700000,
-  confirmations: 84353,
-  minerId: "03ad780153c47df915b3d2e23af727c68facaca4facd5f155bf5018b979b9aeb83",
-  txSecondMempoolExpiry: 0,
-}
-
-```ts
-export async function getMerkleProofFromGorillaPool(txid: string | Buffer): Promise<TscMerkleProofApi | undefined> 
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Function: getMerkleProofFromTaal
-
-Taal.com has the most functional txStatus and merkleProof endpoint for both mainNet and testNet
-
-Proofs use targetType "header" which is converted to "merkleRoot".
-
-Proofs correctly use duplicate computed node value symbol "*".
-
-An apiKey must be used and must correspond to the target chain: mainNet or testNet.
-
-```ts
-export async function getMerkleProofFromTaal(txid: string | Buffer, apiKey: string): Promise<TscMerkleProofApi | undefined> 
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Function: getMerkleProofFromMetastreme
-
-metastreme.com has a partially conforming merkleProof implementation.
-
-Both mainNet and testNet are supported.
-
-Proofs incorrectly included a copy of the computed value instead of "*" along right side of merkle tree.
-
-targetType of hash is used which prevents automatic proof checking as the target root value isn't known
-without a lookup request.
-
-```ts
-export async function getMerkleProofFromMetastreme(txid: string | Buffer, chain: Chain): Promise<TscMerkleProofApi | undefined> 
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Function: getMerkleProofFromWhatsOnChain
-
-WhatOnChain.com has their own "hash/pos/R/L" proof format and a more TSC compliant proof format.
-
-The "/proof" endpoint returns an object for each node with "hash" and "pos" properties. "pos" can have values "R" or "L".
-Normally "pos" indicates which side of a concatenation the provided "hash" goes with one exception! EXCEPTION: When the
-provided should be "*" indicating edge-of-the-tree-duplicate-computed-value, they include the expected computed value and the pos value
-is always "L", even when it should really be "R". This only matters if you are trying to compute index from the "R" and "L" values.
-
-```ts
-export async function getMerkleProofFromWhatsOnChain(txid: string | Buffer, chain: Chain): Promise<TscMerkleProofApi | undefined> 
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Function: getMerkleProofFromWhatsOnChainTsc
-
-WhatOnChain.com has their own "hash/pos/R/L" proof format and a more TSC compliant proof format.
-
-The "/proof/tsc" endpoint is much closer to the TSC specification. It provides "index" directly and each node is just the provided hash value.
-The "targetType" is unspecified and thus defaults to block header hash, requiring a Chaintracks lookup to get the merkleRoot...
-Duplicate hash values are provided in full instead of being replaced by "*".
-
-```ts
-export async function getMerkleProofFromWhatsOnChainTsc(txid: string | Buffer, chain: Chain): Promise<TscMerkleProofApi | undefined> 
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Function: checkMerkleProof
-
-Implement merkle proof per https://tsc.bitcoinassociation.net/standards/merkle-proof-standardised-format/
-
-We extend the current standard by implementing targetType 'height' (binary value 3).
-This extension avoids the need to maintain a merkleroot or block hash index for all headers,
-reducing the space required by 50%.
-
-Other extensions are not currently supported.
-
-Supports partial and full binary format as well as hex strings.
-
-External Assumptions:
-1. The raw transaction is in-hand and is either duplicated in the proof or matches the starting hash
-   used to evaluate the merkle tree branch.
-
-Checking the proof verifies these claims:
-1. The merkleRoot determined by the targetType is confirmed to match a block header on the active chain.
-2. Computing a merkleRoot value starting with the transaction hash, using the proof nodes yields a
-   match for the target value.
-
-Implications:
-1. The transaction in-hand is valid and was included in a block on the active chain.
-
-```ts
-export async function checkMerkleProof(txid: string | Buffer, proof: TscMerkleProofApi | Buffer, chaintracks: ChaintracksClientApi): Promise<BlockHeader> 
-```
-
-<details>
-
-<summary>Function checkMerkleProof Details</summary>
-
-Returns
-
-The block header containing the verified merkleRoot
-
-Argument Details
-
-+ **txid**
-  + the transaction hash of the in-hand transaction to which this proof applies.
-
-</details>
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -1775,10 +1648,19 @@ export async function updateBsvExchangeRate(rate?: BsvExchangeRateApi, updateMse
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
-#### Function: updateFiatExchangeRates
+#### Function: updateChaintracksFiatExchangeRates
 
 ```ts
-export async function updateFiatExchangeRates(rates?: FiatExchangeRatesApi, updateMsecs?: number): Promise<FiatExchangeRatesApi> 
+export async function updateChaintracksFiatExchangeRates(targetCurrencies: string[], options: CwiExternalServicesOptions): Promise<FiatExchangeRatesApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: updateExchangeratesapi
+
+```ts
+export async function updateExchangeratesapi(targetCurrencies: string[], options: CwiExternalServicesOptions): Promise<FiatExchangeRatesApi> 
 ```
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
@@ -1787,8 +1669,146 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 #### Function: getExchangeRatesIo
 
 ```ts
-export async function getExchangeRatesIo(): Promise<ExchangeRatesIoApi> 
+export async function getExchangeRatesIo(key: string): Promise<ExchangeRatesIoApi> 
 ```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getMerkleProofFromGorillaPool
+
+GorillaPool.io has a mapi transaction status endpoint for mainNet, not for testNet,
+and does NOT return merkle proofs...
+
+mapiResponse is signed and has txStatus payload.
+{
+  apiVersion: "",
+  timestamp: "2023-03-23T02:14:39.362Z",
+  txid: "9c31ed1dea4ec1aae0475addc0a74eaed68b718d9983d42b111c387d6696a949",
+  returnResult: "success",
+  resultDescription: "",
+  blockHash: "00000000000000000e155235fd83a8757c44c6299e63104fb12632368f3f0cc9",
+  blockHeight: 700000,
+  confirmations: 84353,
+  minerId: "03ad780153c47df915b3d2e23af727c68facaca4facd5f155bf5018b979b9aeb83",
+  txSecondMempoolExpiry: 0,
+}
+
+```ts
+export async function getMerkleProofFromGorillaPool(txid: string | Buffer): Promise<TscMerkleProofApi | undefined> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getMerkleProofFromTaal
+
+Taal.com has the most functional txStatus and merkleProof endpoint for both mainNet and testNet
+
+Proofs use targetType "header" which is converted to "merkleRoot".
+
+Proofs correctly use duplicate computed node value symbol "*".
+
+An apiKey must be used and must correspond to the target chain: mainNet or testNet.
+
+```ts
+export async function getMerkleProofFromTaal(txid: string | Buffer, apiKey: string): Promise<TscMerkleProofApi | undefined> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getMerkleProofFromMetastreme
+
+metastreme.com has a partially conforming merkleProof implementation.
+
+Both mainNet and testNet are supported.
+
+Proofs incorrectly included a copy of the computed value instead of "*" along right side of merkle tree.
+
+targetType of hash is used which prevents automatic proof checking as the target root value isn't known
+without a lookup request.
+
+```ts
+export async function getMerkleProofFromMetastreme(txid: string | Buffer, chain: Chain): Promise<TscMerkleProofApi | undefined> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getMerkleProofFromWhatsOnChain
+
+WhatOnChain.com has their own "hash/pos/R/L" proof format and a more TSC compliant proof format.
+
+The "/proof" endpoint returns an object for each node with "hash" and "pos" properties. "pos" can have values "R" or "L".
+Normally "pos" indicates which side of a concatenation the provided "hash" goes with one exception! EXCEPTION: When the
+provided should be "*" indicating edge-of-the-tree-duplicate-computed-value, they include the expected computed value and the pos value
+is always "L", even when it should really be "R". This only matters if you are trying to compute index from the "R" and "L" values.
+
+```ts
+export async function getMerkleProofFromWhatsOnChain(txid: string | Buffer, chain: Chain): Promise<TscMerkleProofApi | undefined> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getMerkleProofFromWhatsOnChainTsc
+
+WhatOnChain.com has their own "hash/pos/R/L" proof format and a more TSC compliant proof format.
+
+The "/proof/tsc" endpoint is much closer to the TSC specification. It provides "index" directly and each node is just the provided hash value.
+The "targetType" is unspecified and thus defaults to block header hash, requiring a Chaintracks lookup to get the merkleRoot...
+Duplicate hash values are provided in full instead of being replaced by "*".
+
+```ts
+export async function getMerkleProofFromWhatsOnChainTsc(txid: string | Buffer, chain: Chain): Promise<TscMerkleProofApi | undefined> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: checkMerkleProof
+
+Implement merkle proof per https://tsc.bitcoinassociation.net/standards/merkle-proof-standardised-format/
+
+We extend the current standard by implementing targetType 'height' (binary value 3).
+This extension avoids the need to maintain a merkleroot or block hash index for all headers,
+reducing the space required by 50%.
+
+Other extensions are not currently supported.
+
+Supports partial and full binary format as well as hex strings.
+
+External Assumptions:
+1. The raw transaction is in-hand and is either duplicated in the proof or matches the starting hash
+   used to evaluate the merkle tree branch.
+
+Checking the proof verifies these claims:
+1. The merkleRoot determined by the targetType is confirmed to match a block header on the active chain.
+2. Computing a merkleRoot value starting with the transaction hash, using the proof nodes yields a
+   match for the target value.
+
+Implications:
+1. The transaction in-hand is valid and was included in a block on the active chain.
+
+```ts
+export async function checkMerkleProof(txid: string | Buffer, proof: TscMerkleProofApi | Buffer, chaintracks: ChaintracksClientApi): Promise<BlockHeader> 
+```
+
+<details>
+
+<summary>Function checkMerkleProof Details</summary>
+
+Returns
+
+The block header containing the verified merkleRoot
+
+Argument Details
+
++ **txid**
+  + the transaction hash of the in-hand transaction to which this proof applies.
+
+</details>
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -1814,6 +1834,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 | [GetUtxoStatusOutputFormatApi](#type-getutxostatusoutputformatapi) |
 | [GetUtxoStatusServiceApi](#type-getutxostatusserviceapi) |
 | [PostRawTxServiceApi](#type-postrawtxserviceapi) |
+| [UpdateFiatExchangeRateServiceApi](#type-updatefiatexchangerateserviceapi) |
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -1859,6 +1880,15 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 
 ```ts
 export type GetRawTxServiceApi = (txid: string | Buffer, chain: Chain) => Promise<GetRawTxResultApi>
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Type: UpdateFiatExchangeRateServiceApi
+
+```ts
+export type UpdateFiatExchangeRateServiceApi = (targetCurrencies: string[], options: CwiExternalServicesOptions) => Promise<FiatExchangeRatesApi>
 ```
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
