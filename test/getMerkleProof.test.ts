@@ -1,3 +1,4 @@
+import { CwiExternalServices } from "../src";
 import { getMerkleProofFromGorillaPool, getMerkleProofFromMetastreme, getMerkleProofFromTaal, getMerkleProofFromWhatsOnChain } from "../src/getMerkleProofV1";
 import { verifyDojoTransactionProof } from "./verifyDojoTransactionProofs";
 
@@ -29,6 +30,19 @@ describe("getMerkleProof", () => {
     const unknownTxid = 'fffe38ace373720984d9f77dc2fd9dea0e8b660ac6b39ae49a7961621264efff'
     
     const orphanedTxid = 'b37a0afaad97930f2b08b080557dbea5e49bbb78fba78235c57d4acdd97c3054'
+
+    test.skip("CwiExternalServices main d5ec76e61c6a035b85bdc58cb179da3570417459b1dd7b012088a97e2901a83b", async () => {
+        const opts = CwiExternalServices.createDefaultOptions()
+
+        const services = new CwiExternalServices(opts)
+
+        services.getMerkleProofServices.next()
+        services.getMerkleProofServices.next()
+        const r = await services.getMerkleProof('d5ec76e61c6a035b85bdc58cb179da3570417459b1dd7b012088a97e2901a83b', 'main')
+
+        expect(r).toBeTruthy()
+
+    }, 9000000)
 
     test.skip("WoC orphanedTxid", async () => {
         const r = await getMerkleProofFromWhatsOnChain(orphanedTxid, 'test')

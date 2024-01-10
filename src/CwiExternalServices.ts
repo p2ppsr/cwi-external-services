@@ -73,8 +73,8 @@ export class CwiExternalServices implements CwiExternalServicesApi {
         this.getMerkleProofServices = new ServiceCollection<GetMerkleProofServiceApi>()
         .add({ name: 'WhatsOnChain', service: getProofFromWhatsOnChain})
         .add({ name: 'WhatsOnChainTsc', service: getProofFromWhatsOnChainTsc})
-        .add({ name: 'MetaStreme', service: getProofFromMetastreme})
-        .add({ name: 'GorillaPool', service: getProofFromGorillaPool})
+        //.add({ name: 'MetaStreme', service: getProofFromMetastreme})
+        //.add({ name: 'GorillaPool', service: getProofFromGorillaPool})
         .add({ name: 'Taal', service: this.makeGetProofFromTaal() })
         
         this.getRawTxServices = new ServiceCollection<GetRawTxServiceApi>()
