@@ -13,7 +13,7 @@ import { ServiceCollection } from "./ServiceCollection"
 import { postRawTxToGorillaPool, postRawTxToTaal, postRawTxToWhatsOnChain } from "./postRawTxServices"
 import { getRawTxFromWhatsOnChain } from "./getRawTxServices"
 import {
-    getProofFromGorillaPool, getProofFromMetastreme, getProofFromTaal, getProofFromWhatsOnChain, getProofFromWhatsOnChainTsc
+    getProofFromTaal, getProofFromWhatsOnChain, getProofFromWhatsOnChainTsc
 } from "./getProofServices"
 import { getScriptHistoryFromWhatsOnChain, getUtxoStatusFromWhatsOnChain } from "./getUtxoStatusServices"
 import { updateBsvExchangeRate, updateChaintracksFiatExchangeRates, updateExchangeratesapi } from "./getExchangeRateServices"
