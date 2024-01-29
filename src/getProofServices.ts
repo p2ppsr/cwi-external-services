@@ -1,7 +1,6 @@
-import { Chain, CwiError, asBuffer, computeMerkleTreeParent } from "cwi-base"
+import { Chain, CwiError, MapiResponseApi, TscMerkleProofApi, asBuffer, computeMerkleTreeParent } from "cwi-base"
 import { GetMerkleProofResultApi } from "./Api/CwiExternalServicesApi"
 import axios from 'axios'
-import { MapiResponseApi, TscMerkleProofApi } from "cwi-base/src/Api/MerchantApi"
 import { getMapiTxStatusPayload } from "./merchantApiUtils"
 
 /**

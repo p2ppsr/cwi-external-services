@@ -1,6 +1,6 @@
-import { asBuffer, asString, bsv, identityKeyFromPrivateKey } from "cwi-base";
+import { asBuffer, asString, bsv, identityKeyFromPrivateKey, MapiResponseApi } from "cwi-base";
 
-import { MapiCallbackPayloadApi, MapiPostTxPayloadApi, MapiResponseApi, MapiTxidReturnResultApi, MapiTxStatusPayloadApi } from "cwi-base/src/Api/MerchantApi";
+import { MapiCallbackPayloadApi, MapiPostTxPayloadApi, MapiTxidReturnResultApi, MapiTxStatusPayloadApi } from "cwi-base/src/Api/MerchantApi";
 import {
     ERR_EXTSVS_MAPI_SIGNATURE_INVALID,
     ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING,
