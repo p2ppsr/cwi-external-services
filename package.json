@@ -52,7 +52,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "bn.js": "^5.2.1",
-    "cwi-base": "^0.3.104",
+    "cwi-base": "^0.3.105",
     "whatsonchain": "^0.2.0"
   }
 }

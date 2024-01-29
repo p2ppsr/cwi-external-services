@@ -14,156 +14,20 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 
 | | |
 | --- | --- |
-| [BsvExchangeRateApi](#interface-bsvexchangerateapi) | [GetUtxoStatusResultApi](#interface-getutxostatusresultapi) |
-| [CwiExternalServicesApi](#interface-cwiexternalservicesapi) | [MapiCallbackApi](#interface-mapicallbackapi) |
-| [CwiExternalServicesOptions](#interface-cwiexternalservicesoptions) | [MapiCallbackPayloadApi](#interface-mapicallbackpayloadapi) |
-| [ExchangeRatesIoApi](#interface-exchangeratesioapi) | [MapiPostTxPayloadApi](#interface-mapiposttxpayloadapi) |
-| [FiatExchangeRatesApi](#interface-fiatexchangeratesapi) | [MapiResponseApi](#interface-mapiresponseapi) |
+| [BsvExchangeRateApi](#interface-bsvexchangerateapi) | [GetUtxoStatusDetailsApi](#interface-getutxostatusdetailsapi) |
+| [CwiExternalServicesApi](#interface-cwiexternalservicesapi) | [GetUtxoStatusResultApi](#interface-getutxostatusresultapi) |
+| [CwiExternalServicesOptions](#interface-cwiexternalservicesoptions) | [MapiCallbackApi](#interface-mapicallbackapi) |
+| [ExchangeRatesIoApi](#interface-exchangeratesioapi) | [MapiCallbackPayloadApi](#interface-mapicallbackpayloadapi) |
+| [FiatExchangeRatesApi](#interface-fiatexchangeratesapi) | [MapiPostTxPayloadApi](#interface-mapiposttxpayloadapi) |
 | [GetMerkleProofResultApi](#interface-getmerkleproofresultapi) | [MapiTxStatusPayloadApi](#interface-mapitxstatuspayloadapi) |
 | [GetRawTxResultApi](#interface-getrawtxresultapi) | [MapiTxidReturnResultApi](#interface-mapitxidreturnresultapi) |
 | [GetScriptHistoryDetailsApi](#interface-getscripthistorydetailsapi) | [PostRawTxResultApi](#interface-postrawtxresultapi) |
 | [GetScriptHistoryResultApi](#interface-getscripthistoryresultapi) | [PostTransactionMapiMinerApi](#interface-posttransactionmapiminerapi) |
-| [GetUtxoStatusDetailsApi](#interface-getutxostatusdetailsapi) | [TscMerkleProofApi](#interface-tscmerkleproofapi) |
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
 
-#### Interface: MapiResponseApi
-
-```ts
-export interface MapiResponseApi {
-    payload: string;
-    signature: string;
-    publicKey: string;
-    encoding?: string;
-    mimetype?: string;
-}
-```
-
-<details>
-
-<summary>Interface MapiResponseApi Details</summary>
-
-##### Property encoding
-
-encoding of the payload data
-
-```ts
-encoding?: string
-```
-
-##### Property mimetype
-
-mime type of the payload data
-
-```ts
-mimetype?: string
-```
-
-##### Property payload
-
-Contents of the envelope.
-Validate using signature and publicKey.
-encoding and mimetype may assist with decoding validated payload.
-
-```ts
-payload: string
-```
-
-##### Property publicKey
-
-public key to use to verify signature of payload data
-
-```ts
-publicKey: string
-```
-
-##### Property signature
-
-signature producted by correpsonding private key on payload data
-
-```ts
-signature: string
-```
-
-</details>
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Interface: TscMerkleProofApi
-
-As defined in https://github.com/bitcoin-sv-specs/brfc-merchantapi/blob/master/README.md
-
-```ts
-export interface TscMerkleProofApi {
-    height?: number;
-    index: number;
-    txOrId: string | Buffer;
-    target: string | Buffer;
-    nodes: string[] | Buffer;
-    targetType?: "hash" | "header" | "merkleRoot" | "height";
-    proofType?: "branch" | "tree";
-    composite?: boolean;
-}
-```
-
-<details>
-
-<summary>Interface TscMerkleProofApi Details</summary>
-
-##### Property height
-
-The most efficient way of confirming a proof should also be the most common,
-when the containing block's height is known.
-
-```ts
-height?: number
-```
-
-##### Property index
-
-Index of transaction in its block. First transaction is index zero.
-
-```ts
-index: number
-```
-
-##### Property nodes
-
-Merkle tree sibling hash values required to compute root from txid.
-Duplicates (sibling hash === computed hash) are indicated by "*" or type byte === 1.
-type byte === 2...
-Strings are encoded as hex.
-
-```ts
-nodes: string[] | Buffer
-```
-
-##### Property target
-
-Merkle root (length === 32) or serialized block header containing it (length === 80).
-If string, encoding is hex.
-
-```ts
-target: string | Buffer
-```
-
-##### Property txOrId
-
-Full transaction (length > 32 bytes) or just its double SHA256 hash (length === 32 bytes).
-If string, encoding is hex.
-
-```ts
-txOrId: string | Buffer
-```
-
-</details>
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
 #### Interface: MapiTxStatusPayloadApi
 
 As defined in https://github.com/bitcoin-sv-specs/brfc-merchantapi/blob/master/README.md
