@@ -1,4 +1,4 @@
-import { asBuffer, asString, bsv, identityKeyFromPrivateKey, MapiResponseApi } from "cwi-base";
+import { asString, identityKeyFromPrivateKey, MapiResponseApi } from "cwi-base";
 
 import { MapiCallbackPayloadApi, MapiPostTxPayloadApi, MapiTxidReturnResultApi, MapiTxStatusPayloadApi } from "cwi-base/src/Api/MerchantApi";
 import {
@@ -8,6 +8,7 @@ import {
     ERR_EXTSVS_MAPI_UNSUPPORTED_RETURNRESULT,
     ERR_EXTSVS_TXID_INVALID
 } from "./ERR_EXTSVS_errors";
+import { PrivateKey, PublicKey, Signature } from "@bsv/sdk";
 
 export function createMapiPostTxResponse(txid: string, key: string, resultDescription: string, returnResult = "success")
 : { mapi: MapiResponseApi, payloadData: MapiPostTxPayloadApi }
@@ -36,29 +37,23 @@ export function createMapiPostTxResponse(txid: string, key: string, resultDescri
 /**
  * Verifies the payload signature on a mAPI response object
  *
- * Throws an error if signature fails to validate.
+ * @throws ERR_EXTSVS_MAPI_SIGNATURE_INVALID if signature fails to validate.
  *
  * https://github.com/bitcoin-sv-specs/brfc-misc/tree/master/jsonenvelope
  */
 export function checkMapiResponse(response: MapiResponseApi) {
-    try {
-        // Check the format and signature
-        const payloadHash = bsv.Hash.sha256(Buffer.from(response.payload));
-        const signature = new bsv.Sig().fromString(response.signature);
-        const publicKey = new bsv.PubKey().fromString(response.publicKey);
-        if (bsv.Ecdsa.verify(payloadHash, signature, publicKey) !== true) {
-            throw new ERR_EXTSVS_MAPI_SIGNATURE_INVALID()
-        }
-    } catch (eu: unknown) {
+    // Check the format and signature
+    const signature = Signature.fromDER(response.signature, 'hex')
+    const publicKey = PublicKey.fromString(response.publicKey)
+    const ok = publicKey.verify(response.payload, signature, 'utf8')
+    if (!ok)
         throw new ERR_EXTSVS_MAPI_SIGNATURE_INVALID()
-    }
 }
 
 export function signMapiPayload(payload: string, privateKey: string) : string {
-    const payloadHash = bsv.Hash.sha256(Buffer.from(payload));
-    const key = bsv.PrivKey.fromBn(bsv.Bn.fromBuffer(asBuffer(privateKey)))
-    const signature = bsv.Ecdsa.sign(payloadHash, bsv.KeyPair.fromPrivKey(key))
-    return signature.toString()
+    const key = PrivateKey.fromString(privateKey, 'hex')
+    const signature = key.sign(payload, 'utf8').toDER('hex') as string
+    return signature
 }
 
 /**
