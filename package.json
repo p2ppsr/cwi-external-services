@@ -1,6 +1,6 @@
 {
   "name": "cwi-external-services",
-  "version": "0.3.104",
+  "version": "0.3.107",
   "description": "Implementations of external service APIs and standardized APIs for use within CWI",
   "author": "Peer-to-peer Privacy Systems Research LLC",
   "license": "PROPRIETARY",
@@ -53,7 +53,7 @@
     "@bsv/sdk": "^1.0.4",
     "axios": "^0.21.1",
     "bn.js": "^5.2.1",
-    "cwi-base": "^0.3.119",
+    "cwi-base": "^0.3.123",
     "whatsonchain": "^0.2.0"
   }
 }

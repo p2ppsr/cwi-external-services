@@ -121,6 +121,8 @@ export async function postRawTxToMapiMiner(txid: string | Buffer, rawTx: string 
         }
 
         if (payload.returnResult !== 'success') {
+            if (payload.resultDescription === 'Missing inputs')
+                throw new ERR_EXTSVS_DOUBLE_SPEND(asString(txid), makeDescription(data))
             throw new ERR_EXTSVS_INVALID_TRANSACTION(makeDescription(data))
         }
 
