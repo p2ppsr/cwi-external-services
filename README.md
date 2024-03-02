@@ -1224,13 +1224,21 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 
 Verifies the payload signature on a mAPI response object
 
-Throws an error if signature fails to validate.
-
-https://github.com/bitcoin-sv-specs/brfc-misc/tree/master/jsonenvelope
-
 ```ts
 export function checkMapiResponse(response: MapiResponseApi) 
 ```
+
+<details>
+
+<summary>Function checkMapiResponse Details</summary>
+
+Throws
+
+ERR_EXTSVS_MAPI_SIGNATURE_INVALID if signature fails to validate.
+
+https://github.com/bitcoin-sv-specs/brfc-misc/tree/master/jsonenvelope
+
+</details>
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 

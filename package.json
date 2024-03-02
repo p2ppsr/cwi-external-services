@@ -52,7 +52,7 @@
   "dependencies": {
     "@bsv/sdk": "^1.0.8",
     "axios": "^0.21.1",
-    "cwi-base": "^0.3.123",
+    "cwi-base": "^0.4.0",
     "whatsonchain": "^0.2.0"
   }
 }
