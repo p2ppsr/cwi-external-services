@@ -4,11 +4,13 @@ import { CwiExternalServices } from '../src/CwiExternalServices';
 describe("postRawTx.test", () => {
     const services: CwiExternalServices = new CwiExternalServices()
 
+    jest.setTimeout(900000)
+
     test('postRawTxToWhatsOnChain', async () => {
         const rawTx = '0200000002761d50a0a0078a1874862c1011ca6b084b2fe137c4f59bbdee6f6b97792c8e4f020000006a4730440220123eeab653ca5b5b5c1d5c315457facf05fb565ec1e708d0929650d60f40912702205654b3645e2cb98a84f5c7335f1b6255d1e93d8f66c918b6385ee09471f0b374412102faeb815c995772d071a7dd24c584dc10f9401790a816ce8ee02a69c9a77fe23afeffffff6c5ec011ea6ebac1194dd66bfae22821bf229ba03e98b4a7eb1c5f2466ca33bf000000008a47304402202b9361042b3af536347d324b04accfe1146e34a58b892c709418784a41c6b295022027507840ec381eade6c8b726b261bbad95a9daf6ac74622ea6ea5dfc7258e7574141047b18f712e04921b20480d28f70c8e1abecb7ba0f06d17b18e11b955427355a9f8c91fab08854d6607a297d8c9427f856699fe1c871bfc3a99f5fbdf6ae5cac21feffffff02e6e61b00000000001976a914cf99ea3fd68f8c50bace9795116acfb083da044f88acb00e4e02000000001976a914cfe18a551615d08e56463a3b027eddcb6218e00688ac2ec51700'
         const r = await postRawTxToWhatsOnChain(undefined, rawTx, 'test', undefined)
         expect(r).toBeTruthy()
-    }, 900000)
+    })
 
     test('postRawTx already mined testnet', async () => {
         const options = CwiExternalServices.createDefaultOptions()
@@ -24,7 +26,7 @@ describe("postRawTx.test", () => {
         const message = r[1].error?.message
         if (name === 'ERR_EXTSVS_INVALID_TRANSACTION') expect(message).toBe('16 missing-inputs')
         else expect(name).toBe('ERR_BAD_REQUEST')
-    }, 300000)
+    })
 
     /**
      * GorillaPool fails testnet
@@ -42,7 +44,7 @@ describe("postRawTx.test", () => {
         const rawTx = '0200000002761d50a0a0078a1874862c1011ca6b084b2fe137c4f59bbdee6f6b97792c8e4f020000006a4730440220123eeab653ca5b5b5c1d5c315457facf05fb565ec1e708d0929650d60f40912702205654b3645e2cb98a84f5c7335f1b6255d1e93d8f66c918b6385ee09471f0b374412102faeb815c995772d071a7dd24c584dc10f9401790a816ce8ee02a69c9a77fe23afeffffff6c5ec011ea6ebac1194dd66bfae22821bf229ba03e98b4a7eb1c5f2466ca33bf000000008a47304402202b9361042b3af536347d324b04accfe1146e34a58b892c709418784a41c6b295022027507840ec381eade6c8b726b261bbad95a9daf6ac74622ea6ea5dfc7258e7574141047b18f712e04921b20480d28f70c8e1abecb7ba0f06d17b18e11b955427355a9f8c91fab08854d6607a297d8c9427f856699fe1c871bfc3a99f5fbdf6ae5cac21feffffff02e6e61b00000000001976a914cf99ea3fd68f8c50bace9795116acfb083da044f88acb00e4e02000000001976a914cfe18a551615d08e56463a3b027eddcb6218e00688ac2ec51700'
         const r = await services.postRawTx(rawTx, 'test', undefined)
         expect(r[0].status).toBe('error')
-    }, 300000)
+    })
 
     
     /**
@@ -57,7 +59,7 @@ describe("postRawTx.test", () => {
      */
     test('postRawTx already mined mainnet', async () => {
         const rawTx = '01000000019deb84766cbd2baa2bdaf442fce9b1f592b5cea7e34b2603560cc954655c0fc2010000006b4830450221008ea78f75a8a9e8596d7ed0fc25248e1702c218b7e86375a8fa04a20227cb1a4502204228c2ab3abdc6a9b7cbdff08ac6d1657bb4d5c94ef6a2639375d16c2da46d8741210273cc96bde0fcc1f42e4d4be59e11e8e8872a0c148f89aba8c5497a5e9fafa824ffffffff0243170000000000001976a9144c01fae966c8da6f0d5bd46c29a4cc356220012988ac29740300000000001976a91476e4013eab1e39dd120bd698db2df2963573b51b88ac4d290c00'
-        const r = await services.postRawTx(rawTx, 'main', undefined)
-        expect(r[0].status).toBe('error')
-    }, 300000)
+        const rs = await services.postRawTx(rawTx, 'main', undefined)
+        expect(rs.some(r => r.status === 'success' && r.alreadyKnown)).toBe(true)
+    })
 })

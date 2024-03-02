@@ -5,7 +5,11 @@ import { getUtxoStatusFromWhatsOnChain } from '../src/getUtxoStatusServices';
 
 describe("getUtxoStatus", () => {
 
-    test("WhatsOnChain valid script", async () => {
+
+    test.skip("WhatsOnChain valid script", async () => {
+        // This test requires a real UTXO's locking script to pass.
+        // At present, we don't have a UTXO parked for this purpose,
+        // so update the script and re-enable to use this test.
         const script = '76A9141401B7D9599A6ADDC95B8419688DFC5F1F6CEAC388AC'
         // const script = '76A91490C52A563D0D1E53A0FCDA9C1385C514EB36635288AC'
         const chain = 'test'
