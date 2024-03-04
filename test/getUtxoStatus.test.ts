@@ -32,4 +32,20 @@ describe("getUtxoStatus", () => {
         expect(p.isUtxo).toBe(false)
         expect(p.error).toBeUndefined()
     }, 100000)
+
+
+    test("block 81,191 coinbase output", async () => {
+        // On 2024-03-01 2000 BTC and BCH coinbase coins from around 2010 were moved by one transaction on each chain:
+        // BTC txid 57029b1d8fdea8e4fec72fdd78f89b6d0630cadcc8c03de07e3736aff28ecc5a, block 81,191
+        // BCH txid 2354fc029478991703a69adcf55d80b1986c0003106738c3f3192b9487ec5528
+        // This is the BSV block 81,191 coinbase output script which is still a valid UTXO as of 2024-03-04 :-)
+        const script = '4104b60f22689f4291dc0aa66454de8451f6cf775487d5319c2e3d9db46ee58ad40d4018a6e7b939977c02dbf264b5a1c7c35d0c5c884e4103a0ed5a7314f3ced6e9ac'
+        const chain = 'main'
+        const p = await getUtxoStatusFromWhatsOnChain(script, chain, 'script')
+        expect(p).toBeTruthy()
+        expect(p.name).toBe('WoC')
+        expect(p.status).toBe('success')
+        expect(p.isUtxo).toBe(true)
+        expect(p.error).toBeUndefined()
+    }, 100000)
 })
