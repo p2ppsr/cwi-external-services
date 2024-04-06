@@ -1,6 +1,7 @@
 import { Chain, CwiError } from "cwi-base"
 import { MapiPostTxPayloadApi, MapiResponseApi, TscMerkleProofApi } from "cwi-base"
 import { CwiExternalServicesOptions } from "../CwiExternalServices"
+import { Transaction, TransactionOutput } from "@bsv/sdk"
 
 /**
  * Defines standard interfaces to access functionality implemented by external transaction processing services.
@@ -41,6 +42,27 @@ export interface CwiExternalServicesApi {
      * @param useNext optional, forces skip to next service before starting service requests cycle.
      */
     getRawTx(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetRawTxResultApi>
+
+    /**
+     * Typically uses getRawTx to lookup a raw transaction to return a parsed `Transaction`.
+     *  
+     * @param txid transaction hash for which raw transaction bytes are requested
+     * @param chain which chain to look on
+     * @param useNext optional, forces skip to next service before starting service requests cycle.
+     * @throws ERR_INVALID_PARAMETER if txid does not exist, or can't be found, on chain.
+     */
+    getTransaction(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<Transaction>
+
+    /**
+     * Typically uses getTransaction to obtain a parsed `Transaction` and returns a specific `TransactionOutput`.
+     *  
+     * @param vout the index (zero based) of the output to be returned
+     * @param txid transaction hash for which raw transaction bytes are requested
+     * @param chain which chain to look on
+     * @param useNext optional, forces skip to next service before starting service requests cycle.
+     * @throws ERR_INVALID_PARAMETER if txid does not exist, or can't be found, on chain, or if vout is invalid.
+     */
+    getTransactionOutput(vout: number, txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<TransactionOutput>
 
     /**
      * Attempts to obtain the merkle proof associated with a 32 byte transaction hash (txid).

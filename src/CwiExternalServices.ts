@@ -1,4 +1,10 @@
-import { Chain, CwiError, ERR_INTERNAL, ERR_MISSING_PARAMETER, ERR_TXID_INVALID, asString, doubleSha256BE } from "cwi-base"
+import { Transaction, TransactionOutput } from '@bsv/sdk'
+
+import {
+    Chain,
+    CwiError, ERR_INTERNAL, ERR_INVALID_PARAMETER, ERR_MISSING_PARAMETER, ERR_TXID_INVALID,
+    asBsvSdkTx, asString, doubleSha256BE
+} from "cwi-base"
 
 import {
     BsvExchangeRateApi,
@@ -271,6 +277,20 @@ export class CwiExternalServices implements CwiExternalServicesApi {
             this.getRawTxServices.next()
         }
         return r0
+    }
+
+    async getTransaction(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<Transaction> {
+        const rawTx = await this.getRawTx(txid, chain, useNext)
+        if (!rawTx.rawTx)
+            throw new ERR_INVALID_PARAMETER('txid', `valid on ${chain}Net which has no transaction with txid ${txid}`)
+        return asBsvSdkTx(rawTx.rawTx)
+    }
+
+    async getTransactionOutput(vout: number, txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<TransactionOutput> {
+        const tx = await this.getTransaction(txid, chain, useNext)
+        if (vout < 0 || vout >= tx.outputs.length)
+            throw new ERR_INVALID_PARAMETER('vout', `in range 0..${tx.outputs.length - 1}`)
+        return tx.outputs[vout]
     }
 
     async getMerkleProof(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetMerkleProofResultApi> {
