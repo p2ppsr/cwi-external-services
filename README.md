@@ -166,6 +166,8 @@ export interface CwiExternalServicesApi {
     getBsvExchangeRate(): Promise<number>;
     getFiatExchangeRate(currency: "USD" | "GBP" | "EUR", base?: "USD" | "GBP" | "EUR"): Promise<number>;
     getRawTx(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetRawTxResultApi>;
+    getTransaction(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<Transaction>;
+    getTransactionOutput(vout: number, txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<TransactionOutput>;
     getMerkleProof(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetMerkleProofResultApi>;
     postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]>;
     getUtxoStatus(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi, useNext?: boolean): Promise<GetUtxoStatusResultApi>;
@@ -255,6 +257,50 @@ Argument Details
   + which chain to look on
 + **useNext**
   + optional, forces skip to next service before starting service requests cycle.
+
+##### Method getTransaction
+
+Typically uses getRawTx to lookup a raw transaction to return a parsed `Transaction`.
+
+```ts
+getTransaction(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<Transaction>
+```
+
+Argument Details
+
++ **txid**
+  + transaction hash for which raw transaction bytes are requested
++ **chain**
+  + which chain to look on
++ **useNext**
+  + optional, forces skip to next service before starting service requests cycle.
+
+Throws
+
+ERR_INVALID_PARAMETER if txid does not exist, or can't be found, on chain.
+
+##### Method getTransactionOutput
+
+Typically uses getTransaction to obtain a parsed `Transaction` and returns a specific `TransactionOutput`.
+
+```ts
+getTransactionOutput(vout: number, txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<TransactionOutput>
+```
+
+Argument Details
+
++ **vout**
+  + the index (zero based) of the output to be returned
++ **txid**
+  + transaction hash for which raw transaction bytes are requested
++ **chain**
+  + which chain to look on
++ **useNext**
+  + optional, forces skip to next service before starting service requests cycle.
+
+Throws
+
+ERR_INVALID_PARAMETER if txid does not exist, or can't be found, on chain, or if vout is invalid.
 
 ##### Method getUtxoStatus
 
@@ -1181,6 +1227,8 @@ export class CwiExternalServices implements CwiExternalServicesApi {
     }, chain: Chain): Promise<boolean> 
     async postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]> 
     async getRawTx(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetRawTxResultApi> 
+    async getTransaction(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<Transaction> 
+    async getTransactionOutput(vout: number, txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<TransactionOutput> 
     async getMerkleProof(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetMerkleProofResultApi> 
 }
 ```
