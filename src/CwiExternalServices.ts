@@ -16,7 +16,7 @@ import {
 
 import { ServiceCollection } from "./ServiceCollection"
 
-import { postRawTxToGorillaPool, postRawTxToTaal, postRawTxToWhatsOnChain } from "./postRawTxServices"
+import { postRawTxToGorillaPool, postRawTxToTaal, postRawTxToWhatsOnChain } from "./postRawTxMapiServices"
 import { getRawTxFromWhatsOnChain } from "./getRawTxServices"
 import {
     getProofFromTaal, getProofFromWhatsOnChain, getProofFromWhatsOnChainTsc
