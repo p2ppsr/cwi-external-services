@@ -95,7 +95,7 @@ export interface ExchangeRatesIoApi {
 }
 
 export async function getExchangeRatesIo(key: string): Promise<ExchangeRatesIoApi> {
-    const url = `http://api.exchangeratesapi.io/v1/latest?access_key=${key}`
+    const url = `https://api.exchangeratesapi.io/v1/latest?access_key=${key}`
 
     const r = await axios.get(url)
 

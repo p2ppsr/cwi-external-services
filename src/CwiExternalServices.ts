@@ -59,7 +59,7 @@ export class CwiExternalServices implements CwiExternalServicesApi {
             fiatUpdateMsecs: 1000 * 60 * 60 * 24, // 24 hours
             disableMapiCallback: true, // Rely on DojoWatchman by default.
             exchangeratesapiKey: 'bd539d2ff492bcb5619d5f27726a766f',
-            chaintracksFiatExchangeRatesUrl: `http://npm-registry.babbage.systems:8084/getFiatExchangeRates`
+            chaintracksFiatExchangeRatesUrl: `https://npm-registry.babbage.systems:8084/getFiatExchangeRates`
         }
         return o
     }
