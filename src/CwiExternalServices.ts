@@ -131,7 +131,8 @@ export class CwiExternalServices implements CwiExternalServicesApi {
                 return rates
         }
 
-        const services = this.updateFiatExchangeRateServices
+        // Make sure we always start with the first service listed (chaintracks aggregator)
+        const services = this.updateFiatExchangeRateServices.clone()
 
         let r0: FiatExchangeRatesApi | undefined
 

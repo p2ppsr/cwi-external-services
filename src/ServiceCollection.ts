@@ -2,8 +2,8 @@ export class ServiceCollection<T> {
     services: { name: string; service: T; }[];
     _index: number;
 
-    constructor() {
-        this.services = [];
+    constructor(services?: { name: string, service: T }[]) {
+        this.services = services || [];
         this._index = 0;
     }
 
@@ -25,8 +25,14 @@ export class ServiceCollection<T> {
     get count() { return this.services.length; }
     get index() { return this._index; }
 
+    reset() { this._index = 0 }
+
     next(): number {
         this._index = (this._index + 1) % this.count;
         return this._index;
+    }
+
+    clone(): ServiceCollection<T> {
+        return new ServiceCollection([...this.services])
     }
 }
