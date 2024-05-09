@@ -1180,7 +1180,10 @@ export class ServiceCollection<T> {
         service: T;
     }[];
     _index: number;
-    constructor() 
+    constructor(services?: {
+        name: string;
+        service: T;
+    }[]) 
     add(s: {
         name: string;
         service: T;
@@ -1191,7 +1194,9 @@ export class ServiceCollection<T> {
     get allServices() 
     get count() 
     get index() 
+    reset() 
     next(): number 
+    clone(): ServiceCollection<T> 
 }
 ```
 
