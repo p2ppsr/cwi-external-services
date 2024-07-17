@@ -936,6 +936,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 
 | | |
 | --- | --- |
+| [ChaintracksChainTracker](#class-chaintrackschaintracker) | [ERR_EXTSVS_MAPI_SIGNATURE_INVALID](#class-err_extsvs_mapi_signature_invalid) |
 | [ChaintracksServiceClient](#class-chaintracksserviceclient) | [ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING](#class-err_extsvs_mapi_unsupported_encoding) |
 | [CwiExternalServices](#class-cwiexternalservices) | [ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE](#class-err_extsvs_mapi_unsupported_mimetype) |
 | [ERR_EXTSVS_ALREADY_MINED](#class-err_extsvs_already_mined) | [ERR_EXTSVS_MAPI_UNSUPPORTED_RETURNRESULT](#class-err_extsvs_mapi_unsupported_returnresult) |
@@ -947,7 +948,6 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 | [ERR_EXTSVS_INVALID_TRANSACTION](#class-err_extsvs_invalid_transaction) | [ERR_EXTSVS_MERKLEROOT_MISSING](#class-err_extsvs_merkleroot_missing) |
 | [ERR_EXTSVS_INVALID_TXID](#class-err_extsvs_invalid_txid) | [ERR_EXTSVS_TXID_INVALID](#class-err_extsvs_txid_invalid) |
 | [ERR_EXTSVS_MAPI_MISSING](#class-err_extsvs_mapi_missing) | [ServiceCollection](#class-servicecollection) |
-| [ERR_EXTSVS_MAPI_SIGNATURE_INVALID](#class-err_extsvs_mapi_signature_invalid) |  |
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -1324,6 +1324,19 @@ export class ChaintracksServiceClient implements ChaintracksClientApi {
     async findHeaderForHeight(height: number): Promise<BlockHeader | undefined> 
     async findHeaderForMerkleRoot(root: string | Buffer, height?: number): Promise<BlockHeader | undefined> 
     async addHeader(header: BaseBlockHeader | BaseBlockHeaderHex): Promise<void> 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Class: ChaintracksChainTracker
+
+```ts
+export class ChaintracksChainTracker implements ChainTracker {
+    chaintracks: ChaintracksClientApi;
+    constructor(chain?: Chain, chaintracks?: ChaintracksClientApi) 
+    async isValidRootForHeight(root: string, height: number): Promise<boolean> 
 }
 ```
 
