@@ -14,15 +14,16 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 
 | | |
 | --- | --- |
-| [BsvExchangeRateApi](#interface-bsvexchangerateapi) | [GetUtxoStatusDetailsApi](#interface-getutxostatusdetailsapi) |
+| [BsvExchangeRateApi](#interface-bsvexchangerateapi) | [GetScriptHistoryResultApi](#interface-getscripthistoryresultapi) |
+| [ChaintracksServiceClientOptions](#interface-chaintracksserviceclientoptions) | [GetUtxoStatusDetailsApi](#interface-getutxostatusdetailsapi) |
 | [CwiExternalServicesApi](#interface-cwiexternalservicesapi) | [GetUtxoStatusResultApi](#interface-getutxostatusresultapi) |
 | [CwiExternalServicesOptions](#interface-cwiexternalservicesoptions) | [MapiCallbackApi](#interface-mapicallbackapi) |
 | [ExchangeRatesIoApi](#interface-exchangeratesioapi) | [MapiCallbackPayloadApi](#interface-mapicallbackpayloadapi) |
 | [FiatExchangeRatesApi](#interface-fiatexchangeratesapi) | [MapiPostTxPayloadApi](#interface-mapiposttxpayloadapi) |
-| [GetMerkleProofResultApi](#interface-getmerkleproofresultapi) | [MapiTxStatusPayloadApi](#interface-mapitxstatuspayloadapi) |
-| [GetRawTxResultApi](#interface-getrawtxresultapi) | [MapiTxidReturnResultApi](#interface-mapitxidreturnresultapi) |
-| [GetScriptHistoryDetailsApi](#interface-getscripthistorydetailsapi) | [PostRawTxResultApi](#interface-postrawtxresultapi) |
-| [GetScriptHistoryResultApi](#interface-getscripthistoryresultapi) | [PostTransactionMapiMinerApi](#interface-posttransactionmapiminerapi) |
+| [GetEnvelopeOptionsApi](#interface-getenvelopeoptionsapi) | [MapiTxStatusPayloadApi](#interface-mapitxstatuspayloadapi) |
+| [GetMerkleProofResultApi](#interface-getmerkleproofresultapi) | [MapiTxidReturnResultApi](#interface-mapitxidreturnresultapi) |
+| [GetRawTxResultApi](#interface-getrawtxresultapi) | [PostRawTxResultApi](#interface-postrawtxresultapi) |
+| [GetScriptHistoryDetailsApi](#interface-getscripthistorydetailsapi) | [PostTransactionMapiMinerApi](#interface-posttransactionmapiminerapi) |
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -889,21 +890,64 @@ export interface FiatExchangeRatesApi {
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
+#### Interface: ChaintracksServiceClientOptions
+
+```ts
+export interface ChaintracksServiceClientOptions {
+    useAuthrite: boolean;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: GetEnvelopeOptionsApi
+
+```ts
+export interface GetEnvelopeOptionsApi {
+    chaintracks?: ChaintracksClientApi;
+    maxRecursionDepth?: number;
+    minProofLevel?: number;
+}
+```
+
+<details>
+
+<summary>Interface GetEnvelopeOptionsApi Details</summary>
+
+##### Property minProofLevel
+
+Use to generate test envelopes.
+If set to a number greater than zero,
+proofs will be ignored until that level.
+The first level is zero.
+userId must be undefined.
+
+```ts
+minProofLevel?: number
+```
+
+</details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
 ### Classes
 
 | | |
 | --- | --- |
-| [CwiExternalServices](#class-cwiexternalservices) | [ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING](#class-err_extsvs_mapi_unsupported_encoding) |
-| [ERR_EXTSVS_ALREADY_MINED](#class-err_extsvs_already_mined) | [ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE](#class-err_extsvs_mapi_unsupported_mimetype) |
-| [ERR_EXTSVS_BLOCK_HASH_MISSING](#class-err_extsvs_block_hash_missing) | [ERR_EXTSVS_MAPI_UNSUPPORTED_RETURNRESULT](#class-err_extsvs_mapi_unsupported_returnresult) |
-| [ERR_EXTSVS_BLOCK_HEIGHT_MISSING](#class-err_extsvs_block_height_missing) | [ERR_EXTSVS_MERKLEPROOF_NODE_TYPE](#class-err_extsvs_merkleproof_node_type) |
-| [ERR_EXTSVS_DOUBLE_SPEND](#class-err_extsvs_double_spend) | [ERR_EXTSVS_MERKLEPROOF_PARSING](#class-err_extsvs_merkleproof_parsing) |
-| [ERR_EXTSVS_ENVELOPE_DEPTH](#class-err_extsvs_envelope_depth) | [ERR_EXTSVS_MERKLEPROOF_TAGET_TYPE](#class-err_extsvs_merkleproof_taget_type) |
-| [ERR_EXTSVS_FAILURE](#class-err_extsvs_failure) | [ERR_EXTSVS_MERKLEPROOF_UNSUPPORTED](#class-err_extsvs_merkleproof_unsupported) |
-| [ERR_EXTSVS_INVALID_TRANSACTION](#class-err_extsvs_invalid_transaction) | [ERR_EXTSVS_MERKLEROOT_INVALID](#class-err_extsvs_merkleroot_invalid) |
-| [ERR_EXTSVS_INVALID_TXID](#class-err_extsvs_invalid_txid) | [ERR_EXTSVS_MERKLEROOT_MISSING](#class-err_extsvs_merkleroot_missing) |
-| [ERR_EXTSVS_MAPI_MISSING](#class-err_extsvs_mapi_missing) | [ERR_EXTSVS_TXID_INVALID](#class-err_extsvs_txid_invalid) |
-| [ERR_EXTSVS_MAPI_SIGNATURE_INVALID](#class-err_extsvs_mapi_signature_invalid) | [ServiceCollection](#class-servicecollection) |
+| [ChaintracksServiceClient](#class-chaintracksserviceclient) | [ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING](#class-err_extsvs_mapi_unsupported_encoding) |
+| [CwiExternalServices](#class-cwiexternalservices) | [ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE](#class-err_extsvs_mapi_unsupported_mimetype) |
+| [ERR_EXTSVS_ALREADY_MINED](#class-err_extsvs_already_mined) | [ERR_EXTSVS_MAPI_UNSUPPORTED_RETURNRESULT](#class-err_extsvs_mapi_unsupported_returnresult) |
+| [ERR_EXTSVS_BLOCK_HASH_MISSING](#class-err_extsvs_block_hash_missing) | [ERR_EXTSVS_MERKLEPROOF_NODE_TYPE](#class-err_extsvs_merkleproof_node_type) |
+| [ERR_EXTSVS_BLOCK_HEIGHT_MISSING](#class-err_extsvs_block_height_missing) | [ERR_EXTSVS_MERKLEPROOF_PARSING](#class-err_extsvs_merkleproof_parsing) |
+| [ERR_EXTSVS_DOUBLE_SPEND](#class-err_extsvs_double_spend) | [ERR_EXTSVS_MERKLEPROOF_TAGET_TYPE](#class-err_extsvs_merkleproof_taget_type) |
+| [ERR_EXTSVS_ENVELOPE_DEPTH](#class-err_extsvs_envelope_depth) | [ERR_EXTSVS_MERKLEPROOF_UNSUPPORTED](#class-err_extsvs_merkleproof_unsupported) |
+| [ERR_EXTSVS_FAILURE](#class-err_extsvs_failure) | [ERR_EXTSVS_MERKLEROOT_INVALID](#class-err_extsvs_merkleroot_invalid) |
+| [ERR_EXTSVS_INVALID_TRANSACTION](#class-err_extsvs_invalid_transaction) | [ERR_EXTSVS_MERKLEROOT_MISSING](#class-err_extsvs_merkleroot_missing) |
+| [ERR_EXTSVS_INVALID_TXID](#class-err_extsvs_invalid_txid) | [ERR_EXTSVS_TXID_INVALID](#class-err_extsvs_txid_invalid) |
+| [ERR_EXTSVS_MAPI_MISSING](#class-err_extsvs_mapi_missing) | [ServiceCollection](#class-servicecollection) |
+| [ERR_EXTSVS_MAPI_SIGNATURE_INVALID](#class-err_extsvs_mapi_signature_invalid) |  |
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -1241,21 +1285,67 @@ export class CwiExternalServices implements CwiExternalServicesApi {
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
+#### Class: ChaintracksServiceClient
+
+Connects to a ChaintracksService to implement `ChaintracksClientApi`
+
+```ts
+export class ChaintracksServiceClient implements ChaintracksClientApi {
+    static createChaintracksServiceClientOptions(): ChaintracksServiceClientOptions 
+    authrite?: AuthriteClient;
+    options: ChaintracksServiceClientOptions;
+    constructor(public chain: Chain, public serviceUrl: string, options?: ChaintracksServiceClientOptions) 
+    async subscribeHeaders(listener: HeaderListener): Promise<string> 
+    async subscribeReorgs(listener: ReorgListener): Promise<string> 
+    async unsubscribe(subscriptionId: string): Promise<boolean> 
+    async getJsonOrUndefined<T>(path: string): Promise<T | undefined> 
+    async getJson<T>(path: string): Promise<T> 
+    async postJsonVoid<T>(path: string, params: T): Promise<void> 
+    async addHeaderHex(header: BaseBlockHeaderHex): Promise<void> 
+    async startListening(): Promise<void> 
+    async listening(): Promise<void> 
+    async getChain(): Promise<Chain> 
+    async getInfo(wait?: number): Promise<ChaintracksInfoApi> 
+    async isListening(): Promise<boolean> 
+    async isSynchronized(): Promise<boolean> 
+    async getPresentHeight(): Promise<number> 
+    async findChainTipHeaderHex(): Promise<BlockHeaderHex> 
+    async findChainTipHashHex(): Promise<string> 
+    async getHeadersHex(height: number, count: number): Promise<string> 
+    async findHeaderHexForHeight(height: number): Promise<BlockHeaderHex | undefined> 
+    async findChainWorkHexForBlockHash(hash: string | Buffer): Promise<string | undefined> 
+    async findHeaderHexForBlockHash(hash: Buffer | string): Promise<BlockHeaderHex | undefined> 
+    async findHeaderHexForMerkleRoot(merkleRoot: Buffer | string, height?: number): Promise<BlockHeaderHex | undefined> 
+    async findChainTipHeader(): Promise<BlockHeader> 
+    async findChainTipHash(): Promise<Buffer> 
+    async findChainWorkForBlockHash(hash: string | Buffer): Promise<Buffer | undefined> 
+    async findHeaderForBlockHash(hash: string | Buffer): Promise<BlockHeader | undefined> 
+    async getHeaders(height: number, count: number): Promise<Buffer> 
+    async findHeaderForHeight(height: number): Promise<BlockHeader | undefined> 
+    async findHeaderForMerkleRoot(root: string | Buffer, height?: number): Promise<BlockHeader | undefined> 
+    async addHeader(header: BaseBlockHeader | BaseBlockHeaderHex): Promise<void> 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
 ### Functions
 
 | | | |
 | --- | --- | --- |
-| [checkMapiResponse](#function-checkmapiresponse) | [getMerkleProofFromTaal](#function-getmerkleprooffromtaal) | [getUtxoStatusFromWhatsOnChain](#function-getutxostatusfromwhatsonchain) |
-| [checkMapiResponseForTxid](#function-checkmapiresponsefortxid) | [getMerkleProofFromWhatsOnChain](#function-getmerkleprooffromwhatsonchain) | [postRawTxToGorillaPool](#function-postrawtxtogorillapool) |
-| [checkMerkleProof](#function-checkmerkleproof) | [getMerkleProofFromWhatsOnChainTsc](#function-getmerkleprooffromwhatsonchaintsc) | [postRawTxToMapiMiner](#function-postrawtxtomapiminer) |
-| [createMapiPostTxResponse](#function-createmapiposttxresponse) | [getProofFromGorillaPool](#function-getprooffromgorillapool) | [postRawTxToTaal](#function-postrawtxtotaal) |
-| [getExchangeRatesIo](#function-getexchangeratesio) | [getProofFromMetastreme](#function-getprooffrommetastreme) | [postRawTxToWhatsOnChain](#function-postrawtxtowhatsonchain) |
-| [getMapiCallbackPayload](#function-getmapicallbackpayload) | [getProofFromTaal](#function-getprooffromtaal) | [signMapiPayload](#function-signmapipayload) |
-| [getMapiJsonResponsePayload](#function-getmapijsonresponsepayload) | [getProofFromWhatsOnChain](#function-getprooffromwhatsonchain) | [updateBsvExchangeRate](#function-updatebsvexchangerate) |
-| [getMapiPostTxPayload](#function-getmapiposttxpayload) | [getProofFromWhatsOnChainTsc](#function-getprooffromwhatsonchaintsc) | [updateChaintracksFiatExchangeRates](#function-updatechaintracksfiatexchangerates) |
-| [getMapiTxStatusPayload](#function-getmapitxstatuspayload) | [getRawTxFromWhatsOnChain](#function-getrawtxfromwhatsonchain) | [updateExchangeratesapi](#function-updateexchangeratesapi) |
-| [getMerkleProofFromGorillaPool](#function-getmerkleprooffromgorillapool) | [getScriptHistoryFromWhatsOnChain](#function-getscripthistoryfromwhatsonchain) | [validateScriptHash](#function-validatescripthash) |
-| [getMerkleProofFromMetastreme](#function-getmerkleprooffrommetastreme) | [getSpentStatusForOutpoint](#function-getspentstatusforoutpoint) | [verifyMapiResponseForTxid](#function-verifymapiresponsefortxid) |
+| [checkMapiResponse](#function-checkmapiresponse) | [getMerkleProofFromTaal](#function-getmerkleprooffromtaal) | [postRawTxToGorillaPool](#function-postrawtxtogorillapool) |
+| [checkMapiResponseForTxid](#function-checkmapiresponsefortxid) | [getMerkleProofFromWhatsOnChain](#function-getmerkleprooffromwhatsonchain) | [postRawTxToMapiMiner](#function-postrawtxtomapiminer) |
+| [checkMerkleProof](#function-checkmerkleproof) | [getMerkleProofFromWhatsOnChainTsc](#function-getmerkleprooffromwhatsonchaintsc) | [postRawTxToTaal](#function-postrawtxtotaal) |
+| [createMapiPostTxResponse](#function-createmapiposttxresponse) | [getProofFromGorillaPool](#function-getprooffromgorillapool) | [postRawTxToWhatsOnChain](#function-postrawtxtowhatsonchain) |
+| [getEnvelopeForTransaction](#function-getenvelopefortransaction) | [getProofFromMetastreme](#function-getprooffrommetastreme) | [signMapiPayload](#function-signmapipayload) |
+| [getExchangeRatesIo](#function-getexchangeratesio) | [getProofFromTaal](#function-getprooffromtaal) | [updateBsvExchangeRate](#function-updatebsvexchangerate) |
+| [getMapiCallbackPayload](#function-getmapicallbackpayload) | [getProofFromWhatsOnChain](#function-getprooffromwhatsonchain) | [updateChaintracksFiatExchangeRates](#function-updatechaintracksfiatexchangerates) |
+| [getMapiJsonResponsePayload](#function-getmapijsonresponsepayload) | [getProofFromWhatsOnChainTsc](#function-getprooffromwhatsonchaintsc) | [updateExchangeratesapi](#function-updateexchangeratesapi) |
+| [getMapiPostTxPayload](#function-getmapiposttxpayload) | [getRawTxFromWhatsOnChain](#function-getrawtxfromwhatsonchain) | [validateScriptHash](#function-validatescripthash) |
+| [getMapiTxStatusPayload](#function-getmapitxstatuspayload) | [getScriptHistoryFromWhatsOnChain](#function-getscripthistoryfromwhatsonchain) | [verifyMapiResponseForTxid](#function-verifymapiresponsefortxid) |
+| [getMerkleProofFromGorillaPool](#function-getmerkleprooffromgorillapool) | [getSpentStatusForOutpoint](#function-getspentstatusforoutpoint) |  |
+| [getMerkleProofFromMetastreme](#function-getmerkleprooffrommetastreme) | [getUtxoStatusFromWhatsOnChain](#function-getutxostatusfromwhatsonchain) |  |
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -1745,6 +1835,45 @@ Attempts to validate whether or not an outpoint has been spent by using the What
 ```ts
 export async function getSpentStatusForOutpoint(outpoint: string, chain: Chain): Promise<boolean> 
 ```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getEnvelopeForTransaction
+
+A transaction envelope is a tree of inputs where all the leaves are proven transactions.
+The trivial case is a single leaf: the envelope for a proven transaction is the rawTx and its proof.
+
+Each branching level of the tree corresponds to an unmined transaction without a proof,
+in which case the envelope is:
+- rawTx
+- mapiResponses from transaction processors (optional)
+- inputs object where keys are this transaction's input txids and values are recursive envelope for those txids.    
+
+If storage is defined, any previously unseen txids that are required to build the envelope will be added to the proven_txs table, if they can be proven.
+
+The options.maxRecursionDepth can be set to prevent overly deep and large envelopes. Will throw ERR_EXTSVS_ENVELOPE_DEPTH if exceeded.
+
+```ts
+export async function getEnvelopeForTransaction(services: CwiExternalServices, chain: Chain, txid: string | Buffer, options?: GetEnvelopeOptionsApi): Promise<EnvelopeApi> 
+```
+
+<details>
+
+<summary>Function getEnvelopeForTransaction Details</summary>
+
+Argument Details
+
++ **services**
+  + used to obtain rawTx and merkleProof data.
++ **chain**
+  + the chain on which txid exists.
++ **txid**
+  + the transaction hash for which an envelope is requested.
++ **options**
+  + default options use babbage cloud chaintracks service, chaintracks is required for envelope creation.
+
+</details>
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
