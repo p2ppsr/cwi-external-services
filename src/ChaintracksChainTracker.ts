@@ -1,23 +1,57 @@
 import { ChainTracker } from "@bsv/sdk";
-import { Chain, ChaintracksClientApi } from "cwi-base";
+import { BlockHeaderHex, Chain, ChaintracksClientApi } from "cwi-base";
 import { ChaintracksServiceClient } from "./ChaintracksServiceClient";
+
+export interface ChaintracksChainTrackerOptions {
+    maxRetries?: number
+}
 
 export class ChaintracksChainTracker implements ChainTracker {
     chaintracks: ChaintracksClientApi
+    cache: Record<number, string>
+    options: ChaintracksChainTrackerOptions
 
-    constructor(chain?: Chain, chaintracks?: ChaintracksClientApi) {
+    constructor(chain?: Chain, chaintracks?: ChaintracksClientApi, options?: ChaintracksChainTrackerOptions) {
 
         chain ||= 'main'
         this.chaintracks = chaintracks ?? new ChaintracksServiceClient(chain, `https://npm-registry.babbage.systems:808${chain === 'main' ? '4' : '3'}`)
+        this.cache = {}
+        this.options = options || {}
     }
 
     async isValidRootForHeight(root: string, height: number) : Promise<boolean> {
+        const cachedRoot = this.cache[height]
+        if (cachedRoot) {
+            return cachedRoot === root
+        }
 
-        const header = await this.chaintracks.findHeaderHexForHeight(height)
+        let header: BlockHeaderHex | undefined
+
+        const retries = this.options.maxRetries || 3
+
+        for (let tryCount = 1; tryCount <= retries; tryCount++) {
+
+            try {
+                header = await this.chaintracks.findHeaderHexForHeight(height)
+
+                if (!header)
+                    return false
+
+                break
+            } catch (eu: unknown) {
+                if (tryCount > retries)
+                    throw eu
+            }
+        }
+
         if (!header)
-            return false
+            throw new Error("Maximum retry count reached.")
+
+        this.cache[height] = header.merkleRoot
+
         if (header.merkleRoot !== root)
             return false
+
         return true
     }
 }

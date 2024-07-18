@@ -15,15 +15,16 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 | | |
 | --- | --- |
 | [BsvExchangeRateApi](#interface-bsvexchangerateapi) | [GetScriptHistoryResultApi](#interface-getscripthistoryresultapi) |
-| [ChaintracksServiceClientOptions](#interface-chaintracksserviceclientoptions) | [GetUtxoStatusDetailsApi](#interface-getutxostatusdetailsapi) |
-| [CwiExternalServicesApi](#interface-cwiexternalservicesapi) | [GetUtxoStatusResultApi](#interface-getutxostatusresultapi) |
-| [CwiExternalServicesOptions](#interface-cwiexternalservicesoptions) | [MapiCallbackApi](#interface-mapicallbackapi) |
-| [ExchangeRatesIoApi](#interface-exchangeratesioapi) | [MapiCallbackPayloadApi](#interface-mapicallbackpayloadapi) |
-| [FiatExchangeRatesApi](#interface-fiatexchangeratesapi) | [MapiPostTxPayloadApi](#interface-mapiposttxpayloadapi) |
-| [GetEnvelopeOptionsApi](#interface-getenvelopeoptionsapi) | [MapiTxStatusPayloadApi](#interface-mapitxstatuspayloadapi) |
-| [GetMerkleProofResultApi](#interface-getmerkleproofresultapi) | [MapiTxidReturnResultApi](#interface-mapitxidreturnresultapi) |
-| [GetRawTxResultApi](#interface-getrawtxresultapi) | [PostRawTxResultApi](#interface-postrawtxresultapi) |
-| [GetScriptHistoryDetailsApi](#interface-getscripthistorydetailsapi) | [PostTransactionMapiMinerApi](#interface-posttransactionmapiminerapi) |
+| [ChaintracksChainTrackerOptions](#interface-chaintrackschaintrackeroptions) | [GetUtxoStatusDetailsApi](#interface-getutxostatusdetailsapi) |
+| [ChaintracksServiceClientOptions](#interface-chaintracksserviceclientoptions) | [GetUtxoStatusResultApi](#interface-getutxostatusresultapi) |
+| [CwiExternalServicesApi](#interface-cwiexternalservicesapi) | [MapiCallbackApi](#interface-mapicallbackapi) |
+| [CwiExternalServicesOptions](#interface-cwiexternalservicesoptions) | [MapiCallbackPayloadApi](#interface-mapicallbackpayloadapi) |
+| [ExchangeRatesIoApi](#interface-exchangeratesioapi) | [MapiPostTxPayloadApi](#interface-mapiposttxpayloadapi) |
+| [FiatExchangeRatesApi](#interface-fiatexchangeratesapi) | [MapiTxStatusPayloadApi](#interface-mapitxstatuspayloadapi) |
+| [GetEnvelopeOptionsApi](#interface-getenvelopeoptionsapi) | [MapiTxidReturnResultApi](#interface-mapitxidreturnresultapi) |
+| [GetMerkleProofResultApi](#interface-getmerkleproofresultapi) | [PostRawTxResultApi](#interface-postrawtxresultapi) |
+| [GetRawTxResultApi](#interface-getrawtxresultapi) | [PostTransactionMapiMinerApi](#interface-posttransactionmapiminerapi) |
+| [GetScriptHistoryDetailsApi](#interface-getscripthistorydetailsapi) |  |
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -932,6 +933,17 @@ minProofLevel?: number
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
+#### Interface: ChaintracksChainTrackerOptions
+
+```ts
+export interface ChaintracksChainTrackerOptions {
+    maxRetries?: number;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
 ### Classes
 
 | | |
@@ -1335,7 +1347,9 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 ```ts
 export class ChaintracksChainTracker implements ChainTracker {
     chaintracks: ChaintracksClientApi;
-    constructor(chain?: Chain, chaintracks?: ChaintracksClientApi) 
+    cache: Record<number, string>;
+    options: ChaintracksChainTrackerOptions;
+    constructor(chain?: Chain, chaintracks?: ChaintracksClientApi, options?: ChaintracksChainTrackerOptions) 
     async isValidRootForHeight(root: string, height: number): Promise<boolean> 
 }
 ```
