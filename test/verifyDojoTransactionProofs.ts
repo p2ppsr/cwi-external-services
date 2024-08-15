@@ -2,7 +2,7 @@ import { checkMerkleProof } from "./chaintracks-validation-engine-bsv1";
 
 import { TscMerkleProofApi, asBuffer, asString, computeRootFromMerkleProofNodes } from "cwi-base";
 import { Knex, knex } from "knex";
-import { getMerkleProofFromTaal } from "../src/getMerkleProofV1";
+import { getMerkleProofFromTaal } from "../src/proofs/getMerkleProofV1";
 
 export interface VerifyDojoTransactionProofResults {
     /**

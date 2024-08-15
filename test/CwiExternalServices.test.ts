@@ -1,5 +1,5 @@
 import { GetMerkleProofResultApi } from '../src/Api/CwiExternalServicesApi'
-import { CwiExternalServices } from '../src/CwiExternalServices'
+import { CwiExternalServices } from '../src/index'
 
 describe('CwiExternalServices.test', () => {
     const services: CwiExternalServices = new CwiExternalServices()

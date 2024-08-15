@@ -1,7 +1,7 @@
 // v1 DEPRECATION WARNING: These are obsolete implementations. Use CwiExternalServices class instead.
 import { asBuffer, asString, Chain, computeMerkleTreeParent, computeRootFromMerkleProofNodes, MapiResponseApi, TscMerkleProofApi } from 'cwi-base'
 import axios from 'axios'
-import { getMapiTxStatusPayload } from './merchantApiUtils'
+import { getMapiTxStatusPayload } from '../base/merchantApiUtils'
 
 /**
  * GorillaPool.io has a mapi transaction status endpoint for mainNet, not for testNet,

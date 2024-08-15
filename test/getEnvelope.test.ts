@@ -1,6 +1,6 @@
 import { toBEEFfromEnvelope } from "../../babbage-sdk-ts/src"
 import { toEnvelopeFromBEEF } from "../../babbage-sdk-ts/src/utils/toBEEF"
-import { CwiExternalServices, getEnvelopeForTransaction } from "../src"
+import { CwiExternalServices, getEnvelopeForTransaction } from "../src/index"
 
 describe('getEnvelope tests', () => {
     jest.setTimeout(99999999)
@@ -20,11 +20,11 @@ describe('getEnvelope tests', () => {
         
     })
 
-    test('1_getEnvelope of unmined transaction', async () => {
+    test.skip('1_getEnvelope of unmined transaction', async () => {
+        // Must be updated to an unmined transaction txid...
         const services = new CwiExternalServices()
 
         {
-            // Must be updated to an unmined transaction txid...
             const txid = 'f2a0702ccbd715cdda5d7ed63e9dce9c1c38608b093cd250863a1704370c15e0'
             const r = await getEnvelopeForTransaction(services, 'main', txid)
 

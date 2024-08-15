@@ -1,5 +1,5 @@
 import { postRawTxToWhatsOnChain } from '../src';
-import { CwiExternalServices } from '../src/CwiExternalServices';
+import { CwiExternalServices } from '../src/index';
 
 describe("postRawTx.test", () => {
     const services: CwiExternalServices = new CwiExternalServices()

@@ -1,8 +1,12 @@
 import axios from 'axios'
-import { Chain, CwiError, ERR_BAD_REQUEST, MapiResponseApi, asString, doubleSha256BE } from 'cwi-base'
-import { MapiCallbackApi, PostRawTxResultApi } from './Api/CwiExternalServicesApi'
-import { ERR_EXTSVS_ALREADY_MINED, ERR_EXTSVS_DOUBLE_SPEND, ERR_EXTSVS_FAILURE, ERR_EXTSVS_INVALID_TRANSACTION, ERR_EXTSVS_INVALID_TXID, ERR_EXTSVS_MAPI_MISSING } from './ERR_EXTSVS_errors'
-import { checkMapiResponse, createMapiPostTxResponse, getMapiPostTxPayload } from './merchantApiUtils'
+import { Chain, CwiError, ERR_BAD_REQUEST,  asString } from 'cwi-base'
+import {  PostRawTxResultApi } from '../Api/CwiExternalServicesApi'
+import {  ERR_EXTSVS_FAILURE,  ERR_EXTSVS_MAPI_MISSING } from '../base/ERR_EXTSVS_errors'
+
+// Documentation:
+// https://docs.taal.com/
+// https://docs.taal.com/core-products/transaction-processing/arc-endpoints
+// https://bitcoin-sv.github.io/arc/api.html
 
 export interface PostTransactionArcMinerApi {
     name: string
@@ -23,7 +27,7 @@ const testArcMinerTaal: PostTransactionArcMinerApi = {
     authType: 'bearer',
 }
 
-export function postRawTxToTaal(txid: string | Buffer, rawTx: string | Buffer, chain: Chain, apiKey?: string) : Promise<PostRawTxResultApi> {
+export function postRawTxToTaalArc(txid: string | Buffer, rawTx: string | Buffer, chain: Chain, apiKey?: string) : Promise<PostRawTxResultApi> {
     const miner = {...(chain === 'main' ? mainArcMinerTaal : testArcMinerTaal)}
     if (apiKey)
         miner.authToken = apiKey

@@ -1,5 +1,5 @@
 import { Chain, CwiError, asBuffer, asString } from "cwi-base"
-import { GetRawTxResultApi } from "./Api/CwiExternalServicesApi"
+import { GetRawTxResultApi } from "../Api/CwiExternalServicesApi"
 import axios from 'axios'
 
 export async function getRawTxFromWhatsOnChain(txid: string | Buffer, chain: Chain): Promise<GetRawTxResultApi> {

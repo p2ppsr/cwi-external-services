@@ -3,7 +3,7 @@ import { Transaction, TransactionOutput } from '@bsv/sdk'
 import {
     Chain,
     CwiError, ERR_INTERNAL, ERR_INVALID_PARAMETER, ERR_MISSING_PARAMETER, ERR_TXID_INVALID,
-    asBsvSdkTx, asString, doubleSha256BE
+    asBsvSdkTx, asBuffer, asString, doubleSha256BE
 } from "cwi-base"
 
 import {
@@ -11,18 +11,18 @@ import {
     CwiExternalServicesApi, FiatExchangeRatesApi, GetMerkleProofResultApi, GetMerkleProofServiceApi, GetRawTxResultApi,
     GetRawTxServiceApi, GetScriptHistoryResultApi, GetScriptHistoryServiceApi, GetUtxoStatusOutputFormatApi, GetUtxoStatusResultApi,
     GetUtxoStatusServiceApi,
-    MapiCallbackApi, PostRawTxResultApi, PostRawTxServiceApi, UpdateFiatExchangeRateServiceApi 
-} from "./Api/CwiExternalServicesApi"
+    MapiCallbackApi, PostRawTxResultApi, PostRawTxServiceApi, PostRawTxsServiceApi, postRawTxToWhatsOnChain, RawTxForPost, UpdateFiatExchangeRateServiceApi 
+} from ".."
 
-import { ServiceCollection } from "./ServiceCollection"
+import { ServiceCollection } from "../base/ServiceCollection"
 
-import { postRawTxToGorillaPool, postRawTxToTaal, postRawTxToWhatsOnChain } from "./postRawTxMapiServices"
-import { getRawTxFromWhatsOnChain } from "./getRawTxServices"
+import { getRawTxFromWhatsOnChain } from "../getRaw/getRawTxServices"
 import {
     getProofFromTaal, getProofFromWhatsOnChain, getProofFromWhatsOnChainTsc
-} from "./getProofServices"
-import { getScriptHistoryFromWhatsOnChain, getUtxoStatusFromWhatsOnChain } from "./getUtxoStatusServices"
-import { updateBsvExchangeRate, updateChaintracksFiatExchangeRates, updateExchangeratesapi } from "./getExchangeRateServices"
+} from "../proofs/getProofServices"
+import { getScriptHistoryFromWhatsOnChain, getUtxoStatusFromWhatsOnChain } from "../status/getUtxoStatusServices"
+import { updateBsvExchangeRate, updateChaintracksFiatExchangeRates, updateExchangeratesapi } from "../exchangeRate/getExchangeRateServices"
+import { postRawTxToGorillaPool, postRawTxToTaal } from '../postRaw/postRawTxToMapiMiner'
 
 export interface CwiExternalServicesOptions {
     mainTaalApiKey?: string
@@ -69,6 +69,7 @@ export class CwiExternalServices implements CwiExternalServicesApi {
     getMerkleProofServices: ServiceCollection<GetMerkleProofServiceApi>
     getRawTxServices: ServiceCollection<GetRawTxServiceApi>
     postRawTxServices: ServiceCollection<PostRawTxServiceApi>
+    postRawTxsServices: ServiceCollection<PostRawTxsServiceApi>
     getUtxoStatusServices: ServiceCollection<GetUtxoStatusServiceApi>
     getScriptHistoryServices: ServiceCollection<GetScriptHistoryServiceApi>
     updateFiatExchangeRateServices: ServiceCollection<UpdateFiatExchangeRateServiceApi>
@@ -90,6 +91,9 @@ export class CwiExternalServices implements CwiExternalServicesApi {
         .add({ name: 'WhatsOnChain', service: postRawTxToWhatsOnChain })
         .add({ name: 'GorillaPool', service: postRawTxToGorillaPool })
         .add({ name: 'Taal', service: this.makePostRawTxToTaal() })
+
+        this.postRawTxsServices = new ServiceCollection<PostRawTxsServiceApi>()
+//        .add({ name: 'TaalArc', service: this.makePostRawTxsTaalArc() })
         
         this.getUtxoStatusServices = new ServiceCollection<GetUtxoStatusServiceApi>()
         .add({ name: 'WhatsOnChain', service: getUtxoStatusFromWhatsOnChain})
@@ -171,6 +175,13 @@ export class CwiExternalServices implements CwiExternalServicesApi {
             return postRawTxToTaal(txid, rawTx, chain, callback, this.taalApiKey(chain))
         }
     }
+/*
+    private makePostRawTxsToTaal() {
+        return (txs: RawTxForPost[], chain: Chain) => {
+            return postRawTxsToTaalArc(txs, chain, this.taalApiKey(chain))
+        }
+    }
+*/
 
     private makeGetProofFromTaal() {
         return (txid: string | Buffer, chain: Chain) => {
@@ -181,6 +192,7 @@ export class CwiExternalServices implements CwiExternalServicesApi {
     get getProofsCount() { return this.getMerkleProofServices.count }
     get getRawTxsCount() { return this.getRawTxServices.count }
     get postRawTxsCount() { return this.postRawTxServices.count }
+    get postRawTxsServicesCount() { return this.postRawTxsServices.count }
     get getUtxoStatsCount() { return this.getUtxoStatusServices.count }
 
     async getUtxoStatus(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi, useNext?: boolean): Promise<GetUtxoStatusResultApi> {
@@ -231,6 +243,23 @@ export class CwiExternalServices implements CwiExternalServicesApi {
             }
         }
         return ok
+    }
+
+    async postRawTxs(rawTxs: string[] | Buffer[] | number[][], chain: Chain): Promise<PostRawTxResultApi[][]> {
+        
+        const txs: RawTxForPost[] = []
+        for (const tx of rawTxs) {
+            const rawTx = asBuffer(tx)
+            const txid = asString(doubleSha256BE(rawTx))
+            txs.push({ txid, rawTx })
+        }
+
+        const rs = await Promise.all(this.postRawTxsServices.allServices.map(async service => {
+            const r = await service(txs, chain)
+            return r
+        }))
+
+        return rs
     }
 
     async postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]> {

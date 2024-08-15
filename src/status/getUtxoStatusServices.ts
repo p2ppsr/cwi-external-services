@@ -1,8 +1,8 @@
 import { Chain, CwiError, ERR_INTERNAL, ERR_INVALID_PARAMETER, asBuffer, asString, sha256Hash, swapByteOrder } from "cwi-base";
-import { GetScriptHistoryResultApi, GetUtxoStatusOutputFormatApi, GetUtxoStatusResultApi } from "./Api/CwiExternalServicesApi";
+import { GetScriptHistoryResultApi, GetUtxoStatusOutputFormatApi, GetUtxoStatusResultApi } from "../Api/CwiExternalServicesApi";
 
 import axios from 'axios'
-import { ERR_EXTSVS_FAILURE } from "./ERR_EXTSVS_errors";
+import { ERR_EXTSVS_FAILURE } from "../base/ERR_EXTSVS_errors";
 
 interface WhatsOnChainUtxoStatus {
     value: number

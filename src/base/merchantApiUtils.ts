@@ -7,7 +7,7 @@ import {
     ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE,
     ERR_EXTSVS_MAPI_UNSUPPORTED_RETURNRESULT,
     ERR_EXTSVS_TXID_INVALID
-} from "./ERR_EXTSVS_errors";
+} from "./ERR_EXTSVS_errors"
 import { PrivateKey, PublicKey, Signature } from "@bsv/sdk";
 
 export function createMapiPostTxResponse(txid: string, key: string, resultDescription: string, returnResult = "success")

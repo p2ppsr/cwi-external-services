@@ -1,4 +1,4 @@
-import { CwiExternalServices, getExchangeRatesIo, updateChaintracksFiatExchangeRates } from "../src"
+import { CwiExternalServices, getExchangeRatesIo, updateChaintracksFiatExchangeRates } from "../src/index"
 
 describe("exchangeRate Tests", () => {
 

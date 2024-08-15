@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ERR_EXTSVS_MAPI_SIGNATURE_INVALID, checkMapiResponse, signMapiPayload } from "../src"
+import { ERR_EXTSVS_MAPI_SIGNATURE_INVALID, checkMapiResponse, signMapiPayload } from "../src/index"
 import { BigNumber, Hash, PrivateKey, PublicKey, Signature } from "@bsv/sdk"
 
 describe('checkMapiResponse tests', () => {

@@ -1,8 +1,8 @@
 import axios from 'axios'
 import { ERR_BAD_REQUEST, ERR_MISSING_PARAMETER } from 'cwi-base'
 import Whatsonchain from 'whatsonchain'
-import { BsvExchangeRateApi, FiatExchangeRatesApi } from './Api/CwiExternalServicesApi'
-import { CwiExternalServicesOptions } from './CwiExternalServices'
+import { BsvExchangeRateApi, FiatExchangeRatesApi } from '../Api/CwiExternalServicesApi'
+import { CwiExternalServicesOptions } from '..'
 
 export async function updateBsvExchangeRate(rate?: BsvExchangeRateApi, updateMsecs?: number): Promise<BsvExchangeRateApi> {
 

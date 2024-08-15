@@ -1,6 +1,6 @@
 import { Chain, CwiError } from "cwi-base"
 import { MapiPostTxPayloadApi, MapiResponseApi, TscMerkleProofApi } from "cwi-base"
-import { CwiExternalServicesOptions } from "../CwiExternalServices"
+import { CwiExternalServicesOptions } from ".."
 import { Transaction, TransactionOutput } from "@bsv/sdk"
 
 /**
@@ -101,6 +101,21 @@ export interface CwiExternalServicesApi {
     postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]>
 
     /**
+     * Attempts to post multiple new transaction to each configured external transaction processing service.
+     * 
+     * Posting multiple transactions is recommended when chaining new transactions and
+     * for performance gains.
+     * 
+     * Asynchronously posts the transactions simultaneously to all the configured services.
+     *
+     * @param rawTxs new raw transactions to post for processing
+     * @param chain which chain to post to, all of rawTx's inputs must be unspent on this chain.
+     * 
+     * @returns an array of `PostRawTxResultApi` objects with results of posting to each service
+     */
+    postRawTxs(rawTxs: string[] | Buffer[] | number[][], chain: Chain): Promise<PostRawTxResultApi[][]>
+
+    /**
      * Attempts to determine the UTXO status of a transaction output.
      * 
      * Cycles through configured transaction processing services attempting to get a valid response.
@@ -152,6 +167,13 @@ export interface MapiCallbackApi {
 }
 
 export type PostRawTxServiceApi = (txid: string | Buffer, rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi) => Promise<PostRawTxResultApi>
+
+export interface RawTxForPost {
+    txid: string
+    rawTx: Buffer
+}
+
+export type PostRawTxsServiceApi = (txs: RawTxForPost[], chain: Chain) => Promise<PostRawTxResultApi[]>
 
 /**
  * Properties on result returned from `CwiExternalServicesApi` function `getMerkleProof`.

@@ -1,7 +1,7 @@
 import { Chain, CwiError, MapiResponseApi, TscMerkleProofApi, asBuffer, computeMerkleTreeParent } from "cwi-base"
-import { GetMerkleProofResultApi } from "./Api/CwiExternalServicesApi"
+import { GetMerkleProofResultApi } from "../Api/CwiExternalServicesApi"
 import axios from 'axios'
-import { getMapiTxStatusPayload } from "./merchantApiUtils"
+import { getMapiTxStatusPayload } from "../base/merchantApiUtils"
 
 /**
  * GorillaPool.io MAINNET ONLY

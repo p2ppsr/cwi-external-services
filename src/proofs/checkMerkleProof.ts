@@ -13,7 +13,7 @@ import {
     ERR_EXTSVS_MERKLEROOT_INVALID,
     ERR_EXTSVS_MERKLEROOT_MISSING,
     ERR_EXTSVS_TXID_INVALID
-} from './ERR_EXTSVS_errors'
+} from '..'
 
 /**
  * Implement merkle proof per https://tsc.bitcoinassociation.net/standards/merkle-proof-standardised-format/

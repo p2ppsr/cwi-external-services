@@ -1,6 +1,6 @@
 
 import * as dotenv from 'dotenv';
-import { getUtxoStatusFromWhatsOnChain } from '../src/getUtxoStatusServices';
+import { getUtxoStatusFromWhatsOnChain } from '../src/status/getUtxoStatusServices';
  dotenv.config();
 
 describe("getUtxoStatus", () => {

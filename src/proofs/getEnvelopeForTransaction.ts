@@ -3,9 +3,9 @@ import {
     computeRootFromMerkleProofNodes, EnvelopeApi, EnvelopeEvidenceApi,
     ERR_INTERNAL, MapiResponseApi, TscMerkleProofApi, verifyTruthy
 } from "cwi-base"
-import { CwiExternalServices } from "./CwiExternalServices"
-import { ERR_EXTSVS_ENVELOPE_DEPTH, ERR_EXTSVS_INVALID_TXID, ERR_EXTSVS_MERKLEROOT_MISSING } from "./ERR_EXTSVS_errors"
-import { ChaintracksServiceClient } from "./ChaintracksServiceClient"
+import { CwiExternalServices } from ".."
+import { ERR_EXTSVS_ENVELOPE_DEPTH, ERR_EXTSVS_INVALID_TXID, ERR_EXTSVS_MERKLEROOT_MISSING } from "../base/ERR_EXTSVS_errors"
+import { ChaintracksServiceClient } from "../base/ChaintracksServiceClient"
 
 export interface GetEnvelopeOptionsApi {
     chaintracks?: ChaintracksClientApi

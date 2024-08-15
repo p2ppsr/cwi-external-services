@@ -1,6 +1,6 @@
 import { wait } from "cwi-base";
 import { CwiExternalServices } from "../src";
-import { getMerkleProofFromGorillaPool, getMerkleProofFromMetastreme, getMerkleProofFromTaal, getMerkleProofFromWhatsOnChain } from "../src/getMerkleProofV1";
+import { getMerkleProofFromGorillaPool, getMerkleProofFromMetastreme, getMerkleProofFromTaal, getMerkleProofFromWhatsOnChain } from "../src/proofs/getMerkleProofV1";
 import { verifyDojoTransactionProof } from "./verifyDojoTransactionProofs";
 
 import * as dotenv from 'dotenv';
