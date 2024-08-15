@@ -2,16 +2,16 @@ import { wait } from "cwi-base";
 import { CwiExternalServices } from "../src";
 import { getMerkleProofFromGorillaPool, getMerkleProofFromMetastreme, getMerkleProofFromTaal, getMerkleProofFromWhatsOnChain } from "../src/proofs/getMerkleProofV1";
 import { verifyDojoTransactionProof } from "./verifyDojoTransactionProofs";
-
-import * as dotenv from 'dotenv';
-dotenv.config();
+import { getTestEnv } from "./getTestEnv";
 
 describe("getMerkleProof", () => {
     jest.setTimeout(900000)
-    const mainTaalApiKey = process.env.MAIN_TAAL_API_KEY || ''
-    const testTaalApiKey = process.env.TEST_TAAL_API_KEY || ''
-    const mainDojoConnection = process.env.MAIN_DOJO_CONNECTION || ''
-    const testDojoConnection = process.env.TEST_DOJO_CONNECTION || ''
+    const {
+        mainTaalApiKey,
+        testTaalApiKey,
+        mainDojoConnection,
+        testDojoConnection
+    } = getTestEnv()
 
     // Testnet block 1,542,911 had 12 transactions:
     const txids = [

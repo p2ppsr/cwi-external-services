@@ -1,8 +1,5 @@
-
-import * as dotenv from 'dotenv';
 import { getScriptHistoryFromWhatsOnChain } from '../src/status/getUtxoStatusServices';
 import { CwiExternalServices } from '../src';
- dotenv.config();
 
 describe("getScriptHistory", () => {
 
