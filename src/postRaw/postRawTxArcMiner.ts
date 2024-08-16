@@ -1,6 +1,7 @@
 import axios from 'axios'
-import { Chain, CwiError, ERR_BAD_REQUEST,  asString } from 'cwi-base'
-import {  PostRawTxResultApi } from '../Api/CwiExternalServicesApi'
+import { Readable } from 'stream'
+import { CwiError, ERR_BAD_REQUEST,  asBuffer,  asString, randomBytesHex } from 'cwi-base'
+import {  PostRawTxResultApi, RawTxForPost } from '../Api/CwiExternalServicesApi'
 import {  ERR_EXTSVS_FAILURE,  ERR_EXTSVS_MAPI_MISSING } from '../base/ERR_EXTSVS_errors'
 
 // Documentation:
@@ -11,54 +12,72 @@ import {  ERR_EXTSVS_FAILURE,  ERR_EXTSVS_MAPI_MISSING } from '../base/ERR_EXTSV
 export interface PostTransactionArcMinerApi {
     name: string
     url: string
-    authType: 'none' | 'bearer'
-    authToken?: string
+    apiKey?: string
+    deploymentId?: string
 }
 
-const mainArcMinerTaal: PostTransactionArcMinerApi = {
-    name: 'Taal',
-    url: 'https://api.taal.com/mapi',
-    authType: 'bearer',
+export const defaultArcMinerTaal: PostTransactionArcMinerApi = {
+    name: 'TaalArc',
+    url: 'https://tapi.taal.com/arc',
 }
 
-const testArcMinerTaal: PostTransactionArcMinerApi = {
-    name: 'Taal',
-    url: 'https://api.taal.com/mapi',
-    authType: 'bearer',
-}
-
-export function postRawTxToTaalArc(txid: string | Buffer, rawTx: string | Buffer, chain: Chain, apiKey?: string) : Promise<PostRawTxResultApi> {
-    const miner = {...(chain === 'main' ? mainArcMinerTaal : testArcMinerTaal)}
-    if (apiKey)
-        miner.authToken = apiKey
-    return postRawTxToArcMiner(txid, rawTx, miner)
-}
-
-export async function postRawTxToArcMiner(txid: string | Buffer, rawTx: string | Buffer, miner: PostTransactionArcMinerApi)
+export async function postRawTxToArcMiner(
+    txid: string | Buffer,
+    rawTx: string | Buffer,
+    miner: PostTransactionArcMinerApi,
+)
 : Promise<PostRawTxResultApi>
 {
+    const r = (await postRawTxsToArcMiner([{ txid: asString(txid), rawTx: asBuffer(rawTx)}], miner))[0]
+    return r
+}
+
+export async function postRawTxsToArcMiner(
+    txs: RawTxForPost[],
+    miner: PostTransactionArcMinerApi
+)
+: Promise<PostRawTxResultApi[]>
+{
+    const m = {...miner}
 
     let url = ''
 
     try {
-        const headers = {
-            'Content-Type': 'application/json'
-        }
-        if (miner.authType === 'bearer') {
-            headers['Authorization'] = `Bearer ${miner.authToken}`
+        const length = txs.reduce((a, tx) => a + tx.rawTx.length, 0)
+
+        const makeRequestHeaders = () => {
+            const headers: Record<string, string> = {
+                'Content-Type': 'application/octet-stream',
+                'Content-Length': length.toString(),
+                'XDeployment-ID': m.deploymentId || `cwi-external-services-${randomBytesHex(16)}`,
+            }
+
+            if (m.apiKey) {
+                headers['Authorization'] = `Bearer ${m.apiKey}`
+            }
+
+            return headers
         }
 
-        url = `${miner.url}/tx`
+        const headers = makeRequestHeaders()
+
+        const stream = new Readable({
+            read() {
+                for (const tx of txs) {
+                    this.push(tx.rawTx)
+                }
+            }
+        })
+
+        url = `${miner.url}/v1/txs`
 
         const data = await axios.post(
             url,
-            {
-                rawtx: asString(rawTx),
-                merkleFormat: 'TSC',
-            },
+            stream,
             {
                 headers,
-                validateStatus: () => true
+                maxBodyLength: Infinity,
+                validateStatus: () => true,
             }
         )
         
@@ -93,13 +112,17 @@ export async function postRawTxToArcMiner(txid: string | Buffer, rawTx: string |
             name: miner.name,
         }
 
-        return r
+        return [r]
 
     } catch (err: unknown) {
+        console.log(err)
+        throw new ERR_EXTSVS_FAILURE(url, CwiError.fromUnknown(err))
+        /*
         return {
             status: 'error',
             error: new ERR_EXTSVS_FAILURE(url, CwiError.fromUnknown(err)),
             name: miner.name,
         }
+        */
     }
 }
