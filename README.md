@@ -24,141 +24,12 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 | [GetEnvelopeOptionsApi](#interface-getenvelopeoptionsapi) | [MapiTxidReturnResultApi](#interface-mapitxidreturnresultapi) |
 | [GetMerkleProofResultApi](#interface-getmerkleproofresultapi) | [PostRawTxResultApi](#interface-postrawtxresultapi) |
 | [GetRawTxResultApi](#interface-getrawtxresultapi) | [PostTransactionMapiMinerApi](#interface-posttransactionmapiminerapi) |
-| [GetScriptHistoryDetailsApi](#interface-getscripthistorydetailsapi) |  |
+| [GetScriptHistoryDetailsApi](#interface-getscripthistorydetailsapi) | [RawTxForPost](#interface-rawtxforpost) |
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
 
-#### Interface: MapiTxStatusPayloadApi
-
-As defined in https://github.com/bitcoin-sv-specs/brfc-merchantapi/blob/master/README.md
-
-```ts
-export interface MapiTxStatusPayloadApi {
-    apiVersion: string;
-    timestamp: string;
-    txid: string;
-    returnResult: string;
-    blockHash: string;
-    blockHeight: number;
-    confirmations: number;
-    minerId: string;
-    txSecondMempoolExpiry: number;
-    merkleProof?: TscMerkleProofApi;
-}
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Interface: MapiCallbackPayloadApi
-
-As defined in https://github.com/bitcoin-sv-specs/brfc-merchantapi/blob/master/README.md
-
-```ts
-export interface MapiCallbackPayloadApi {
-    apiVersion: string;
-    timestamp: string;
-    blockHash: string;
-    blockHeight: number;
-    callbackTxId: string;
-    callbackReason: string;
-    callbackPayload: string;
-}
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Interface: MapiTxidReturnResultApi
-
-Used to parse payloads when only confirmation that a miner acknowledges a specific txid matters.
-
-```ts
-export interface MapiTxidReturnResultApi {
-    apiVersion?: string;
-    timestamp?: string;
-    txid: string;
-    returnResult: string;
-}
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Interface: MapiPostTxPayloadApi
-
-As defined in https://github.com/bitcoin-sv-specs/brfc-merchantapi/blob/master/README.md
-
-```ts
-export interface MapiPostTxPayloadApi {
-    apiVersion: string;
-    timestamp: string;
-    txid: string;
-    returnResult: string;
-    resultDescription: string;
-    minerId: string;
-    currentHighestBlockHash?: string;
-    currentHighestBlockHeight?: number;
-    txSecondMempoolExpiry?: number;
-    failureRetryable?: boolean;
-    warnings?: unknown[];
-    conflictedWith?: unknown[];
-}
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Interface: PostTransactionMapiMinerApi
-
-```ts
-export interface PostTransactionMapiMinerApi {
-    name: string;
-    url: string;
-    authType: "none" | "bearer";
-    authToken?: string;
-}
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Interface: ExchangeRatesIoApi
-
-```ts
-export interface ExchangeRatesIoApi {
-    success: boolean;
-    timestamp: number;
-    base: "EUR" | "USD";
-    date: string;
-    rates: Record<string, number>;
-}
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Interface: CwiExternalServicesOptions
-
-```ts
-export interface CwiExternalServicesOptions {
-    mainTaalApiKey?: string;
-    testTaalApiKey?: string;
-    bsvExchangeRate: BsvExchangeRateApi;
-    bsvUpdateMsecs: number;
-    fiatExchangeRates: FiatExchangeRatesApi;
-    fiatUpdateMsecs: number;
-    disableMapiCallback?: boolean;
-    exchangeratesapiKey?: string;
-    chaintracksFiatExchangeRatesUrl?: string;
-}
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
 #### Interface: CwiExternalServicesApi
 
 Defines standard interfaces to access functionality implemented by external transaction processing services.
@@ -172,6 +43,7 @@ export interface CwiExternalServicesApi {
     getTransactionOutput(vout: number, txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<TransactionOutput>;
     getMerkleProof(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetMerkleProofResultApi>;
     postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]>;
+    postRawTxs(rawTxs: string[] | Buffer[] | number[][], chain: Chain): Promise<PostRawTxResultApi[][]>;
     getUtxoStatus(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi, useNext?: boolean): Promise<GetUtxoStatusResultApi>;
 }
 ```
@@ -352,6 +224,30 @@ Argument Details
 + **callback**
   + optional, controls whether and how each service is to make transaction status update callbacks.
 
+##### Method postRawTxs
+
+Attempts to post multiple new transaction to each configured external transaction processing service.
+
+Posting multiple transactions is recommended when chaining new transactions and
+for performance gains.
+
+Asynchronously posts the transactions simultaneously to all the configured services.
+
+```ts
+postRawTxs(rawTxs: string[] | Buffer[] | number[][], chain: Chain): Promise<PostRawTxResultApi[][]>
+```
+
+Returns
+
+an array of `PostRawTxResultApi` objects with results of posting to each service
+
+Argument Details
+
++ **rawTxs**
+  + new raw transactions to post for processing
++ **chain**
+  + which chain to post to, all of rawTx's inputs must be unspent on this chain.
+
 </details>
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
@@ -394,6 +290,18 @@ url: string
 ```
 
 </details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: RawTxForPost
+
+```ts
+export interface RawTxForPost {
+    txid: string;
+    rawTx: Buffer;
+}
+```
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -902,6 +810,146 @@ export interface ChaintracksServiceClientOptions {
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
+#### Interface: ChaintracksChainTrackerOptions
+
+```ts
+export interface ChaintracksChainTrackerOptions {
+    maxRetries?: number;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: MapiTxStatusPayloadApi
+
+As defined in https://github.com/bitcoin-sv-specs/brfc-merchantapi/blob/master/README.md
+
+```ts
+export interface MapiTxStatusPayloadApi {
+    apiVersion: string;
+    timestamp: string;
+    txid: string;
+    returnResult: string;
+    blockHash: string;
+    blockHeight: number;
+    confirmations: number;
+    minerId: string;
+    txSecondMempoolExpiry: number;
+    merkleProof?: TscMerkleProofApi;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: MapiCallbackPayloadApi
+
+As defined in https://github.com/bitcoin-sv-specs/brfc-merchantapi/blob/master/README.md
+
+```ts
+export interface MapiCallbackPayloadApi {
+    apiVersion: string;
+    timestamp: string;
+    blockHash: string;
+    blockHeight: number;
+    callbackTxId: string;
+    callbackReason: string;
+    callbackPayload: string;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: MapiTxidReturnResultApi
+
+Used to parse payloads when only confirmation that a miner acknowledges a specific txid matters.
+
+```ts
+export interface MapiTxidReturnResultApi {
+    apiVersion?: string;
+    timestamp?: string;
+    txid: string;
+    returnResult: string;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: MapiPostTxPayloadApi
+
+As defined in https://github.com/bitcoin-sv-specs/brfc-merchantapi/blob/master/README.md
+
+```ts
+export interface MapiPostTxPayloadApi {
+    apiVersion: string;
+    timestamp: string;
+    txid: string;
+    returnResult: string;
+    resultDescription: string;
+    minerId: string;
+    currentHighestBlockHash?: string;
+    currentHighestBlockHeight?: number;
+    txSecondMempoolExpiry?: number;
+    failureRetryable?: boolean;
+    warnings?: unknown[];
+    conflictedWith?: unknown[];
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: ExchangeRatesIoApi
+
+```ts
+export interface ExchangeRatesIoApi {
+    success: boolean;
+    timestamp: number;
+    base: "EUR" | "USD";
+    date: string;
+    rates: Record<string, number>;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: PostTransactionMapiMinerApi
+
+```ts
+export interface PostTransactionMapiMinerApi {
+    name: string;
+    url: string;
+    authType: "none" | "bearer";
+    authToken?: string;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Interface: CwiExternalServicesOptions
+
+```ts
+export interface CwiExternalServicesOptions {
+    mainTaalApiKey?: string;
+    testTaalApiKey?: string;
+    bsvExchangeRate: BsvExchangeRateApi;
+    bsvUpdateMsecs: number;
+    fiatExchangeRates: FiatExchangeRatesApi;
+    fiatUpdateMsecs: number;
+    disableMapiCallback?: boolean;
+    exchangeratesapiKey?: string;
+    chaintracksFiatExchangeRatesUrl?: string;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
 #### Interface: GetEnvelopeOptionsApi
 
 ```ts
@@ -933,17 +981,6 @@ minProofLevel?: number
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
-#### Interface: ChaintracksChainTrackerOptions
-
-```ts
-export interface ChaintracksChainTrackerOptions {
-    maxRetries?: number;
-}
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
 ### Classes
 
 | | |
@@ -965,6 +1002,98 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 
 ---
 
+#### Class: ChaintracksServiceClient
+
+Connects to a ChaintracksService to implement `ChaintracksClientApi`
+
+```ts
+export class ChaintracksServiceClient implements ChaintracksClientApi {
+    static createChaintracksServiceClientOptions(): ChaintracksServiceClientOptions 
+    authrite?: AuthriteClient;
+    options: ChaintracksServiceClientOptions;
+    constructor(public chain: Chain, public serviceUrl: string, options?: ChaintracksServiceClientOptions) 
+    async subscribeHeaders(listener: HeaderListener): Promise<string> 
+    async subscribeReorgs(listener: ReorgListener): Promise<string> 
+    async unsubscribe(subscriptionId: string): Promise<boolean> 
+    async getJsonOrUndefined<T>(path: string): Promise<T | undefined> 
+    async getJson<T>(path: string): Promise<T> 
+    async postJsonVoid<T>(path: string, params: T): Promise<void> 
+    async addHeaderHex(header: BaseBlockHeaderHex): Promise<void> 
+    async startListening(): Promise<void> 
+    async listening(): Promise<void> 
+    async getChain(): Promise<Chain> 
+    async getInfo(wait?: number): Promise<ChaintracksInfoApi> 
+    async isListening(): Promise<boolean> 
+    async isSynchronized(): Promise<boolean> 
+    async getPresentHeight(): Promise<number> 
+    async findChainTipHeaderHex(): Promise<BlockHeaderHex> 
+    async findChainTipHashHex(): Promise<string> 
+    async getHeadersHex(height: number, count: number): Promise<string> 
+    async findHeaderHexForHeight(height: number): Promise<BlockHeaderHex | undefined> 
+    async findChainWorkHexForBlockHash(hash: string | Buffer): Promise<string | undefined> 
+    async findHeaderHexForBlockHash(hash: Buffer | string): Promise<BlockHeaderHex | undefined> 
+    async findHeaderHexForMerkleRoot(merkleRoot: Buffer | string, height?: number): Promise<BlockHeaderHex | undefined> 
+    async findChainTipHeader(): Promise<BlockHeader> 
+    async findChainTipHash(): Promise<Buffer> 
+    async findChainWorkForBlockHash(hash: string | Buffer): Promise<Buffer | undefined> 
+    async findHeaderForBlockHash(hash: string | Buffer): Promise<BlockHeader | undefined> 
+    async getHeaders(height: number, count: number): Promise<Buffer> 
+    async findHeaderForHeight(height: number): Promise<BlockHeader | undefined> 
+    async findHeaderForMerkleRoot(root: string | Buffer, height?: number): Promise<BlockHeader | undefined> 
+    async addHeader(header: BaseBlockHeader | BaseBlockHeaderHex): Promise<void> 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Class: ChaintracksChainTracker
+
+```ts
+export class ChaintracksChainTracker implements ChainTracker {
+    chaintracks: ChaintracksClientApi;
+    cache: Record<number, string>;
+    options: ChaintracksChainTrackerOptions;
+    constructor(chain?: Chain, chaintracks?: ChaintracksClientApi, options?: ChaintracksChainTrackerOptions) 
+    async isValidRootForHeight(root: string, height: number): Promise<boolean> 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Class: ServiceCollection
+
+```ts
+export class ServiceCollection<T> {
+    services: {
+        name: string;
+        service: T;
+    }[];
+    _index: number;
+    constructor(services?: {
+        name: string;
+        service: T;
+    }[]) 
+    add(s: {
+        name: string;
+        service: T;
+    }): ServiceCollection<T> 
+    remove(name: string): void 
+    get name() 
+    get service() 
+    get allServices() 
+    get count() 
+    get index() 
+    reset() 
+    next(): number 
+    clone(): ServiceCollection<T> 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
 #### Class: ERR_EXTSVS_FAILURE
 
 Expected txid ${expected} doesn't match proof txid ${actual}
@@ -1227,38 +1356,6 @@ export class ERR_EXTSVS_ALREADY_MINED extends CwiError {
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
-#### Class: ServiceCollection
-
-```ts
-export class ServiceCollection<T> {
-    services: {
-        name: string;
-        service: T;
-    }[];
-    _index: number;
-    constructor(services?: {
-        name: string;
-        service: T;
-    }[]) 
-    add(s: {
-        name: string;
-        service: T;
-    }): ServiceCollection<T> 
-    remove(name: string): void 
-    get name() 
-    get service() 
-    get allServices() 
-    get count() 
-    get index() 
-    reset() 
-    next(): number 
-    clone(): ServiceCollection<T> 
-}
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
 #### Class: CwiExternalServices
 
 ```ts
@@ -1268,6 +1365,7 @@ export class CwiExternalServices implements CwiExternalServicesApi {
     getMerkleProofServices: ServiceCollection<GetMerkleProofServiceApi>;
     getRawTxServices: ServiceCollection<GetRawTxServiceApi>;
     postRawTxServices: ServiceCollection<PostRawTxServiceApi>;
+    postRawTxsServices: ServiceCollection<PostRawTxsServiceApi>;
     getUtxoStatusServices: ServiceCollection<GetUtxoStatusServiceApi>;
     getScriptHistoryServices: ServiceCollection<GetScriptHistoryServiceApi>;
     updateFiatExchangeRateServices: ServiceCollection<UpdateFiatExchangeRateServiceApi>;
@@ -1279,6 +1377,7 @@ export class CwiExternalServices implements CwiExternalServicesApi {
     get getProofsCount() 
     get getRawTxsCount() 
     get postRawTxsCount() 
+    get postRawTxsServicesCount() 
     get getUtxoStatsCount() 
     async getUtxoStatus(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi, useNext?: boolean): Promise<GetUtxoStatusResultApi> 
     async getScriptHistory(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi, useNext?: boolean): Promise<GetScriptHistoryResultApi> 
@@ -1286,71 +1385,12 @@ export class CwiExternalServices implements CwiExternalServicesApi {
         outputScript: Buffer | null;
         amount: number | null;
     }, chain: Chain): Promise<boolean> 
+    async postRawTxs(rawTxs: string[] | Buffer[] | number[][], chain: Chain): Promise<PostRawTxResultApi[][]> 
     async postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]> 
     async getRawTx(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetRawTxResultApi> 
     async getTransaction(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<Transaction> 
     async getTransactionOutput(vout: number, txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<TransactionOutput> 
     async getMerkleProof(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetMerkleProofResultApi> 
-}
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Class: ChaintracksServiceClient
-
-Connects to a ChaintracksService to implement `ChaintracksClientApi`
-
-```ts
-export class ChaintracksServiceClient implements ChaintracksClientApi {
-    static createChaintracksServiceClientOptions(): ChaintracksServiceClientOptions 
-    authrite?: AuthriteClient;
-    options: ChaintracksServiceClientOptions;
-    constructor(public chain: Chain, public serviceUrl: string, options?: ChaintracksServiceClientOptions) 
-    async subscribeHeaders(listener: HeaderListener): Promise<string> 
-    async subscribeReorgs(listener: ReorgListener): Promise<string> 
-    async unsubscribe(subscriptionId: string): Promise<boolean> 
-    async getJsonOrUndefined<T>(path: string): Promise<T | undefined> 
-    async getJson<T>(path: string): Promise<T> 
-    async postJsonVoid<T>(path: string, params: T): Promise<void> 
-    async addHeaderHex(header: BaseBlockHeaderHex): Promise<void> 
-    async startListening(): Promise<void> 
-    async listening(): Promise<void> 
-    async getChain(): Promise<Chain> 
-    async getInfo(wait?: number): Promise<ChaintracksInfoApi> 
-    async isListening(): Promise<boolean> 
-    async isSynchronized(): Promise<boolean> 
-    async getPresentHeight(): Promise<number> 
-    async findChainTipHeaderHex(): Promise<BlockHeaderHex> 
-    async findChainTipHashHex(): Promise<string> 
-    async getHeadersHex(height: number, count: number): Promise<string> 
-    async findHeaderHexForHeight(height: number): Promise<BlockHeaderHex | undefined> 
-    async findChainWorkHexForBlockHash(hash: string | Buffer): Promise<string | undefined> 
-    async findHeaderHexForBlockHash(hash: Buffer | string): Promise<BlockHeaderHex | undefined> 
-    async findHeaderHexForMerkleRoot(merkleRoot: Buffer | string, height?: number): Promise<BlockHeaderHex | undefined> 
-    async findChainTipHeader(): Promise<BlockHeader> 
-    async findChainTipHash(): Promise<Buffer> 
-    async findChainWorkForBlockHash(hash: string | Buffer): Promise<Buffer | undefined> 
-    async findHeaderForBlockHash(hash: string | Buffer): Promise<BlockHeader | undefined> 
-    async getHeaders(height: number, count: number): Promise<Buffer> 
-    async findHeaderForHeight(height: number): Promise<BlockHeader | undefined> 
-    async findHeaderForMerkleRoot(root: string | Buffer, height?: number): Promise<BlockHeader | undefined> 
-    async addHeader(header: BaseBlockHeader | BaseBlockHeaderHex): Promise<void> 
-}
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Class: ChaintracksChainTracker
-
-```ts
-export class ChaintracksChainTracker implements ChainTracker {
-    chaintracks: ChaintracksClientApi;
-    cache: Record<number, string>;
-    options: ChaintracksChainTrackerOptions;
-    constructor(chain?: Chain, chaintracks?: ChaintracksClientApi, options?: ChaintracksChainTrackerOptions) 
-    async isValidRootForHeight(root: string, height: number): Promise<boolean> 
 }
 ```
 
@@ -1378,6 +1418,15 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 
 ---
 
+#### Function: getRawTxFromWhatsOnChain
+
+```ts
+export async function getRawTxFromWhatsOnChain(txid: string | Buffer, chain: Chain): Promise<GetRawTxResultApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
 #### Function: createMapiPostTxResponse
 
 ```ts
@@ -1511,51 +1560,6 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 
 ```ts
 export function checkMapiResponseForTxid(response: MapiResponseApi, txid?: string | Buffer): boolean 
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Function: postRawTxToGorillaPool
-
-```ts
-export async function postRawTxToGorillaPool(txid: string | Buffer, rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi> 
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Function: postRawTxToTaal
-
-```ts
-export function postRawTxToTaal(txid: string | Buffer, rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi, apiKey?: string): Promise<PostRawTxResultApi> 
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Function: postRawTxToMapiMiner
-
-```ts
-export async function postRawTxToMapiMiner(txid: string | Buffer, rawTx: string | Buffer, miner: PostTransactionMapiMinerApi, callback?: MapiCallbackApi): Promise<PostRawTxResultApi> 
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Function: postRawTxToWhatsOnChain
-
-```ts
-export async function postRawTxToWhatsOnChain(txid: string | Buffer | undefined, rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi> 
-```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Function: getRawTxFromWhatsOnChain
-
-```ts
-export async function getRawTxFromWhatsOnChain(txid: string | Buffer, chain: Chain): Promise<GetRawTxResultApi> 
 ```
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
@@ -1717,6 +1721,127 @@ export async function getExchangeRatesIo(key: string): Promise<ExchangeRatesIoAp
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
+#### Function: postRawTxToGorillaPool
+
+```ts
+export async function postRawTxToGorillaPool(txid: string | Buffer, rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: postRawTxToTaal
+
+```ts
+export function postRawTxToTaal(txid: string | Buffer, rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi, apiKey?: string): Promise<PostRawTxResultApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: postRawTxToMapiMiner
+
+```ts
+export async function postRawTxToMapiMiner(txid: string | Buffer, rawTx: string | Buffer, miner: PostTransactionMapiMinerApi, callback?: MapiCallbackApi): Promise<PostRawTxResultApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: postRawTxToWhatsOnChain
+
+```ts
+export async function postRawTxToWhatsOnChain(txid: string | Buffer | undefined, rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: checkMerkleProof
+
+Implement merkle proof per https://tsc.bitcoinassociation.net/standards/merkle-proof-standardised-format/
+
+We extend the current standard by implementing targetType 'height' (binary value 3).
+This extension avoids the need to maintain a merkleroot or block hash index for all headers,
+reducing the space required by 50%.
+
+Other extensions are not currently supported.
+
+Supports partial and full binary format as well as hex strings.
+
+External Assumptions:
+1. The raw transaction is in-hand and is either duplicated in the proof or matches the starting hash
+   used to evaluate the merkle tree branch.
+
+Checking the proof verifies these claims:
+1. The merkleRoot determined by the targetType is confirmed to match a block header on the active chain.
+2. Computing a merkleRoot value starting with the transaction hash, using the proof nodes yields a
+   match for the target value.
+
+Implications:
+1. The transaction in-hand is valid and was included in a block on the active chain.
+
+```ts
+export async function checkMerkleProof(txid: string | Buffer, proof: TscMerkleProofApi | Buffer, chaintracks: ChaintracksClientApi): Promise<BlockHeader> 
+```
+
+<details>
+
+<summary>Function checkMerkleProof Details</summary>
+
+Returns
+
+The block header containing the verified merkleRoot
+
+Argument Details
+
++ **txid**
+  + the transaction hash of the in-hand transaction to which this proof applies.
+
+</details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Function: getEnvelopeForTransaction
+
+A transaction envelope is a tree of inputs where all the leaves are proven transactions.
+The trivial case is a single leaf: the envelope for a proven transaction is the rawTx and its proof.
+
+Each branching level of the tree corresponds to an unmined transaction without a proof,
+in which case the envelope is:
+- rawTx
+- mapiResponses from transaction processors (optional)
+- inputs object where keys are this transaction's input txids and values are recursive envelope for those txids.    
+
+If storage is defined, any previously unseen txids that are required to build the envelope will be added to the proven_txs table, if they can be proven.
+
+The options.maxRecursionDepth can be set to prevent overly deep and large envelopes. Will throw ERR_EXTSVS_ENVELOPE_DEPTH if exceeded.
+
+```ts
+export async function getEnvelopeForTransaction(services: CwiExternalServices, chain: Chain, txid: string | Buffer, options?: GetEnvelopeOptionsApi): Promise<EnvelopeApi> 
+```
+
+<details>
+
+<summary>Function getEnvelopeForTransaction Details</summary>
+
+Argument Details
+
++ **services**
+  + used to obtain rawTx and merkleProof data.
++ **chain**
+  + the chain on which txid exists.
++ **txid**
+  + the transaction hash for which an envelope is requested.
++ **options**
+  + default options use babbage cloud chaintracks service, chaintracks is required for envelope creation.
+
+</details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
 #### Function: getMerkleProofFromGorillaPool
 
 GorillaPool.io has a mapi transaction status endpoint for mainNet, not for testNet,
@@ -1809,52 +1934,6 @@ export async function getMerkleProofFromWhatsOnChainTsc(txid: string | Buffer, c
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
 ---
-#### Function: checkMerkleProof
-
-Implement merkle proof per https://tsc.bitcoinassociation.net/standards/merkle-proof-standardised-format/
-
-We extend the current standard by implementing targetType 'height' (binary value 3).
-This extension avoids the need to maintain a merkleroot or block hash index for all headers,
-reducing the space required by 50%.
-
-Other extensions are not currently supported.
-
-Supports partial and full binary format as well as hex strings.
-
-External Assumptions:
-1. The raw transaction is in-hand and is either duplicated in the proof or matches the starting hash
-   used to evaluate the merkle tree branch.
-
-Checking the proof verifies these claims:
-1. The merkleRoot determined by the targetType is confirmed to match a block header on the active chain.
-2. Computing a merkleRoot value starting with the transaction hash, using the proof nodes yields a
-   match for the target value.
-
-Implications:
-1. The transaction in-hand is valid and was included in a block on the active chain.
-
-```ts
-export async function checkMerkleProof(txid: string | Buffer, proof: TscMerkleProofApi | Buffer, chaintracks: ChaintracksClientApi): Promise<BlockHeader> 
-```
-
-<details>
-
-<summary>Function checkMerkleProof Details</summary>
-
-Returns
-
-The block header containing the verified merkleRoot
-
-Argument Details
-
-+ **txid**
-  + the transaction hash of the in-hand transaction to which this proof applies.
-
-</details>
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
 #### Function: getSpentStatusForOutpoint
 
 Attempts to validate whether or not an outpoint has been spent by using the WhatsOnChain API
@@ -1862,45 +1941,6 @@ Attempts to validate whether or not an outpoint has been spent by using the What
 ```ts
 export async function getSpentStatusForOutpoint(outpoint: string, chain: Chain): Promise<boolean> 
 ```
-
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
-
----
-#### Function: getEnvelopeForTransaction
-
-A transaction envelope is a tree of inputs where all the leaves are proven transactions.
-The trivial case is a single leaf: the envelope for a proven transaction is the rawTx and its proof.
-
-Each branching level of the tree corresponds to an unmined transaction without a proof,
-in which case the envelope is:
-- rawTx
-- mapiResponses from transaction processors (optional)
-- inputs object where keys are this transaction's input txids and values are recursive envelope for those txids.    
-
-If storage is defined, any previously unseen txids that are required to build the envelope will be added to the proven_txs table, if they can be proven.
-
-The options.maxRecursionDepth can be set to prevent overly deep and large envelopes. Will throw ERR_EXTSVS_ENVELOPE_DEPTH if exceeded.
-
-```ts
-export async function getEnvelopeForTransaction(services: CwiExternalServices, chain: Chain, txid: string | Buffer, options?: GetEnvelopeOptionsApi): Promise<EnvelopeApi> 
-```
-
-<details>
-
-<summary>Function getEnvelopeForTransaction Details</summary>
-
-Argument Details
-
-+ **services**
-  + used to obtain rawTx and merkleProof data.
-+ **chain**
-  + the chain on which txid exists.
-+ **txid**
-  + the transaction hash for which an envelope is requested.
-+ **options**
-  + default options use babbage cloud chaintracks service, chaintracks is required for envelope creation.
-
-</details>
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
 
@@ -1915,6 +1955,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 | [GetUtxoStatusOutputFormatApi](#type-getutxostatusoutputformatapi) |
 | [GetUtxoStatusServiceApi](#type-getutxostatusserviceapi) |
 | [PostRawTxServiceApi](#type-postrawtxserviceapi) |
+| [PostRawTxsServiceApi](#type-postrawtxsserviceapi) |
 | [UpdateFiatExchangeRateServiceApi](#type-updatefiatexchangerateserviceapi) |
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
@@ -1979,6 +2020,15 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 
 ```ts
 export type PostRawTxServiceApi = (txid: string | Buffer, rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi) => Promise<PostRawTxResultApi>
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+
+---
+#### Type: PostRawTxsServiceApi
+
+```ts
+export type PostRawTxsServiceApi = (txs: RawTxForPost[], chain: Chain) => Promise<PostRawTxResultApi[]>
 ```
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
