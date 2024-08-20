@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { Readable } from 'stream'
-import { CwiError, ERR_BAD_REQUEST,  asBuffer,  asString, randomBytesHex } from 'cwi-base'
-import {  PostRawTxResultApi, RawTxForPost } from '../Api/CwiExternalServicesApi'
+import { Chain, CwiError, ERR_BAD_REQUEST,  ERR_NOT_IMPLEMENTED,  randomBytesHex } from 'cwi-base'
+import {  PostBeefResultApi } from '../Api/CwiExternalServicesApi'
 import {  ERR_EXTSVS_FAILURE,  ERR_EXTSVS_MAPI_MISSING } from '../base/ERR_EXTSVS_errors'
 
 // Documentation:
@@ -9,41 +9,42 @@ import {  ERR_EXTSVS_FAILURE,  ERR_EXTSVS_MAPI_MISSING } from '../base/ERR_EXTSV
 // https://docs.taal.com/core-products/transaction-processing/arc-endpoints
 // https://bitcoin-sv.github.io/arc/api.html
 
-export interface PostTransactionArcMinerApi {
+export const arcMinerTaalMainDefault: ArcMinerApi = {
+    name: 'TaalArc',
+    url: 'https://tapi.taal.com/arc',
+}
+
+export async function postBeefToTaalArcMiner(
+    beef: number[],
+    chain: Chain,
+    miner?: ArcMinerApi
+)
+: Promise<PostBeefResultApi>
+{
+    if (chain === 'test' && !miner) throw new ERR_NOT_IMPLEMENTED()
+    const r = await postBeefToArcMiner(beef, miner || arcMinerTaalMainDefault)
+    return r
+}
+
+export interface ArcMinerApi {
     name: string
     url: string
     apiKey?: string
     deploymentId?: string
 }
 
-export const defaultArcMinerTaal: PostTransactionArcMinerApi = {
-    name: 'TaalArc',
-    url: 'https://tapi.taal.com/arc',
-}
-
-export async function postRawTxToArcMiner(
-    txid: string | Buffer,
-    rawTx: string | Buffer,
-    miner: PostTransactionArcMinerApi,
+export async function postBeefToArcMiner(
+    beef: number[],
+    miner: ArcMinerApi
 )
-: Promise<PostRawTxResultApi>
-{
-    const r = (await postRawTxsToArcMiner([{ txid: asString(txid), rawTx: asBuffer(rawTx)}], miner))[0]
-    return r
-}
-
-export async function postRawTxsToArcMiner(
-    txs: RawTxForPost[],
-    miner: PostTransactionArcMinerApi
-)
-: Promise<PostRawTxResultApi[]>
+: Promise<PostBeefResultApi>
 {
     const m = {...miner}
 
     let url = ''
 
     try {
-        const length = txs.reduce((a, tx) => a + tx.rawTx.length, 0)
+        const length = beef.length
 
         const makeRequestHeaders = () => {
             const headers: Record<string, string> = {
@@ -63,13 +64,11 @@ export async function postRawTxsToArcMiner(
 
         const stream = new Readable({
             read() {
-                for (const tx of txs) {
-                    this.push(tx.rawTx)
-                }
+                this.push(beef)
             }
         })
 
-        url = `${miner.url}/v1/txs`
+        url = `${miner.url}/v1/tx`
 
         const data = await axios.post(
             url,
@@ -107,12 +106,12 @@ export async function postRawTxsToArcMiner(
         // TODO: This is a kludge. Protocol should encode this explicitly.
         // "resultDescription": "" | "Transaction already mined into block" | "Already known"
         
-        const r: PostRawTxResultApi = {
+        const r: PostBeefResultApi = {
             status: 'success',
             name: miner.name,
         }
 
-        return [r]
+        return r
 
     } catch (err: unknown) {
         console.log(err)

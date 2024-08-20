@@ -11,7 +11,7 @@ import {
     CwiExternalServicesApi, FiatExchangeRatesApi, GetMerkleProofResultApi, GetMerkleProofServiceApi, GetRawTxResultApi,
     GetRawTxServiceApi, GetScriptHistoryResultApi, GetScriptHistoryServiceApi, GetUtxoStatusOutputFormatApi, GetUtxoStatusResultApi,
     GetUtxoStatusServiceApi,
-    MapiCallbackApi, PostRawTxResultApi, PostRawTxServiceApi, PostRawTxsServiceApi, postRawTxToWhatsOnChain, RawTxForPost, UpdateFiatExchangeRateServiceApi 
+    MapiCallbackApi, PostBeefResultApi, PostBeefServiceApi, PostBeefsServiceApi, PostRawTxResultApi, PostRawTxServiceApi, PostRawTxsServiceApi, postRawTxToWhatsOnChain, RawTxForPost, UpdateFiatExchangeRateServiceApi 
 } from ".."
 
 import { ServiceCollection } from "../base/ServiceCollection"
@@ -23,6 +23,7 @@ import {
 import { getScriptHistoryFromWhatsOnChain, getUtxoStatusFromWhatsOnChain } from "../status/getUtxoStatusServices"
 import { updateBsvExchangeRate, updateChaintracksFiatExchangeRates, updateExchangeratesapi } from "../exchangeRate/getExchangeRateServices"
 import { postRawTxToGorillaPool, postRawTxToTaal } from '../postRaw/postRawTxToMapiMiner'
+import { postBeefToTaalArcMiner } from '../postRaw/postRawTxArcMiner'
 
 export interface CwiExternalServicesOptions {
     mainTaalApiKey?: string
@@ -70,6 +71,8 @@ export class CwiExternalServices implements CwiExternalServicesApi {
     getRawTxServices: ServiceCollection<GetRawTxServiceApi>
     postRawTxServices: ServiceCollection<PostRawTxServiceApi>
     postRawTxsServices: ServiceCollection<PostRawTxsServiceApi>
+    postBeefServices: ServiceCollection<PostBeefServiceApi>
+    postBeefsServices: ServiceCollection<PostBeefsServiceApi>
     getUtxoStatusServices: ServiceCollection<GetUtxoStatusServiceApi>
     getScriptHistoryServices: ServiceCollection<GetScriptHistoryServiceApi>
     updateFiatExchangeRateServices: ServiceCollection<UpdateFiatExchangeRateServiceApi>
@@ -94,6 +97,11 @@ export class CwiExternalServices implements CwiExternalServicesApi {
 
         this.postRawTxsServices = new ServiceCollection<PostRawTxsServiceApi>()
 //        .add({ name: 'TaalArc', service: this.makePostRawTxsTaalArc() })
+
+        this.postBeefServices = new ServiceCollection<PostBeefServiceApi>()
+        .add({ name: 'TaalArc', service: postBeefToTaalArcMiner })
+
+        this.postBeefsServices = new ServiceCollection<PostBeefsServiceApi>()
         
         this.getUtxoStatusServices = new ServiceCollection<GetUtxoStatusServiceApi>()
         .add({ name: 'WhatsOnChain', service: getUtxoStatusFromWhatsOnChain})
@@ -192,6 +200,7 @@ export class CwiExternalServices implements CwiExternalServicesApi {
     get getProofsCount() { return this.getMerkleProofServices.count }
     get getRawTxsCount() { return this.getRawTxServices.count }
     get postRawTxsCount() { return this.postRawTxServices.count }
+    get postBeefServicesCount() { return this.postBeefServices.count }
     get postRawTxsServicesCount() { return this.postRawTxsServices.count }
     get getUtxoStatsCount() { return this.getUtxoStatusServices.count }
 
@@ -243,6 +252,38 @@ export class CwiExternalServices implements CwiExternalServicesApi {
             }
         }
         return ok
+    }
+
+    /**
+     * 
+     * @param beef 
+     * @param chain 
+     * @returns
+     */
+    async postBeef(beef: number[], chain: Chain): Promise<PostBeefResultApi[]> {
+        
+        const rs = await Promise.all(this.postBeefServices.allServices.map(async service => {
+            const r = await service(beef, chain)
+            return r
+        }))
+
+        return rs
+    }
+
+    /**
+     * 
+     * @param beef 
+     * @param chain 
+     * @returns
+     */
+    async postBeefs(beefs: number[][], chain: Chain): Promise<PostBeefResultApi[][]> {
+        
+        const rs = await Promise.all(this.postBeefsServices.allServices.map(async service => {
+            const r = await service(beefs, chain)
+            return r
+        }))
+
+        return rs
     }
 
     async postRawTxs(rawTxs: string[] | Buffer[] | number[][], chain: Chain): Promise<PostRawTxResultApi[][]> {

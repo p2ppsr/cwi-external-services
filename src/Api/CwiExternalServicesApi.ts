@@ -175,6 +175,10 @@ export interface RawTxForPost {
 
 export type PostRawTxsServiceApi = (txs: RawTxForPost[], chain: Chain) => Promise<PostRawTxResultApi[]>
 
+export type PostBeefServiceApi = (beef: number[], chain: Chain) => Promise<PostBeefResultApi>
+
+export type PostBeefsServiceApi = (beefs: number[][], chain: Chain) => Promise<PostBeefResultApi[]>
+
 /**
  * Properties on result returned from `CwiExternalServicesApi` function `getMerkleProof`.
  */
@@ -268,6 +272,37 @@ export interface PostRawTxResultApi {
      * ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING
      * ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE
      * ERR_EXTSVS_MAPI_MISSING (description has service request error details)
+     */
+    error?: CwiError
+    /**
+     * if true, the transaction was already known to this service. Usually treat as a success.
+     * 
+     * Potentially stop posting to additional transaction processors.
+     */
+    alreadyKnown?: boolean
+}
+
+/**
+ * Properties on array items of result returned from `CwiExternalServicesApi` function `postBeef`.
+ */
+export interface PostBeefResultApi {
+    /**
+     * The name of the service to which the transaction was submitted for processing
+     */
+    name: string
+    /**
+     * 'success' - The transaction was accepted for processing
+     */
+    status: 'success' | 'error'
+    /**
+     * When status is 'error', provides code and description
+     * 
+     * Specific potential errors:
+     * ERR_BAD_REQUEST
+     * ERR_EXTSVS_DOUBLE_SPEND
+     * ERR_EXTSVS_ALREADY_MINED (description has error details)
+     * ERR_EXTSVS_INVALID_TRANSACTION (description has error details)
+     * ERR_EXTSVS_TXID_INVALID (service response txid doesn't match rawTx)
      */
     error?: CwiError
     /**
