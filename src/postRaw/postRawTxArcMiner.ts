@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { Readable } from 'stream'
-import { Chain, CwiError, ERR_BAD_REQUEST,  ERR_NOT_IMPLEMENTED,  randomBytesHex } from 'cwi-base'
+import { Chain, CwiError, ERR_BAD_REQUEST,  randomBytesHex } from 'cwi-base'
 import {  PostBeefResultApi } from '../Api/CwiExternalServicesApi'
 import {  ERR_EXTSVS_FAILURE,  ERR_EXTSVS_MAPI_MISSING } from '../base/ERR_EXTSVS_errors'
 
@@ -14,6 +14,11 @@ export const arcMinerTaalMainDefault: ArcMinerApi = {
     url: 'https://tapi.taal.com/arc',
 }
 
+export const arcMinerTaalTestDefault: ArcMinerApi = {
+    name: 'TaalArc',
+    url: 'https://arc-test.taal.com',
+}
+
 export async function postBeefToTaalArcMiner(
     beef: number[],
     chain: Chain,
@@ -21,8 +26,8 @@ export async function postBeefToTaalArcMiner(
 )
 : Promise<PostBeefResultApi>
 {
-    if (chain === 'test' && !miner) throw new ERR_NOT_IMPLEMENTED()
-    const r = await postBeefToArcMiner(beef, miner || arcMinerTaalMainDefault)
+    const m = miner || chain === 'main' ? arcMinerTaalMainDefault : arcMinerTaalTestDefault
+    const r = await postBeefToArcMiner(beef, m)
     return r
 }
 
@@ -64,7 +69,8 @@ export async function postBeefToArcMiner(
 
         const stream = new Readable({
             read() {
-                this.push(beef)
+                this.push(Buffer.from(beef))
+                this.push(null)
             }
         })
 

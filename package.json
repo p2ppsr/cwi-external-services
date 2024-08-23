@@ -50,6 +50,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "@babbage/sdk-ts": "^0.2.49",
     "@bsv/sdk": "^1.1.14",
     "authrite-js": "^0.4.34",
     "axios": "^0.21.1",
