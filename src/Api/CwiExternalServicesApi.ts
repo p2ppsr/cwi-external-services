@@ -116,6 +116,22 @@ export interface CwiExternalServicesApi {
     postRawTxs(rawTxs: string[] | Buffer[] | number[][], chain: Chain): Promise<PostRawTxResultApi[][]>
 
     /**
+     * 
+     * @param beef 
+     * @param chain 
+     * @returns
+     */
+    postBeef(beef: number[], chain: Chain): Promise<PostBeefResultApi[]>
+
+    /**
+     * 
+     * @param beefs 
+     * @param chain 
+     * @returns
+     */
+    postBeefs(beefs: number[][], chain: Chain): Promise<PostBeefResultApi[][]>
+
+    /**
      * Attempts to determine the UTXO status of a transaction output.
      * 
      * Cycles through configured transaction processing services attempting to get a valid response.
@@ -311,6 +327,16 @@ export interface PostBeefResultApi {
      * Potentially stop posting to additional transaction processors.
      */
     alreadyKnown?: boolean
+
+    txid?: string
+    blockHash?: string
+    blockHeight?: number
+    merklePath?: string
+
+    /**
+     * Service response object. Use service name and status to infer type of object.
+     */
+    data?: object
 }
 
 export interface GetUtxoStatusDetailsApi {

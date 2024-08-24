@@ -23,7 +23,8 @@ import {
 import { getScriptHistoryFromWhatsOnChain, getUtxoStatusFromWhatsOnChain } from "../status/getUtxoStatusServices"
 import { updateBsvExchangeRate, updateChaintracksFiatExchangeRates, updateExchangeratesapi } from "../exchangeRate/getExchangeRateServices"
 import { postRawTxToGorillaPool, postRawTxToTaal } from '../postRaw/postRawTxToMapiMiner'
-import { postBeefToTaalArcMiner } from '../postRaw/postRawTxArcMiner'
+import { postBeefToTaalArcMiner } from '../postBeef/postBeefArcMiner'
+import { postBeefsToTaalArcMiner } from '../postBeef/postBeefsArcMiner'
 
 export interface CwiExternalServicesOptions {
     mainTaalApiKey?: string
@@ -102,6 +103,7 @@ export class CwiExternalServices implements CwiExternalServicesApi {
         .add({ name: 'TaalArc', service: postBeefToTaalArcMiner })
 
         this.postBeefsServices = new ServiceCollection<PostBeefsServiceApi>()
+        .add({ name: 'TaalArc', service: postBeefsToTaalArcMiner })
         
         this.getUtxoStatusServices = new ServiceCollection<GetUtxoStatusServiceApi>()
         .add({ name: 'WhatsOnChain', service: getUtxoStatusFromWhatsOnChain})

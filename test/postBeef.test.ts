@@ -1,5 +1,6 @@
 import { Beef } from "@babbage/sdk-ts"
 import { CwiExternalServices } from "../src"
+import { Utils } from "@bsv/sdk"
 
 describe('postBeef tests', () => {
     jest.setTimeout(99999999)
@@ -17,6 +18,36 @@ describe('postBeef tests', () => {
 
         const pr = await s.postBeef(beefBin, 'test')
         expect(pr).toBeTruthy()
+        expect(pr.length).toBeGreaterThanOrEqual(1)
+        const r = pr[0]
+        expect(r.alreadyKnown).toBe(true)
+        expect(r.blockHash).toBe("00000000000059c282644e73b8798f66a23c7691b1a88683429e4957f24b1a58")
+        expect(r.blockHeight).toBe(1631877)
+        expect(r.status).toBe('success')
+        expect(r.txid).toBe("272b5cdca9a0aa51846df9be29ee366ff85902691d38210e8c4be2fead3823a5")
+        expect(r.merklePath).toBe("fe85e61800040202000bee5ac27ca4d5ccce58cb40dee77619cdf7287a3483d6fd7fbeffeb259b45890302a52338adfee24b8c0e21381d690259f86f36ee29bef96d8451aaa0a9dc5c2b270100008b4e79a96f0514e926523bd38b2f023f8f9838438bfdfdb40290d78cd8f52d4701010095883b63688083c151132b58d8b94b997420b31ce75aa20b2fe5eee78d8ffbef0101000060e2582a43213f3ddb334e4fff55f7ec4bb8ae8b8d83d603bd16c304c21eab")
+        
+    })
+
+    test('1_postBeefs', async () => {
+        
+        const bs = [
+            Utils.toArray(beefs[0], 'hex'),
+            Utils.toArray(beefs[1], 'hex'),
+        ]
+
+        const s = new CwiExternalServices()
+
+        const pr = await s.postBeefs(bs, 'test')
+        expect(pr).toBeTruthy()
+        expect(pr.length).toBeGreaterThanOrEqual(1)
+        const r = pr[0][1]
+        expect(r.alreadyKnown).toBe(true)
+        expect(r.blockHash).toBe("00000000000059c282644e73b8798f66a23c7691b1a88683429e4957f24b1a58")
+        expect(r.blockHeight).toBe(1631877)
+        expect(r.status).toBe('success')
+        expect(r.txid).toBe("272b5cdca9a0aa51846df9be29ee366ff85902691d38210e8c4be2fead3823a5")
+        expect(r.merklePath).toBe("fe85e61800040202000bee5ac27ca4d5ccce58cb40dee77619cdf7287a3483d6fd7fbeffeb259b45890302a52338adfee24b8c0e21381d690259f86f36ee29bef96d8451aaa0a9dc5c2b270100008b4e79a96f0514e926523bd38b2f023f8f9838438bfdfdb40290d78cd8f52d4701010095883b63688083c151132b58d8b94b997420b31ce75aa20b2fe5eee78d8ffbef0101000060e2582a43213f3ddb334e4fff55f7ec4bb8ae8b8d83d603bd16c304c21eab")
         
     })
 })

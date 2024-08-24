@@ -82,3 +82,15 @@ export class ERR_EXTSVS_DOUBLE_SPEND extends CwiError { constructor(public txid:
  * Transaction was already mined.
  */
 export class ERR_EXTSVS_ALREADY_MINED extends CwiError { constructor(description?: string) { super('ERR_EXTSVS_ALREADY_MINED', description || 'Transaction was already mined.') } }
+/**
+ * Security error.
+ */
+export class ERR_EXTSVS_SECURITY extends CwiError { constructor(description?: string) { super('ERR_EXTSVS_SECURITY', description ?? 'Security error.') } }
+/**
+ * See description.
+ */
+export class ERR_EXTSVS_GENERIC extends CwiError { constructor(description: string) { super('ERR_EXTSVS_GENERIC', description) } }
+/**
+ * Fee error.
+ */
+export class ERR_EXTSVS_FEE extends CwiError { constructor(description?: string) { super('ERR_EXTSVS_FEE', description ?? 'Fee error.') } }
