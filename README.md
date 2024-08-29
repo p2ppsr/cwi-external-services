@@ -8,25 +8,23 @@ Standardized service APIs for use within CWI.
 
 <!--#region ts2md-api-merged-here-->
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ### Interfaces
 
-| | |
-| --- | --- |
-| [BsvExchangeRateApi](#interface-bsvexchangerateapi) | [GetScriptHistoryResultApi](#interface-getscripthistoryresultapi) |
-| [ChaintracksChainTrackerOptions](#interface-chaintrackschaintrackeroptions) | [GetUtxoStatusDetailsApi](#interface-getutxostatusdetailsapi) |
-| [ChaintracksServiceClientOptions](#interface-chaintracksserviceclientoptions) | [GetUtxoStatusResultApi](#interface-getutxostatusresultapi) |
-| [CwiExternalServicesApi](#interface-cwiexternalservicesapi) | [MapiCallbackApi](#interface-mapicallbackapi) |
-| [CwiExternalServicesOptions](#interface-cwiexternalservicesoptions) | [MapiCallbackPayloadApi](#interface-mapicallbackpayloadapi) |
-| [ExchangeRatesIoApi](#interface-exchangeratesioapi) | [MapiPostTxPayloadApi](#interface-mapiposttxpayloadapi) |
-| [FiatExchangeRatesApi](#interface-fiatexchangeratesapi) | [MapiTxStatusPayloadApi](#interface-mapitxstatuspayloadapi) |
-| [GetEnvelopeOptionsApi](#interface-getenvelopeoptionsapi) | [MapiTxidReturnResultApi](#interface-mapitxidreturnresultapi) |
-| [GetMerkleProofResultApi](#interface-getmerkleproofresultapi) | [PostRawTxResultApi](#interface-postrawtxresultapi) |
-| [GetRawTxResultApi](#interface-getrawtxresultapi) | [PostTransactionMapiMinerApi](#interface-posttransactionmapiminerapi) |
-| [GetScriptHistoryDetailsApi](#interface-getscripthistorydetailsapi) | [RawTxForPost](#interface-rawtxforpost) |
+| | | |
+| --- | --- | --- |
+| [ArcMinerApi](#interface-arcminerapi) | [GetEnvelopeOptionsApi](#interface-getenvelopeoptionsapi) | [MapiPostTxPayloadApi](#interface-mapiposttxpayloadapi) |
+| [ArcMinerPostBeefDataApi](#interface-arcminerpostbeefdataapi) | [GetMerkleProofResultApi](#interface-getmerkleproofresultapi) | [MapiTxStatusPayloadApi](#interface-mapitxstatuspayloadapi) |
+| [BsvExchangeRateApi](#interface-bsvexchangerateapi) | [GetRawTxResultApi](#interface-getrawtxresultapi) | [MapiTxidReturnResultApi](#interface-mapitxidreturnresultapi) |
+| [ChaintracksChainTrackerOptions](#interface-chaintrackschaintrackeroptions) | [GetScriptHistoryDetailsApi](#interface-getscripthistorydetailsapi) | [PostBeefResultApi](#interface-postbeefresultapi) |
+| [ChaintracksServiceClientOptions](#interface-chaintracksserviceclientoptions) | [GetScriptHistoryResultApi](#interface-getscripthistoryresultapi) | [PostRawTxResultApi](#interface-postrawtxresultapi) |
+| [CwiExternalServicesApi](#interface-cwiexternalservicesapi) | [GetUtxoStatusDetailsApi](#interface-getutxostatusdetailsapi) | [PostTransactionMapiMinerApi](#interface-posttransactionmapiminerapi) |
+| [CwiExternalServicesOptions](#interface-cwiexternalservicesoptions) | [GetUtxoStatusResultApi](#interface-getutxostatusresultapi) | [RawTxForPost](#interface-rawtxforpost) |
+| [ExchangeRatesIoApi](#interface-exchangeratesioapi) | [MapiCallbackApi](#interface-mapicallbackapi) |  |
+| [FiatExchangeRatesApi](#interface-fiatexchangeratesapi) | [MapiCallbackPayloadApi](#interface-mapicallbackpayloadapi) |  |
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 
@@ -44,6 +42,8 @@ export interface CwiExternalServicesApi {
     getMerkleProof(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetMerkleProofResultApi>;
     postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]>;
     postRawTxs(rawTxs: string[] | Buffer[] | number[][], chain: Chain): Promise<PostRawTxResultApi[][]>;
+    postBeef(beef: number[], chain: Chain): Promise<PostBeefResultApi[]>;
+    postBeefs(beefs: number[][], chain: Chain): Promise<PostBeefResultApi[][]>;
     getUtxoStatus(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi, useNext?: boolean): Promise<GetUtxoStatusResultApi>;
 }
 ```
@@ -250,7 +250,7 @@ Argument Details
 
 </details>
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Interface: MapiCallbackApi
@@ -291,7 +291,7 @@ url: string
 
 </details>
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Interface: RawTxForPost
@@ -303,7 +303,7 @@ export interface RawTxForPost {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Interface: GetMerkleProofResultApi
@@ -371,7 +371,7 @@ proof?: TscMerkleProofApi | TscMerkleProofApi[]
 
 </details>
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Interface: GetRawTxResultApi
@@ -448,7 +448,7 @@ txid: string
 
 </details>
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Interface: PostRawTxResultApi
@@ -542,7 +542,83 @@ status: "success" | "error"
 
 </details>
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
+
+---
+#### Interface: PostBeefResultApi
+
+Properties on array items of result returned from `CwiExternalServicesApi` function `postBeef`.
+
+```ts
+export interface PostBeefResultApi {
+    name: string;
+    status: "success" | "error";
+    error?: CwiError;
+    alreadyKnown?: boolean;
+    txid?: string;
+    blockHash?: string;
+    blockHeight?: number;
+    merklePath?: string;
+    data?: object;
+}
+```
+
+<details>
+
+<summary>Interface PostBeefResultApi Details</summary>
+
+##### Property alreadyKnown
+
+if true, the transaction was already known to this service. Usually treat as a success.
+
+Potentially stop posting to additional transaction processors.
+
+```ts
+alreadyKnown?: boolean
+```
+
+##### Property data
+
+Service response object. Use service name and status to infer type of object.
+
+```ts
+data?: object
+```
+
+##### Property error
+
+When status is 'error', provides code and description
+
+Specific potential errors:
+ERR_BAD_REQUEST
+ERR_EXTSVS_DOUBLE_SPEND
+ERR_EXTSVS_ALREADY_MINED (description has error details)
+ERR_EXTSVS_INVALID_TRANSACTION (description has error details)
+ERR_EXTSVS_TXID_INVALID (service response txid doesn't match rawTx)
+
+```ts
+error?: CwiError
+```
+
+##### Property name
+
+The name of the service to which the transaction was submitted for processing
+
+```ts
+name: string
+```
+
+##### Property status
+
+'success' - The transaction was accepted for processing
+
+```ts
+status: "success" | "error"
+```
+
+</details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Interface: GetUtxoStatusDetailsApi
@@ -602,7 +678,7 @@ txid?: string
 
 </details>
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Interface: GetUtxoStatusResultApi
@@ -667,7 +743,7 @@ status: "success" | "error"
 
 </details>
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Interface: GetScriptHistoryDetailsApi
@@ -714,7 +790,7 @@ txid: string
 
 </details>
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Interface: GetScriptHistoryResultApi
@@ -770,7 +846,7 @@ status: "success" | "error"
 
 </details>
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Interface: BsvExchangeRateApi
@@ -783,7 +859,7 @@ export interface BsvExchangeRateApi {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Interface: FiatExchangeRatesApi
@@ -796,7 +872,7 @@ export interface FiatExchangeRatesApi {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Interface: ChaintracksServiceClientOptions
@@ -807,7 +883,7 @@ export interface ChaintracksServiceClientOptions {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Interface: ChaintracksChainTrackerOptions
@@ -818,7 +894,7 @@ export interface ChaintracksChainTrackerOptions {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Interface: MapiTxStatusPayloadApi
@@ -840,7 +916,7 @@ export interface MapiTxStatusPayloadApi {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Interface: MapiCallbackPayloadApi
@@ -859,7 +935,7 @@ export interface MapiCallbackPayloadApi {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Interface: MapiTxidReturnResultApi
@@ -875,7 +951,7 @@ export interface MapiTxidReturnResultApi {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Interface: MapiPostTxPayloadApi
@@ -899,7 +975,7 @@ export interface MapiPostTxPayloadApi {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Interface: ExchangeRatesIoApi
@@ -914,7 +990,7 @@ export interface ExchangeRatesIoApi {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Interface: PostTransactionMapiMinerApi
@@ -928,7 +1004,44 @@ export interface PostTransactionMapiMinerApi {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
+
+---
+#### Interface: ArcMinerPostBeefDataApi
+
+```ts
+export interface ArcMinerPostBeefDataApi {
+    status: number;
+    title: string;
+    extraInfo: string;
+    blockHash?: string;
+    blockHeight?: number;
+    competingTxs?: null;
+    merklePath?: string;
+    timestamp?: string;
+    txStatus?: string;
+    txid?: string;
+    type?: string;
+    detail?: string;
+    instance?: string;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
+
+---
+#### Interface: ArcMinerApi
+
+```ts
+export interface ArcMinerApi {
+    name: string;
+    url: string;
+    apiKey?: string;
+    deploymentId?: string;
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Interface: CwiExternalServicesOptions
@@ -947,7 +1060,7 @@ export interface CwiExternalServicesOptions {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Interface: GetEnvelopeOptionsApi
@@ -978,27 +1091,24 @@ minProofLevel?: number
 
 </details>
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 ### Classes
 
-| | |
-| --- | --- |
-| [ChaintracksChainTracker](#class-chaintrackschaintracker) | [ERR_EXTSVS_MAPI_SIGNATURE_INVALID](#class-err_extsvs_mapi_signature_invalid) |
-| [ChaintracksServiceClient](#class-chaintracksserviceclient) | [ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING](#class-err_extsvs_mapi_unsupported_encoding) |
-| [CwiExternalServices](#class-cwiexternalservices) | [ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE](#class-err_extsvs_mapi_unsupported_mimetype) |
-| [ERR_EXTSVS_ALREADY_MINED](#class-err_extsvs_already_mined) | [ERR_EXTSVS_MAPI_UNSUPPORTED_RETURNRESULT](#class-err_extsvs_mapi_unsupported_returnresult) |
-| [ERR_EXTSVS_BLOCK_HASH_MISSING](#class-err_extsvs_block_hash_missing) | [ERR_EXTSVS_MERKLEPROOF_NODE_TYPE](#class-err_extsvs_merkleproof_node_type) |
-| [ERR_EXTSVS_BLOCK_HEIGHT_MISSING](#class-err_extsvs_block_height_missing) | [ERR_EXTSVS_MERKLEPROOF_PARSING](#class-err_extsvs_merkleproof_parsing) |
-| [ERR_EXTSVS_DOUBLE_SPEND](#class-err_extsvs_double_spend) | [ERR_EXTSVS_MERKLEPROOF_TAGET_TYPE](#class-err_extsvs_merkleproof_taget_type) |
-| [ERR_EXTSVS_ENVELOPE_DEPTH](#class-err_extsvs_envelope_depth) | [ERR_EXTSVS_MERKLEPROOF_UNSUPPORTED](#class-err_extsvs_merkleproof_unsupported) |
-| [ERR_EXTSVS_FAILURE](#class-err_extsvs_failure) | [ERR_EXTSVS_MERKLEROOT_INVALID](#class-err_extsvs_merkleroot_invalid) |
-| [ERR_EXTSVS_INVALID_TRANSACTION](#class-err_extsvs_invalid_transaction) | [ERR_EXTSVS_MERKLEROOT_MISSING](#class-err_extsvs_merkleroot_missing) |
-| [ERR_EXTSVS_INVALID_TXID](#class-err_extsvs_invalid_txid) | [ERR_EXTSVS_TXID_INVALID](#class-err_extsvs_txid_invalid) |
-| [ERR_EXTSVS_MAPI_MISSING](#class-err_extsvs_mapi_missing) | [ServiceCollection](#class-servicecollection) |
+| | | |
+| --- | --- | --- |
+| [ChaintracksChainTracker](#class-chaintrackschaintracker) | [ERR_EXTSVS_FEE](#class-err_extsvs_fee) | [ERR_EXTSVS_MERKLEPROOF_NODE_TYPE](#class-err_extsvs_merkleproof_node_type) |
+| [ChaintracksServiceClient](#class-chaintracksserviceclient) | [ERR_EXTSVS_GENERIC](#class-err_extsvs_generic) | [ERR_EXTSVS_MERKLEPROOF_PARSING](#class-err_extsvs_merkleproof_parsing) |
+| [CwiExternalServices](#class-cwiexternalservices) | [ERR_EXTSVS_INVALID_TRANSACTION](#class-err_extsvs_invalid_transaction) | [ERR_EXTSVS_MERKLEPROOF_TAGET_TYPE](#class-err_extsvs_merkleproof_taget_type) |
+| [ERR_EXTSVS_ALREADY_MINED](#class-err_extsvs_already_mined) | [ERR_EXTSVS_INVALID_TXID](#class-err_extsvs_invalid_txid) | [ERR_EXTSVS_MERKLEPROOF_UNSUPPORTED](#class-err_extsvs_merkleproof_unsupported) |
+| [ERR_EXTSVS_BLOCK_HASH_MISSING](#class-err_extsvs_block_hash_missing) | [ERR_EXTSVS_MAPI_MISSING](#class-err_extsvs_mapi_missing) | [ERR_EXTSVS_MERKLEROOT_INVALID](#class-err_extsvs_merkleroot_invalid) |
+| [ERR_EXTSVS_BLOCK_HEIGHT_MISSING](#class-err_extsvs_block_height_missing) | [ERR_EXTSVS_MAPI_SIGNATURE_INVALID](#class-err_extsvs_mapi_signature_invalid) | [ERR_EXTSVS_MERKLEROOT_MISSING](#class-err_extsvs_merkleroot_missing) |
+| [ERR_EXTSVS_DOUBLE_SPEND](#class-err_extsvs_double_spend) | [ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING](#class-err_extsvs_mapi_unsupported_encoding) | [ERR_EXTSVS_SECURITY](#class-err_extsvs_security) |
+| [ERR_EXTSVS_ENVELOPE_DEPTH](#class-err_extsvs_envelope_depth) | [ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE](#class-err_extsvs_mapi_unsupported_mimetype) | [ERR_EXTSVS_TXID_INVALID](#class-err_extsvs_txid_invalid) |
+| [ERR_EXTSVS_FAILURE](#class-err_extsvs_failure) | [ERR_EXTSVS_MAPI_UNSUPPORTED_RETURNRESULT](#class-err_extsvs_mapi_unsupported_returnresult) | [ServiceCollection](#class-servicecollection) |
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 
@@ -1044,7 +1154,7 @@ export class ChaintracksServiceClient implements ChaintracksClientApi {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: ChaintracksChainTracker
@@ -1059,7 +1169,7 @@ export class ChaintracksChainTracker implements ChainTracker {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: ServiceCollection
@@ -1091,7 +1201,7 @@ export class ServiceCollection<T> {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: ERR_EXTSVS_FAILURE
@@ -1104,7 +1214,7 @@ export class ERR_EXTSVS_FAILURE extends CwiError {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: ERR_EXTSVS_TXID_INVALID
@@ -1117,7 +1227,7 @@ export class ERR_EXTSVS_TXID_INVALID extends CwiError {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: ERR_EXTSVS_BLOCK_HASH_MISSING
@@ -1130,7 +1240,7 @@ export class ERR_EXTSVS_BLOCK_HASH_MISSING extends CwiError {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: ERR_EXTSVS_BLOCK_HEIGHT_MISSING
@@ -1143,7 +1253,7 @@ export class ERR_EXTSVS_BLOCK_HEIGHT_MISSING extends CwiError {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: ERR_EXTSVS_ENVELOPE_DEPTH
@@ -1156,7 +1266,7 @@ export class ERR_EXTSVS_ENVELOPE_DEPTH extends CwiError {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: ERR_EXTSVS_MERKLEROOT_INVALID
@@ -1169,7 +1279,7 @@ export class ERR_EXTSVS_MERKLEROOT_INVALID extends CwiError {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: ERR_EXTSVS_MERKLEROOT_MISSING
@@ -1182,7 +1292,7 @@ export class ERR_EXTSVS_MERKLEROOT_MISSING extends CwiError {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: ERR_EXTSVS_MERKLEPROOF_TAGET_TYPE
@@ -1195,7 +1305,7 @@ export class ERR_EXTSVS_MERKLEPROOF_TAGET_TYPE extends CwiError {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: ERR_EXTSVS_MERKLEPROOF_NODE_TYPE
@@ -1208,7 +1318,7 @@ export class ERR_EXTSVS_MERKLEPROOF_NODE_TYPE extends CwiError {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: ERR_EXTSVS_MERKLEPROOF_PARSING
@@ -1221,7 +1331,7 @@ export class ERR_EXTSVS_MERKLEPROOF_PARSING extends CwiError {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: ERR_EXTSVS_MERKLEPROOF_UNSUPPORTED
@@ -1234,7 +1344,7 @@ export class ERR_EXTSVS_MERKLEPROOF_UNSUPPORTED extends CwiError {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: ERR_EXTSVS_MAPI_MISSING
@@ -1247,7 +1357,7 @@ export class ERR_EXTSVS_MAPI_MISSING extends CwiError {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: ERR_EXTSVS_MAPI_SIGNATURE_INVALID
@@ -1260,7 +1370,7 @@ export class ERR_EXTSVS_MAPI_SIGNATURE_INVALID extends CwiError {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE
@@ -1273,7 +1383,7 @@ export class ERR_EXTSVS_MAPI_UNSUPPORTED_MIMETYPE extends CwiError {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING
@@ -1286,7 +1396,7 @@ export class ERR_EXTSVS_MAPI_UNSUPPORTED_ENCODING extends CwiError {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: ERR_EXTSVS_MAPI_UNSUPPORTED_RETURNRESULT
@@ -1299,7 +1409,7 @@ export class ERR_EXTSVS_MAPI_UNSUPPORTED_RETURNRESULT extends CwiError {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: ERR_EXTSVS_INVALID_TRANSACTION
@@ -1312,7 +1422,7 @@ export class ERR_EXTSVS_INVALID_TRANSACTION extends CwiError {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: ERR_EXTSVS_INVALID_TXID
@@ -1325,7 +1435,7 @@ export class ERR_EXTSVS_INVALID_TXID extends CwiError {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: ERR_EXTSVS_DOUBLE_SPEND
@@ -1340,7 +1450,7 @@ export class ERR_EXTSVS_DOUBLE_SPEND extends CwiError {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: ERR_EXTSVS_ALREADY_MINED
@@ -1353,7 +1463,46 @@ export class ERR_EXTSVS_ALREADY_MINED extends CwiError {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
+
+---
+#### Class: ERR_EXTSVS_SECURITY
+
+Security error.
+
+```ts
+export class ERR_EXTSVS_SECURITY extends CwiError {
+    constructor(description?: string) 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
+
+---
+#### Class: ERR_EXTSVS_GENERIC
+
+See description.
+
+```ts
+export class ERR_EXTSVS_GENERIC extends CwiError {
+    constructor(description: string) 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
+
+---
+#### Class: ERR_EXTSVS_FEE
+
+Fee error.
+
+```ts
+export class ERR_EXTSVS_FEE extends CwiError {
+    constructor(description?: string) 
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Class: CwiExternalServices
@@ -1366,6 +1515,8 @@ export class CwiExternalServices implements CwiExternalServicesApi {
     getRawTxServices: ServiceCollection<GetRawTxServiceApi>;
     postRawTxServices: ServiceCollection<PostRawTxServiceApi>;
     postRawTxsServices: ServiceCollection<PostRawTxsServiceApi>;
+    postBeefServices: ServiceCollection<PostBeefServiceApi>;
+    postBeefsServices: ServiceCollection<PostBeefsServiceApi>;
     getUtxoStatusServices: ServiceCollection<GetUtxoStatusServiceApi>;
     getScriptHistoryServices: ServiceCollection<GetScriptHistoryServiceApi>;
     updateFiatExchangeRateServices: ServiceCollection<UpdateFiatExchangeRateServiceApi>;
@@ -1377,6 +1528,7 @@ export class CwiExternalServices implements CwiExternalServicesApi {
     get getProofsCount() 
     get getRawTxsCount() 
     get postRawTxsCount() 
+    get postBeefServicesCount() 
     get postRawTxsServicesCount() 
     get getUtxoStatsCount() 
     async getUtxoStatus(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi, useNext?: boolean): Promise<GetUtxoStatusResultApi> 
@@ -1385,6 +1537,8 @@ export class CwiExternalServices implements CwiExternalServicesApi {
         outputScript: Buffer | null;
         amount: number | null;
     }, chain: Chain): Promise<boolean> 
+    async postBeef(beef: number[], chain: Chain): Promise<PostBeefResultApi[]> 
+    async postBeefs(beefs: number[][], chain: Chain): Promise<PostBeefResultApi[][]> 
     async postRawTxs(rawTxs: string[] | Buffer[] | number[][], chain: Chain): Promise<PostRawTxResultApi[][]> 
     async postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]> 
     async getRawTx(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetRawTxResultApi> 
@@ -1394,27 +1548,29 @@ export class CwiExternalServices implements CwiExternalServicesApi {
 }
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 ### Functions
 
 | | | |
 | --- | --- | --- |
-| [checkMapiResponse](#function-checkmapiresponse) | [getMerkleProofFromTaal](#function-getmerkleprooffromtaal) | [postRawTxToGorillaPool](#function-postrawtxtogorillapool) |
-| [checkMapiResponseForTxid](#function-checkmapiresponsefortxid) | [getMerkleProofFromWhatsOnChain](#function-getmerkleprooffromwhatsonchain) | [postRawTxToMapiMiner](#function-postrawtxtomapiminer) |
-| [checkMerkleProof](#function-checkmerkleproof) | [getMerkleProofFromWhatsOnChainTsc](#function-getmerkleprooffromwhatsonchaintsc) | [postRawTxToTaal](#function-postrawtxtotaal) |
-| [createMapiPostTxResponse](#function-createmapiposttxresponse) | [getProofFromGorillaPool](#function-getprooffromgorillapool) | [postRawTxToWhatsOnChain](#function-postrawtxtowhatsonchain) |
-| [getEnvelopeForTransaction](#function-getenvelopefortransaction) | [getProofFromMetastreme](#function-getprooffrommetastreme) | [signMapiPayload](#function-signmapipayload) |
-| [getExchangeRatesIo](#function-getexchangeratesio) | [getProofFromTaal](#function-getprooffromtaal) | [updateBsvExchangeRate](#function-updatebsvexchangerate) |
-| [getMapiCallbackPayload](#function-getmapicallbackpayload) | [getProofFromWhatsOnChain](#function-getprooffromwhatsonchain) | [updateChaintracksFiatExchangeRates](#function-updatechaintracksfiatexchangerates) |
-| [getMapiJsonResponsePayload](#function-getmapijsonresponsepayload) | [getProofFromWhatsOnChainTsc](#function-getprooffromwhatsonchaintsc) | [updateExchangeratesapi](#function-updateexchangeratesapi) |
-| [getMapiPostTxPayload](#function-getmapiposttxpayload) | [getRawTxFromWhatsOnChain](#function-getrawtxfromwhatsonchain) | [validateScriptHash](#function-validatescripthash) |
-| [getMapiTxStatusPayload](#function-getmapitxstatuspayload) | [getScriptHistoryFromWhatsOnChain](#function-getscripthistoryfromwhatsonchain) | [verifyMapiResponseForTxid](#function-verifymapiresponsefortxid) |
-| [getMerkleProofFromGorillaPool](#function-getmerkleprooffromgorillapool) | [getSpentStatusForOutpoint](#function-getspentstatusforoutpoint) |  |
-| [getMerkleProofFromMetastreme](#function-getmerkleprooffrommetastreme) | [getUtxoStatusFromWhatsOnChain](#function-getutxostatusfromwhatsonchain) |  |
+| [checkMapiResponse](#function-checkmapiresponse) | [getMerkleProofFromWhatsOnChainTsc](#function-getmerkleprooffromwhatsonchaintsc) | [postBeefsToArcMiner](#function-postbeefstoarcminer) |
+| [checkMapiResponseForTxid](#function-checkmapiresponsefortxid) | [getProofFromGorillaPool](#function-getprooffromgorillapool) | [postBeefsToTaalArcMiner](#function-postbeefstotaalarcminer) |
+| [checkMerkleProof](#function-checkmerkleproof) | [getProofFromMetastreme](#function-getprooffrommetastreme) | [postRawTxToGorillaPool](#function-postrawtxtogorillapool) |
+| [createMapiPostTxResponse](#function-createmapiposttxresponse) | [getProofFromTaal](#function-getprooffromtaal) | [postRawTxToMapiMiner](#function-postrawtxtomapiminer) |
+| [getEnvelopeForTransaction](#function-getenvelopefortransaction) | [getProofFromWhatsOnChain](#function-getprooffromwhatsonchain) | [postRawTxToTaal](#function-postrawtxtotaal) |
+| [getExchangeRatesIo](#function-getexchangeratesio) | [getProofFromWhatsOnChainTsc](#function-getprooffromwhatsonchaintsc) | [postRawTxToWhatsOnChain](#function-postrawtxtowhatsonchain) |
+| [getMapiCallbackPayload](#function-getmapicallbackpayload) | [getRawTxFromWhatsOnChain](#function-getrawtxfromwhatsonchain) | [signMapiPayload](#function-signmapipayload) |
+| [getMapiJsonResponsePayload](#function-getmapijsonresponsepayload) | [getScriptHistoryFromWhatsOnChain](#function-getscripthistoryfromwhatsonchain) | [updateBsvExchangeRate](#function-updatebsvexchangerate) |
+| [getMapiPostTxPayload](#function-getmapiposttxpayload) | [getSpentStatusForOutpoint](#function-getspentstatusforoutpoint) | [updateChaintracksFiatExchangeRates](#function-updatechaintracksfiatexchangerates) |
+| [getMapiTxStatusPayload](#function-getmapitxstatuspayload) | [getUtxoStatusFromWhatsOnChain](#function-getutxostatusfromwhatsonchain) | [updateExchangeratesapi](#function-updateexchangeratesapi) |
+| [getMerkleProofFromGorillaPool](#function-getmerkleprooffromgorillapool) | [makeErrorResult](#function-makeerrorresult) | [validateScriptHash](#function-validatescripthash) |
+| [getMerkleProofFromMetastreme](#function-getmerkleprooffrommetastreme) | [makePostBeefResult](#function-makepostbeefresult) | [verifyMapiResponseForTxid](#function-verifymapiresponsefortxid) |
+| [getMerkleProofFromTaal](#function-getmerkleprooffromtaal) | [postBeefToArcMiner](#function-postbeeftoarcminer) |  |
+| [getMerkleProofFromWhatsOnChain](#function-getmerkleprooffromwhatsonchain) | [postBeefToTaalArcMiner](#function-postbeeftotaalarcminer) |  |
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 
@@ -1424,7 +1580,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export async function getRawTxFromWhatsOnChain(txid: string | Buffer, chain: Chain): Promise<GetRawTxResultApi> 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: createMapiPostTxResponse
@@ -1436,7 +1592,7 @@ export function createMapiPostTxResponse(txid: string, key: string, resultDescri
 } 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: checkMapiResponse
@@ -1459,7 +1615,7 @@ https://github.com/bitcoin-sv-specs/brfc-misc/tree/master/jsonenvelope
 
 </details>
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: signMapiPayload
@@ -1468,7 +1624,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export function signMapiPayload(payload: string, privateKey: string): string 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: getMapiJsonResponsePayload
@@ -1496,7 +1652,7 @@ Argument Details
 
 </details>
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: getMapiTxStatusPayload
@@ -1526,7 +1682,7 @@ Argument Details
 
 </details>
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: getMapiCallbackPayload
@@ -1535,7 +1691,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export function getMapiCallbackPayload(txid: string | Buffer | undefined, response: MapiResponseApi): MapiCallbackPayloadApi 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: verifyMapiResponseForTxid
@@ -1544,7 +1700,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export function verifyMapiResponseForTxid<T extends MapiTxidReturnResultApi>(response: MapiResponseApi, txid?: string | Buffer, checkFailure?: boolean): T 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: getMapiPostTxPayload
@@ -1553,7 +1709,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export function getMapiPostTxPayload(response: MapiResponseApi, txid?: string | Buffer, checkFailure?: boolean): MapiPostTxPayloadApi 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: checkMapiResponseForTxid
@@ -1562,7 +1718,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export function checkMapiResponseForTxid(response: MapiResponseApi, txid?: string | Buffer): boolean 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: getProofFromGorillaPool
@@ -1590,7 +1746,7 @@ mapiResponse is signed and has txStatus payload.
 export async function getProofFromGorillaPool(txid: string | Buffer, chain: Chain): Promise<GetMerkleProofResultApi> 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: getProofFromTaal
@@ -1607,7 +1763,7 @@ An apiKey must be used and must correspond to the target chain: mainNet or testN
 export async function getProofFromTaal(txid: string | Buffer, apiKey: string): Promise<GetMerkleProofResultApi> 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: getProofFromMetastreme
@@ -1624,7 +1780,7 @@ targetType of hash
 export async function getProofFromMetastreme(txid: string | Buffer, chain: Chain): Promise<GetMerkleProofResultApi> 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: getProofFromWhatsOnChain
@@ -1640,7 +1796,7 @@ is always "L", even when it should really be "R". This only matters if you are t
 export async function getProofFromWhatsOnChain(txid: string | Buffer, chain: Chain): Promise<GetMerkleProofResultApi> 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: getProofFromWhatsOnChainTsc
@@ -1655,7 +1811,7 @@ Duplicate hash values are provided in full instead of being replaced by "*".
 export async function getProofFromWhatsOnChainTsc(txid: string | Buffer, chain: Chain): Promise<GetMerkleProofResultApi> 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: getUtxoStatusFromWhatsOnChain
@@ -1664,7 +1820,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export async function getUtxoStatusFromWhatsOnChain(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi): Promise<GetUtxoStatusResultApi> 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: getScriptHistoryFromWhatsOnChain
@@ -1673,7 +1829,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export async function getScriptHistoryFromWhatsOnChain(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi): Promise<GetScriptHistoryResultApi> 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: validateScriptHash
@@ -1682,7 +1838,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export function validateScriptHash(output: string | Buffer, outputFormat?: GetUtxoStatusOutputFormatApi): string 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: updateBsvExchangeRate
@@ -1691,7 +1847,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export async function updateBsvExchangeRate(rate?: BsvExchangeRateApi, updateMsecs?: number): Promise<BsvExchangeRateApi> 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: updateChaintracksFiatExchangeRates
@@ -1700,7 +1856,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export async function updateChaintracksFiatExchangeRates(targetCurrencies: string[], options: CwiExternalServicesOptions): Promise<FiatExchangeRatesApi> 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: updateExchangeratesapi
@@ -1709,7 +1865,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export async function updateExchangeratesapi(targetCurrencies: string[], options: CwiExternalServicesOptions): Promise<FiatExchangeRatesApi> 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: getExchangeRatesIo
@@ -1718,7 +1874,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export async function getExchangeRatesIo(key: string): Promise<ExchangeRatesIoApi> 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: postRawTxToGorillaPool
@@ -1727,7 +1883,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export async function postRawTxToGorillaPool(txid: string | Buffer, rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi> 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: postRawTxToTaal
@@ -1736,7 +1892,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export function postRawTxToTaal(txid: string | Buffer, rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi, apiKey?: string): Promise<PostRawTxResultApi> 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: postRawTxToMapiMiner
@@ -1745,7 +1901,61 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export async function postRawTxToMapiMiner(txid: string | Buffer, rawTx: string | Buffer, miner: PostTransactionMapiMinerApi, callback?: MapiCallbackApi): Promise<PostRawTxResultApi> 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
+
+---
+#### Function: postBeefToTaalArcMiner
+
+```ts
+export async function postBeefToTaalArcMiner(beef: number[], chain: Chain, miner?: ArcMinerApi): Promise<PostBeefResultApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
+
+---
+#### Function: postBeefToArcMiner
+
+```ts
+export async function postBeefToArcMiner(beef: number[], miner: ArcMinerApi): Promise<PostBeefResultApi> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
+
+---
+#### Function: makePostBeefResult
+
+```ts
+export function makePostBeefResult(dd: ArcMinerPostBeefDataApi, miner: ArcMinerApi, beef: number[]): PostBeefResultApi 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
+
+---
+#### Function: makeErrorResult
+
+```ts
+export function makeErrorResult(error: CwiError, miner: ArcMinerApi, beef: number[], dd?: ArcMinerPostBeefDataApi): PostBeefResultApi 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
+
+---
+#### Function: postBeefsToTaalArcMiner
+
+```ts
+export async function postBeefsToTaalArcMiner(beefs: number[][], chain: Chain, miner?: ArcMinerApi): Promise<PostBeefResultApi[]> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
+
+---
+#### Function: postBeefsToArcMiner
+
+```ts
+export async function postBeefsToArcMiner(beefs: number[][], miner: ArcMinerApi): Promise<PostBeefResultApi[]> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: postRawTxToWhatsOnChain
@@ -1754,7 +1964,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export async function postRawTxToWhatsOnChain(txid: string | Buffer | undefined, rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi> 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: checkMerkleProof
@@ -1800,7 +2010,7 @@ Argument Details
 
 </details>
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: getEnvelopeForTransaction
@@ -1839,7 +2049,7 @@ Argument Details
 
 </details>
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: getMerkleProofFromGorillaPool
@@ -1865,7 +2075,7 @@ mapiResponse is signed and has txStatus payload.
 export async function getMerkleProofFromGorillaPool(txid: string | Buffer): Promise<TscMerkleProofApi | undefined> 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: getMerkleProofFromTaal
@@ -1882,7 +2092,7 @@ An apiKey must be used and must correspond to the target chain: mainNet or testN
 export async function getMerkleProofFromTaal(txid: string | Buffer, apiKey: string): Promise<TscMerkleProofApi | undefined> 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: getMerkleProofFromMetastreme
@@ -1900,7 +2110,7 @@ without a lookup request.
 export async function getMerkleProofFromMetastreme(txid: string | Buffer, chain: Chain): Promise<TscMerkleProofApi | undefined> 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: getMerkleProofFromWhatsOnChain
@@ -1916,7 +2126,7 @@ is always "L", even when it should really be "R". This only matters if you are t
 export async function getMerkleProofFromWhatsOnChain(txid: string | Buffer, chain: Chain): Promise<TscMerkleProofApi | undefined> 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: getMerkleProofFromWhatsOnChainTsc
@@ -1931,7 +2141,7 @@ Duplicate hash values are provided in full instead of being replaced by "*".
 export async function getMerkleProofFromWhatsOnChainTsc(txid: string | Buffer, chain: Chain): Promise<TscMerkleProofApi | undefined> 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Function: getSpentStatusForOutpoint
@@ -1942,7 +2152,7 @@ Attempts to validate whether or not an outpoint has been spent by using the What
 export async function getSpentStatusForOutpoint(outpoint: string, chain: Chain): Promise<boolean> 
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 ### Types
@@ -1954,11 +2164,13 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 | [GetScriptHistoryServiceApi](#type-getscripthistoryserviceapi) |
 | [GetUtxoStatusOutputFormatApi](#type-getutxostatusoutputformatapi) |
 | [GetUtxoStatusServiceApi](#type-getutxostatusserviceapi) |
+| [PostBeefServiceApi](#type-postbeefserviceapi) |
+| [PostBeefsServiceApi](#type-postbeefsserviceapi) |
 | [PostRawTxServiceApi](#type-postrawtxserviceapi) |
 | [PostRawTxsServiceApi](#type-postrawtxsserviceapi) |
 | [UpdateFiatExchangeRateServiceApi](#type-updatefiatexchangerateserviceapi) |
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 
@@ -1968,7 +2180,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export type GetUtxoStatusOutputFormatApi = "hashLE" | "hashBE" | "script"
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Type: GetUtxoStatusServiceApi
@@ -1977,7 +2189,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export type GetUtxoStatusServiceApi = (output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi) => Promise<GetUtxoStatusResultApi>
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Type: GetScriptHistoryServiceApi
@@ -1986,7 +2198,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export type GetScriptHistoryServiceApi = (output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi) => Promise<GetScriptHistoryResultApi>
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Type: GetMerkleProofServiceApi
@@ -1995,7 +2207,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export type GetMerkleProofServiceApi = (txid: string | Buffer, chain: Chain) => Promise<GetMerkleProofResultApi>
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Type: GetRawTxServiceApi
@@ -2004,7 +2216,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export type GetRawTxServiceApi = (txid: string | Buffer, chain: Chain) => Promise<GetRawTxResultApi>
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Type: UpdateFiatExchangeRateServiceApi
@@ -2013,7 +2225,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export type UpdateFiatExchangeRateServiceApi = (targetCurrencies: string[], options: CwiExternalServicesOptions) => Promise<FiatExchangeRatesApi>
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Type: PostRawTxServiceApi
@@ -2022,7 +2234,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export type PostRawTxServiceApi = (txid: string | Buffer, rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi) => Promise<PostRawTxResultApi>
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 #### Type: PostRawTxsServiceApi
@@ -2031,7 +2243,60 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 export type PostRawTxsServiceApi = (txs: RawTxForPost[], chain: Chain) => Promise<PostRawTxResultApi[]>
 ```
 
-Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types)
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
+
+---
+#### Type: PostBeefServiceApi
+
+```ts
+export type PostBeefServiceApi = (beef: number[], chain: Chain) => Promise<PostBeefResultApi>
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
+
+---
+#### Type: PostBeefsServiceApi
+
+```ts
+export type PostBeefsServiceApi = (beefs: number[][], chain: Chain) => Promise<PostBeefResultApi[]>
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
+
+---
+### Variables
+
+| |
+| --- |
+| [arcMinerTaalMainDefault](#variable-arcminertaalmaindefault) |
+| [arcMinerTaalTestDefault](#variable-arcminertaaltestdefault) |
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
+
+---
+
+#### Variable: arcMinerTaalMainDefault
+
+```ts
+arcMinerTaalMainDefault: ArcMinerApi = {
+    name: "TaalArc",
+    url: "https://tapi.taal.com/arc",
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
+
+---
+#### Variable: arcMinerTaalTestDefault
+
+```ts
+arcMinerTaalTestDefault: ArcMinerApi = {
+    name: "TaalArc",
+    url: "https://arc-test.taal.com",
+}
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
 ---
 
