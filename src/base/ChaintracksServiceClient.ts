@@ -4,6 +4,7 @@ import {
     asBuffer, asString,
     BaseBlockHeader, BaseBlockHeaderHex, BlockHeader, BlockHeaderHex,
     Chain, ChaintracksClientApi, ChaintracksInfoApi,
+    CwiError,
     ERR_NOT_IMPLEMENTED,
     HeaderListener, isBaseBlockHeader, ReorgListener, toBaseBlockHeaderHex, toBlockHeader
 } from 'cwi-base'
@@ -48,19 +49,24 @@ export class ChaintracksServiceClient implements ChaintracksClientApi {
     async unsubscribe(subscriptionId: string) : Promise<boolean> { throw new ERR_NOT_IMPLEMENTED() }
 
     async getJsonOrUndefined<T>(path: string) : Promise<T | undefined> {
-        if (this.authrite) {
-            const r = await this.authrite.createSignedRequest(path, {})
-            const v = <FetchStatus<T>>await r.json()
-            if (v.status === 'success')
-                return v.value
-            throw new Error(JSON.stringify(v))
-        } else {
-            const r = await fetch(`${this.serviceUrl}${path}`)
-            const v = <FetchStatus<T>>await r.json()
-            if (v.status === 'success')
-                return v.value
-            throw new Error(JSON.stringify(v))
+        let e: Error | undefined = undefined
+        for (let retry = 0; retry < 3; retry++) {
+            try {
+                const r = this.authrite
+                    ? await this.authrite.createSignedRequest(path, {})
+                    : await fetch(`${this.serviceUrl}${path}`)
+                const v = <FetchStatus<T>>await r.json()
+                if (v.status === 'success')
+                    return v.value
+                else
+                    e = new Error(JSON.stringify(v))
+            } catch (eu: unknown) {
+                e = eu as Error
+            }
+            if (e && e.name !== 'ECONNRESET')
+                break
         }
+        if (e) throw e
     }
 
     async getJson<T>(path: string): Promise<T> {
@@ -111,7 +117,10 @@ export class ChaintracksServiceClient implements ChaintracksClientApi {
         return await this.getJsonOrUndefined('/startListening')
     }
     async listening(): Promise<void> { return await this.getJsonOrUndefined('/listening') }
-    async getChain(): Promise<Chain> { return await this.getJson('/getChain') }
+    async getChain(): Promise<Chain> {
+        return this.chain
+        //return await this.getJson('/getChain')
+    }
     async getInfo(wait?: number): Promise<ChaintracksInfoApi> {
         return await this.getJson(`/getInfo?wait=${wait || ''}`)
     }
