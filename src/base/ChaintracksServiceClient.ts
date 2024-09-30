@@ -11,6 +11,7 @@ import {
 import { AuthriteClient } from 'authrite-js'
 
 import fetch from 'node-fetch'
+import { getMerkleRootForHeight } from '@babbage/sdk-ts'
 
 interface FetchStatus<T> {
     status: 'success' | 'error',
@@ -42,6 +43,13 @@ export class ChaintracksServiceClient implements ChaintracksClientApi {
         if (this.options.useAuthrite) {
             this.authrite = new AuthriteClient(serviceUrl)
         }
+    }
+// /Users/tone/.nvm/versions/node/v16.19.1/lib/node_modules/@cwi/chaintracks-base/src/Api/ChaintracksApi.ts
+    async isValidRootForHeight(root: string, height: number): Promise<boolean> {
+        const r = await this.findHeaderForHeight(height)
+        if (!r) return false
+        const isValid = root === asString(r.merkleRoot)
+        return isValid
     }
 
     async subscribeHeaders(listener: HeaderListener) : Promise<string> { throw new ERR_NOT_IMPLEMENTED() }
