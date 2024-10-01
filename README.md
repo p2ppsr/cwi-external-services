@@ -1122,6 +1122,7 @@ export class ChaintracksServiceClient implements ChaintracksClientApi {
     authrite?: AuthriteClient;
     options: ChaintracksServiceClientOptions;
     constructor(public chain: Chain, public serviceUrl: string, options?: ChaintracksServiceClientOptions) 
+    async isValidRootForHeight(root: string, height: number): Promise<boolean> 
     async subscribeHeaders(listener: HeaderListener): Promise<string> 
     async subscribeReorgs(listener: ReorgListener): Promise<string> 
     async unsubscribe(subscriptionId: string): Promise<boolean> 
