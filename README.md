@@ -1556,20 +1556,21 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 
 | | | |
 | --- | --- | --- |
-| [checkMapiResponse](#function-checkmapiresponse) | [getMerkleProofFromWhatsOnChainTsc](#function-getmerkleprooffromwhatsonchaintsc) | [postBeefsToArcMiner](#function-postbeefstoarcminer) |
-| [checkMapiResponseForTxid](#function-checkmapiresponsefortxid) | [getProofFromGorillaPool](#function-getprooffromgorillapool) | [postBeefsToTaalArcMiner](#function-postbeefstotaalarcminer) |
-| [checkMerkleProof](#function-checkmerkleproof) | [getProofFromMetastreme](#function-getprooffrommetastreme) | [postRawTxToGorillaPool](#function-postrawtxtogorillapool) |
-| [createMapiPostTxResponse](#function-createmapiposttxresponse) | [getProofFromTaal](#function-getprooffromtaal) | [postRawTxToMapiMiner](#function-postrawtxtomapiminer) |
-| [getEnvelopeForTransaction](#function-getenvelopefortransaction) | [getProofFromWhatsOnChain](#function-getprooffromwhatsonchain) | [postRawTxToTaal](#function-postrawtxtotaal) |
-| [getExchangeRatesIo](#function-getexchangeratesio) | [getProofFromWhatsOnChainTsc](#function-getprooffromwhatsonchaintsc) | [postRawTxToWhatsOnChain](#function-postrawtxtowhatsonchain) |
-| [getMapiCallbackPayload](#function-getmapicallbackpayload) | [getRawTxFromWhatsOnChain](#function-getrawtxfromwhatsonchain) | [signMapiPayload](#function-signmapipayload) |
-| [getMapiJsonResponsePayload](#function-getmapijsonresponsepayload) | [getScriptHistoryFromWhatsOnChain](#function-getscripthistoryfromwhatsonchain) | [updateBsvExchangeRate](#function-updatebsvexchangerate) |
-| [getMapiPostTxPayload](#function-getmapiposttxpayload) | [getSpentStatusForOutpoint](#function-getspentstatusforoutpoint) | [updateChaintracksFiatExchangeRates](#function-updatechaintracksfiatexchangerates) |
-| [getMapiTxStatusPayload](#function-getmapitxstatuspayload) | [getUtxoStatusFromWhatsOnChain](#function-getutxostatusfromwhatsonchain) | [updateExchangeratesapi](#function-updateexchangeratesapi) |
-| [getMerkleProofFromGorillaPool](#function-getmerkleprooffromgorillapool) | [makeErrorResult](#function-makeerrorresult) | [validateScriptHash](#function-validatescripthash) |
-| [getMerkleProofFromMetastreme](#function-getmerkleprooffrommetastreme) | [makePostBeefResult](#function-makepostbeefresult) | [verifyMapiResponseForTxid](#function-verifymapiresponsefortxid) |
-| [getMerkleProofFromTaal](#function-getmerkleprooffromtaal) | [postBeefToArcMiner](#function-postbeeftoarcminer) |  |
-| [getMerkleProofFromWhatsOnChain](#function-getmerkleprooffromwhatsonchain) | [postBeefToTaalArcMiner](#function-postbeeftotaalarcminer) |  |
+| [checkMapiResponse](#function-checkmapiresponse) | [getMerkleProofFromWhatsOnChain](#function-getmerkleprooffromwhatsonchain) | [postBeefsToArcMiner](#function-postbeefstoarcminer) |
+| [checkMapiResponseForTxid](#function-checkmapiresponsefortxid) | [getMerkleProofFromWhatsOnChainTsc](#function-getmerkleprooffromwhatsonchaintsc) | [postBeefsToTaalArcMiner](#function-postbeefstotaalarcminer) |
+| [checkMerkleProof](#function-checkmerkleproof) | [getProofFromGorillaPool](#function-getprooffromgorillapool) | [postRawTxToGorillaPool](#function-postrawtxtogorillapool) |
+| [createMapiPostTxResponse](#function-createmapiposttxresponse) | [getProofFromMetastreme](#function-getprooffrommetastreme) | [postRawTxToMapiMiner](#function-postrawtxtomapiminer) |
+| [deserializeTscMerkleProof](#function-deserializetscmerkleproof) | [getProofFromTaal](#function-getprooffromtaal) | [postRawTxToTaal](#function-postrawtxtotaal) |
+| [deserializeTscMerkleProofNodes](#function-deserializetscmerkleproofnodes) | [getProofFromWhatsOnChain](#function-getprooffromwhatsonchain) | [postRawTxToWhatsOnChain](#function-postrawtxtowhatsonchain) |
+| [getEnvelopeForTransaction](#function-getenvelopefortransaction) | [getProofFromWhatsOnChainTsc](#function-getprooffromwhatsonchaintsc) | [serializeTscMerkleProof](#function-serializetscmerkleproof) |
+| [getExchangeRatesIo](#function-getexchangeratesio) | [getRawTxFromWhatsOnChain](#function-getrawtxfromwhatsonchain) | [serializeTscMerkleProofNodes](#function-serializetscmerkleproofnodes) |
+| [getMapiCallbackPayload](#function-getmapicallbackpayload) | [getScriptHistoryFromWhatsOnChain](#function-getscripthistoryfromwhatsonchain) | [signMapiPayload](#function-signmapipayload) |
+| [getMapiJsonResponsePayload](#function-getmapijsonresponsepayload) | [getSpentStatusForOutpoint](#function-getspentstatusforoutpoint) | [updateBsvExchangeRate](#function-updatebsvexchangerate) |
+| [getMapiPostTxPayload](#function-getmapiposttxpayload) | [getUtxoStatusFromWhatsOnChain](#function-getutxostatusfromwhatsonchain) | [updateChaintracksFiatExchangeRates](#function-updatechaintracksfiatexchangerates) |
+| [getMapiTxStatusPayload](#function-getmapitxstatuspayload) | [makeErrorResult](#function-makeerrorresult) | [updateExchangeratesapi](#function-updateexchangeratesapi) |
+| [getMerkleProofFromGorillaPool](#function-getmerkleprooffromgorillapool) | [makePostBeefResult](#function-makepostbeefresult) | [validateScriptHash](#function-validatescripthash) |
+| [getMerkleProofFromMetastreme](#function-getmerkleprooffrommetastreme) | [postBeefToArcMiner](#function-postbeeftoarcminer) | [verifyMapiResponseForTxid](#function-verifymapiresponsefortxid) |
+| [getMerkleProofFromTaal](#function-getmerkleprooffromtaal) | [postBeefToTaalArcMiner](#function-postbeeftotaalarcminer) |  |
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
 
@@ -2140,6 +2141,44 @@ Duplicate hash values are provided in full instead of being replaced by "*".
 
 ```ts
 export async function getMerkleProofFromWhatsOnChainTsc(txid: string | Buffer, chain: Chain): Promise<TscMerkleProofApi | undefined> 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
+
+---
+#### Function: serializeTscMerkleProof
+
+Convert JSON style TSC Merkle Proof to standard binary format.
+
+```ts
+export function serializeTscMerkleProof(proof: TscMerkleProofApi): Buffer 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
+
+---
+#### Function: serializeTscMerkleProofNodes
+
+```ts
+export function serializeTscMerkleProofNodes(nodes: Buffer | string[]): Buffer 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
+
+---
+#### Function: deserializeTscMerkleProof
+
+```ts
+export function deserializeTscMerkleProof(txid: string, buffer: TscMerkleProofApi | Buffer): TscMerkleProofApi 
+```
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
+
+---
+#### Function: deserializeTscMerkleProofNodes
+
+```ts
+export function deserializeTscMerkleProofNodes(nodes: Buffer | string[]): string[] 
 ```
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
