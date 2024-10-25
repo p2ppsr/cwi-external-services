@@ -50,11 +50,11 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@babbage/sdk-ts": "^0.2.61",
+    "@babbage/sdk-ts": "^0.2.62",
     "@bsv/sdk": "^1.1.29",
     "authrite-js": "^0.4.36",
     "axios": "^0.21.1",
-    "cwi-base": "^0.4.57",
+    "cwi-base": "^0.4.58",
     "whatsonchain": "^0.2.0"
   }
 }
