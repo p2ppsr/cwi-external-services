@@ -14,18 +14,20 @@ import { ArcMinerApi, ArcMinerPostBeefDataApi, arcMinerTaalMainDefault, arcMiner
 
 export async function postBeefsToTaalArcMiner(
     beefs: number[][],
+    txids: string[],
     chain: Chain,
     miner?: ArcMinerApi
 )
 : Promise<PostBeefResultApi[]>
 {
     const m = miner || chain === 'main' ? arcMinerTaalMainDefault : arcMinerTaalTestDefault
-    const r = await postBeefsToArcMiner(beefs, m)
+    const r = await postBeefsToArcMiner(beefs, txids, m)
     return r
 }
 
 export async function postBeefsToArcMiner(
     beefs: number[][],
+    txids: string[],
     miner: ArcMinerApi
 )
 : Promise<PostBeefResultApi[]>
@@ -84,14 +86,14 @@ export async function postBeefsToArcMiner(
         for (const dd of dds) {
             i++
             const beef = beefs[i]
-            r.push(makePostBeefResult(dd, miner, beef))
+            r.push(makePostBeefResult(dd, miner, beef, txids))
         }
 
     } catch (err: unknown) {
         console.log(err)
         const error = new ERR_EXTSVS_FAILURE(url, CwiError.fromUnknown(err))
         for (const beef of beefs) {
-            r.push(makeErrorResult(error, miner, beef))
+            r.push(makeErrorResult(error, miner, beef, txids))
         }
     }
 

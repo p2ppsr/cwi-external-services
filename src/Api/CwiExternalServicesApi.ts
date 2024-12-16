@@ -1,7 +1,7 @@
 import { Chain, CwiError } from "cwi-base"
 import { MapiPostTxPayloadApi, MapiResponseApi, TscMerkleProofApi } from "cwi-base"
 import { CwiExternalServicesOptions } from ".."
-import { Transaction, TransactionOutput } from "@bsv/sdk"
+import { Beef, Transaction, TransactionOutput } from "@bsv/sdk"
 
 /**
  * Defines standard interfaces to access functionality implemented by external transaction processing services.
@@ -118,18 +118,20 @@ export interface CwiExternalServicesApi {
     /**
      * 
      * @param beef 
+     * @param txids
      * @param chain 
      * @returns
      */
-    postBeef(beef: number[], chain: Chain): Promise<PostBeefResultApi[]>
+    postBeef(beef: number[], txids: string[], chain: Chain): Promise<PostBeefResultApi[]>
 
     /**
      * 
      * @param beefs 
+     * @param txids
      * @param chain 
      * @returns
      */
-    postBeefs(beefs: number[][], chain: Chain): Promise<PostBeefResultApi[][]>
+    postBeefs(beefs: number[][], txids: string[], chain: Chain): Promise<PostBeefResultApi[][]>
 
     /**
      * Attempts to determine the UTXO status of a transaction output.
@@ -191,9 +193,9 @@ export interface RawTxForPost {
 
 export type PostRawTxsServiceApi = (txs: RawTxForPost[], chain: Chain) => Promise<PostRawTxResultApi[]>
 
-export type PostBeefServiceApi = (beef: number[], chain: Chain) => Promise<PostBeefResultApi>
+export type PostBeefServiceApi = (beef: number[] | Beef, txids: string[], chain: Chain) => Promise<PostBeefResultApi>
 
-export type PostBeefsServiceApi = (beefs: number[][], chain: Chain) => Promise<PostBeefResultApi[]>
+export type PostBeefsServiceApi = (beefs: number[][], txids: string[], chain: Chain) => Promise<PostBeefResultApi[]>
 
 /**
  * Properties on result returned from `CwiExternalServicesApi` function `getMerkleProof`.
@@ -298,6 +300,26 @@ export interface PostRawTxResultApi {
     alreadyKnown?: boolean
 }
 
+export interface PostBeefResultForTxidApi {
+    txid: string
+
+    /**
+     * 'success' - The transaction was accepted for processing
+     */
+    status: 'success' | 'error'
+
+    /**
+     * if true, the transaction was already known to this service. Usually treat as a success.
+     * 
+     * Potentially stop posting to additional transaction processors.
+     */
+    alreadyKnown?: boolean
+
+    blockHash?: string
+    blockHeight?: number
+    merklePath?: string
+}
+
 /**
  * Properties on array items of result returned from `CwiExternalServicesApi` function `postBeef`.
  */
@@ -307,7 +329,7 @@ export interface PostBeefResultApi {
      */
     name: string
     /**
-     * 'success' - The transaction was accepted for processing
+     * 'success' - The beef was accepted for processing
      */
     status: 'success' | 'error'
     /**
@@ -321,17 +343,8 @@ export interface PostBeefResultApi {
      * ERR_EXTSVS_TXID_INVALID (service response txid doesn't match rawTx)
      */
     error?: CwiError
-    /**
-     * if true, the transaction was already known to this service. Usually treat as a success.
-     * 
-     * Potentially stop posting to additional transaction processors.
-     */
-    alreadyKnown?: boolean
 
-    txid?: string
-    blockHash?: string
-    blockHeight?: number
-    merklePath?: string
+    txids: PostBeefResultForTxidApi[]
 
     /**
      * Service response object. Use service name and status to infer type of object.

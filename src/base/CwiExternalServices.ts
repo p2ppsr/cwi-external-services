@@ -1,4 +1,4 @@
-import { Transaction, TransactionOutput } from '@bsv/sdk'
+import { Beef, Transaction, TransactionOutput } from '@bsv/sdk'
 
 import {
     Chain,
@@ -262,10 +262,10 @@ export class CwiExternalServices implements CwiExternalServicesApi {
      * @param chain 
      * @returns
      */
-    async postBeef(beef: number[], chain: Chain): Promise<PostBeefResultApi[]> {
+    async postBeef(beef: number[] | Beef, txids: string[], chain: Chain): Promise<PostBeefResultApi[]> {
         
         const rs = await Promise.all(this.postBeefServices.allServices.map(async service => {
-            const r = await service(beef, chain)
+            const r = await service(beef, txids, chain)
             return r
         }))
 
@@ -278,10 +278,10 @@ export class CwiExternalServices implements CwiExternalServicesApi {
      * @param chain 
      * @returns
      */
-    async postBeefs(beefs: number[][], chain: Chain): Promise<PostBeefResultApi[][]> {
+    async postBeefs(beefs: number[][], txids: string[], chain: Chain): Promise<PostBeefResultApi[][]> {
         
         const rs = await Promise.all(this.postBeefsServices.allServices.map(async service => {
-            const r = await service(beefs, chain)
+            const r = await service(beefs, txids, chain)
             return r
         }))
 
