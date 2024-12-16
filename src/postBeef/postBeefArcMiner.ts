@@ -11,7 +11,7 @@ import {
     ERR_EXTSVS_MERKLEROOT_INVALID,
     ERR_EXTSVS_SECURITY
 } from '../base/ERR_EXTSVS_errors'
-import { Beef, Hash, Utils } from '@bsv/sdk'
+import { Beef } from '@bsv/sdk'
 
 // Documentation:
 // https://docs.taal.com/
@@ -63,6 +63,12 @@ export async function postBeefToTaalArcMiner(
     // Clearly they updated their code since the atomic beef spec wasn't written until after
     // the original tests were done...
     beef = Array.isArray(beef) ? Beef.fromBinary(beef) : beef
+
+    if (beef.atomicTxid === undefined) {
+        beef = beef.toBinaryAtomic(txids[txids.length -1])
+    }
+    return await postBeefToArcMiner(beef, txids, m)
+/*
     const r: PostBeefResultApi = {
         name: m.name,
         status: 'success',
@@ -77,6 +83,7 @@ export async function postBeefToTaalArcMiner(
         r.txids.push(rt.txids[0])
     }
     return r
+*/
 }
 
 export interface ArcMinerApi {
@@ -103,7 +110,7 @@ export async function postBeefToArcMiner(
 
 
     // HACK to resolve ARC error when row has zero leaves.
-    addComputedLeaves(beef)
+    beef.addComputedLeaves()
     beefBinary = beef.toBinary()
 
     try {
@@ -158,32 +165,6 @@ export async function postBeefToArcMiner(
     }
 
     return r
-}
-
-export function addComputedLeaves(beef: Beef) {
-    const hash = (m: string): string => Utils.toHex((
-        Hash.hash256(Utils.toArray(m, 'hex').reverse())
-    ).reverse())
-
-    for (const bump of beef.bumps) {
-        for (let row = 1; row < bump.path.length; row++) {
-            for (const leafL of bump.path[row - 1]) {
-                if (leafL.hash && (leafL.offset & 1) === 0) {
-                    const leafR = bump.path[row - 1].find(l => l.offset === leafL.offset + 1)
-                    const offsetOnRow = leafL.offset >> 1
-                    if (leafR && leafR.hash && -1 === bump.path[row].findIndex(l => l.offset === offsetOnRow)) {
-                        // computable leaf is missing... add it.
-                        // not handling duplicate leaves, assuming not required to workaround bug at ARC.
-                        bump.path[row].push({
-                            offset: offsetOnRow,
-                            // string concatenation puts the right leaf on the left of the left leaf hash :-)
-                            hash: hash(leafR.hash + leafL.hash)
-                        })
-                    }
-                }
-            }
-        }
-    }
 }
 
 export function makePostBeefResult(dd: ArcMinerPostBeefDataApi, miner: ArcMinerApi, beef: number[], txids: string[]) : PostBeefResultApi {
