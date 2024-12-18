@@ -18,10 +18,10 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 | [ArcMinerPostBeefDataApi](#interface-arcminerpostbeefdataapi) | [GetMerkleProofResultApi](#interface-getmerkleproofresultapi) | [MapiTxStatusPayloadApi](#interface-mapitxstatuspayloadapi) |
 | [BsvExchangeRateApi](#interface-bsvexchangerateapi) | [GetRawTxResultApi](#interface-getrawtxresultapi) | [MapiTxidReturnResultApi](#interface-mapitxidreturnresultapi) |
 | [ChaintracksChainTrackerOptions](#interface-chaintrackschaintrackeroptions) | [GetScriptHistoryDetailsApi](#interface-getscripthistorydetailsapi) | [PostBeefResultApi](#interface-postbeefresultapi) |
-| [ChaintracksServiceClientOptions](#interface-chaintracksserviceclientoptions) | [GetScriptHistoryResultApi](#interface-getscripthistoryresultapi) | [PostRawTxResultApi](#interface-postrawtxresultapi) |
-| [CwiExternalServicesApi](#interface-cwiexternalservicesapi) | [GetUtxoStatusDetailsApi](#interface-getutxostatusdetailsapi) | [PostTransactionMapiMinerApi](#interface-posttransactionmapiminerapi) |
-| [CwiExternalServicesOptions](#interface-cwiexternalservicesoptions) | [GetUtxoStatusResultApi](#interface-getutxostatusresultapi) | [RawTxForPost](#interface-rawtxforpost) |
-| [ExchangeRatesIoApi](#interface-exchangeratesioapi) | [MapiCallbackApi](#interface-mapicallbackapi) |  |
+| [ChaintracksServiceClientOptions](#interface-chaintracksserviceclientoptions) | [GetScriptHistoryResultApi](#interface-getscripthistoryresultapi) | [PostBeefResultForTxidApi](#interface-postbeefresultfortxidapi) |
+| [CwiExternalServicesApi](#interface-cwiexternalservicesapi) | [GetUtxoStatusDetailsApi](#interface-getutxostatusdetailsapi) | [PostRawTxResultApi](#interface-postrawtxresultapi) |
+| [CwiExternalServicesOptions](#interface-cwiexternalservicesoptions) | [GetUtxoStatusResultApi](#interface-getutxostatusresultapi) | [PostTransactionMapiMinerApi](#interface-posttransactionmapiminerapi) |
+| [ExchangeRatesIoApi](#interface-exchangeratesioapi) | [MapiCallbackApi](#interface-mapicallbackapi) | [RawTxForPost](#interface-rawtxforpost) |
 | [FiatExchangeRatesApi](#interface-fiatexchangeratesapi) | [MapiCallbackPayloadApi](#interface-mapicallbackpayloadapi) |  |
 
 Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
@@ -114,8 +114,8 @@ export interface CwiExternalServicesApi {
     getMerkleProof(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetMerkleProofResultApi>;
     postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]>;
     postRawTxs(rawTxs: string[] | Buffer[] | number[][], chain: Chain): Promise<PostRawTxResultApi[][]>;
-    postBeef(beef: number[], chain: Chain): Promise<PostBeefResultApi[]>;
-    postBeefs(beefs: number[][], chain: Chain): Promise<PostBeefResultApi[][]>;
+    postBeef(beef: number[], txids: string[], chain: Chain): Promise<PostBeefResultApi[]>;
+    postBeefs(beefs: number[][], txids: string[], chain: Chain): Promise<PostBeefResultApi[][]>;
     getUtxoStatus(output: string | Buffer, chain: Chain, outputFormat?: GetUtxoStatusOutputFormatApi, useNext?: boolean): Promise<GetUtxoStatusResultApi>;
 }
 ```
@@ -922,28 +922,16 @@ export interface PostBeefResultApi {
     name: string;
     status: "success" | "error";
     error?: CwiError;
-    alreadyKnown?: boolean;
-    txid?: string;
-    blockHash?: string;
-    blockHeight?: number;
-    merklePath?: string;
+    txids: PostBeefResultForTxidApi[];
     data?: object;
 }
 ```
 
+See also: [PostBeefResultForTxidApi](#interface-postbeefresultfortxidapi)
+
 <details>
 
 <summary>Interface PostBeefResultApi Details</summary>
-
-##### Property alreadyKnown
-
-if true, the transaction was already known to this service. Usually treat as a success.
-
-Potentially stop posting to additional transaction processors.
-
-```ts
-alreadyKnown?: boolean
-```
 
 ##### Property data
 
@@ -974,6 +962,46 @@ The name of the service to which the transaction was submitted for processing
 
 ```ts
 name: string
+```
+
+##### Property status
+
+'success' - The beef was accepted for processing
+
+```ts
+status: "success" | "error"
+```
+
+</details>
+
+Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](#functions), [Types](#types), [Variables](#variables)
+
+---
+#### Interface: PostBeefResultForTxidApi
+
+```ts
+export interface PostBeefResultForTxidApi {
+    txid: string;
+    status: "success" | "error";
+    alreadyKnown?: boolean;
+    blockHash?: string;
+    blockHeight?: number;
+    merklePath?: string;
+}
+```
+
+<details>
+
+<summary>Interface PostBeefResultForTxidApi Details</summary>
+
+##### Property alreadyKnown
+
+if true, the transaction was already known to this service. Usually treat as a success.
+
+Potentially stop posting to additional transaction processors.
+
+```ts
+alreadyKnown?: boolean
 ```
 
 ##### Property status
@@ -1227,8 +1255,8 @@ export class CwiExternalServices implements CwiExternalServicesApi {
         outputScript: Buffer | null;
         amount: number | null;
     }, chain: Chain): Promise<boolean> 
-    async postBeef(beef: number[], chain: Chain): Promise<PostBeefResultApi[]> 
-    async postBeefs(beefs: number[][], chain: Chain): Promise<PostBeefResultApi[][]> 
+    async postBeef(beef: number[] | Beef, txids: string[], chain: Chain): Promise<PostBeefResultApi[]> 
+    async postBeefs(beefs: number[][], txids: string[], chain: Chain): Promise<PostBeefResultApi[][]> 
     async postRawTxs(rawTxs: string[] | Buffer[] | number[][], chain: Chain): Promise<PostRawTxResultApi[][]> 
     async postRawTx(rawTx: string | Buffer, chain: Chain, callback?: MapiCallbackApi): Promise<PostRawTxResultApi[]> 
     async getRawTx(txid: string | Buffer, chain: Chain, useNext?: boolean): Promise<GetRawTxResultApi> 
@@ -2086,7 +2114,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 #### Function: makeErrorResult
 
 ```ts
-export function makeErrorResult(error: CwiError, miner: ArcMinerApi, beef: number[], dd?: ArcMinerPostBeefDataApi): PostBeefResultApi 
+export function makeErrorResult(error: CwiError, miner: ArcMinerApi, beef: number[], txids: string[], dd?: ArcMinerPostBeefDataApi): PostBeefResultApi 
 ```
 
 See also: [ArcMinerApi](#interface-arcminerapi), [ArcMinerPostBeefDataApi](#interface-arcminerpostbeefdataapi), [PostBeefResultApi](#interface-postbeefresultapi)
@@ -2097,7 +2125,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 #### Function: makePostBeefResult
 
 ```ts
-export function makePostBeefResult(dd: ArcMinerPostBeefDataApi, miner: ArcMinerApi, beef: number[]): PostBeefResultApi 
+export function makePostBeefResult(dd: ArcMinerPostBeefDataApi, miner: ArcMinerApi, beef: number[], txids: string[]): PostBeefResultApi 
 ```
 
 See also: [ArcMinerApi](#interface-arcminerapi), [ArcMinerPostBeefDataApi](#interface-arcminerpostbeefdataapi), [PostBeefResultApi](#interface-postbeefresultapi)
@@ -2108,7 +2136,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 #### Function: postBeefToArcMiner
 
 ```ts
-export async function postBeefToArcMiner(beef: number[], miner: ArcMinerApi): Promise<PostBeefResultApi> 
+export async function postBeefToArcMiner(beef: number[] | Beef, txids: string[], miner: ArcMinerApi): Promise<PostBeefResultApi> 
 ```
 
 See also: [ArcMinerApi](#interface-arcminerapi), [PostBeefResultApi](#interface-postbeefresultapi)
@@ -2119,7 +2147,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 #### Function: postBeefToTaalArcMiner
 
 ```ts
-export async function postBeefToTaalArcMiner(beef: number[], chain: Chain, miner?: ArcMinerApi): Promise<PostBeefResultApi> 
+export async function postBeefToTaalArcMiner(beef: number[] | Beef, txids: string[], chain: Chain, miner?: ArcMinerApi): Promise<PostBeefResultApi> 
 ```
 
 See also: [ArcMinerApi](#interface-arcminerapi), [PostBeefResultApi](#interface-postbeefresultapi)
@@ -2130,7 +2158,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 #### Function: postBeefsToArcMiner
 
 ```ts
-export async function postBeefsToArcMiner(beefs: number[][], miner: ArcMinerApi): Promise<PostBeefResultApi[]> 
+export async function postBeefsToArcMiner(beefs: number[][], txids: string[], miner: ArcMinerApi): Promise<PostBeefResultApi[]> 
 ```
 
 See also: [ArcMinerApi](#interface-arcminerapi), [PostBeefResultApi](#interface-postbeefresultapi)
@@ -2141,7 +2169,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 #### Function: postBeefsToTaalArcMiner
 
 ```ts
-export async function postBeefsToTaalArcMiner(beefs: number[][], chain: Chain, miner?: ArcMinerApi): Promise<PostBeefResultApi[]> 
+export async function postBeefsToTaalArcMiner(beefs: number[][], txids: string[], chain: Chain, miner?: ArcMinerApi): Promise<PostBeefResultApi[]> 
 ```
 
 See also: [ArcMinerApi](#interface-arcminerapi), [PostBeefResultApi](#interface-postbeefresultapi)
@@ -2352,7 +2380,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 #### Type: PostBeefServiceApi
 
 ```ts
-export type PostBeefServiceApi = (beef: number[], chain: Chain) => Promise<PostBeefResultApi>
+export type PostBeefServiceApi = (beef: number[] | Beef, txids: string[], chain: Chain) => Promise<PostBeefResultApi>
 ```
 
 See also: [PostBeefResultApi](#interface-postbeefresultapi)
@@ -2363,7 +2391,7 @@ Links: [API](#api), [Interfaces](#interfaces), [Classes](#classes), [Functions](
 #### Type: PostBeefsServiceApi
 
 ```ts
-export type PostBeefsServiceApi = (beefs: number[][], chain: Chain) => Promise<PostBeefResultApi[]>
+export type PostBeefsServiceApi = (beefs: number[][], txids: string[], chain: Chain) => Promise<PostBeefResultApi[]>
 ```
 
 See also: [PostBeefResultApi](#interface-postbeefresultapi)
