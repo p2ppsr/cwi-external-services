@@ -56,34 +56,46 @@ export async function postBeefToTaalArcMiner(
 : Promise<PostBeefResultApi>
 {
     const m = miner || chain === 'main' ? arcMinerTaalMainDefault : arcMinerTaalTestDefault
+
+    const r1 = await postBeefToArcMiner(beef, txids, m)
+    if (r1.status === 'success') return r1
+    const datas: object = { r1: r1.data }
+
+    const obeef = Array.isArray(beef) ? Beef.fromBinary(beef) : beef
+
     // 2024-12-15 Testing still fails to consistently accept multiple new transactions in one Beef.
     // Earlier testing seemed to confirm it worked. Did they break it??
     // This has to work eventually, but for now, break multiple new transactions into
     // individual atomic beefs and send them.
     // Clearly they updated their code since the atomic beef spec wasn't written until after
     // the original tests were done...
-    beef = Array.isArray(beef) ? Beef.fromBinary(beef) : beef
-
-    if (beef.atomicTxid === undefined) {
-        beef = beef.toBinaryAtomic(txids[txids.length -1])
+    {
+        if (obeef.atomicTxid === undefined) {
+            const abeef = obeef.toBinaryAtomic(txids[txids.length -1])
+            const r2 = await postBeefToArcMiner(abeef, txids, m)
+            datas['r2'] = r2.data
+            r2.data = datas
+            if (r2.status === 'success') return r2
+        }
     }
-    return await postBeefToArcMiner(beef, txids, m)
-/*
-    const r: PostBeefResultApi = {
+
+    const r3: PostBeefResultApi = {
         name: m.name,
         status: 'success',
         data: {},
         txids: []
     }
     for (const txid of txids) {
-        const ab = beef.toBinaryAtomic(txid)
-        const rt = await postBeefToArcMiner(ab, [txid], m)
-        if (rt.status === 'error') r.status = 'error'
-        r.data![txid] = rt.data
-        r.txids.push(rt.txids[0])
+        const ab = obeef.toBinaryAtomic(txid)
+        const b = Beef.fromBinary(ab)
+        const rt = await postBeefToArcMiner(b, [txid], m)
+        if (rt.status === 'error') r3.status = 'error'
+        r3.data![txid] = rt.data
+        r3.txids.push(rt.txids[0])
     }
-    return r
-*/
+    datas['r3'] = r3.data
+    r3.data = datas
+    return r3
 }
 
 export interface ArcMinerApi {
