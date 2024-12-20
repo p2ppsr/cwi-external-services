@@ -19,6 +19,10 @@ export class ChaintracksChainTracker implements ChainTracker {
         this.options = options || {}
     }
 
+    async currentHeight() : Promise<number> {
+        return await this.chaintracks.getPresentHeight()
+    }
+
     async isValidRootForHeight(root: string, height: number) : Promise<boolean> {
         const cachedRoot = this.cache[height]
         if (cachedRoot) {

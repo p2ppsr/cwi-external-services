@@ -44,7 +44,11 @@ export class ChaintracksServiceClient implements ChaintracksClientApi {
             this.authrite = new AuthriteClient(serviceUrl)
         }
     }
-// /Users/tone/.nvm/versions/node/v16.19.1/lib/node_modules/@cwi/chaintracks-base/src/Api/ChaintracksApi.ts
+
+    async currentHeight() : Promise<number> {
+        return await this.getPresentHeight()
+    }
+
     async isValidRootForHeight(root: string, height: number): Promise<boolean> {
         const r = await this.findHeaderForHeight(height)
         if (!r) return false
