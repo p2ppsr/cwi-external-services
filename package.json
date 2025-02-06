@@ -51,10 +51,10 @@
   },
   "dependencies": {
     "@babbage/sdk-ts": "^0.2.75",
-    "@bsv/sdk": "^1.2.19",
+    "@bsv/sdk": "^1.3.12",
     "authrite-js": "^0.4.36",
     "axios": "^0.21.1",
-    "cwi-base": "^0.4.77",
+    "cwi-base": "^0.4.79",
     "whatsonchain": "^0.2.0"
   }
 }
